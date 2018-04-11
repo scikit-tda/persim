@@ -2,15 +2,15 @@
 
 from setuptools import setup
 
-setup(name='persim',
+setup(name='persimmon',
       version='0.0.1',
       description='Python implementation persistent images representation of persistence diagrams.',
-      long_description="""""",
+      long_description=""" :D """,
       author='Nathaniel Saul',
       author_email='nat@saulgill.com',
       url='https://github.com/sauln/persistence-images',
       license='MIT',
-      packages=['persim'],
+      packages=['persimmon'],
       include_package_data=True,
       install_requires=[
         'numpy'
