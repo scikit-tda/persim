@@ -14,14 +14,23 @@ class PersImage(BaseEstimator):
         assert int(np.sqrt(pixels)) == np.sqrt(pixels), "Pixels must be a square"
         self.pixels = pixels
     
-    def transform(self, diagram, is_landscape=False):
-        """ Convert the diagram to a persistence image
-
-        TODO: Work on a list of diagrams, returning a list of images.
+    def transform(self, diagrams, is_landscape=False):
+        """ Convert diagram or list of diagrams to a persistence image
         """
 
-        dg = np.copy(diagram) 
-        landscape = PersImage.to_landscape(dg) if not is_landscape else dg
+        if type(diagrams) is not list:
+            imgs = self._transform(diagrams, is_landscape)
+        else:
+            imgs = [self._transform(dgm, is_landscape) for dgm in diagrams]
+        
+        return imgs
+
+    def _transform(self, diagram, is_landscape=False):
+        """ Convert single diagram to a persistence image
+        """
+
+        dg = np.copy(diagram) # keep original diagram untouched
+        landscape = PersImage.to_landscape(dg)  if not is_landscape else dg
 
         N = int(np.sqrt(self.pixels))
 
@@ -88,13 +97,20 @@ class PersImage(BaseEstimator):
             
         return diagram
     
-    def show(self, img, landscape=None):
+    def show(self, imgs, diagrams=None):
         """ Visualize the persistence image
         """
-        # If you provide a landscape, we can scale the image axes to compare both. Useful for debugging
-        if landscape:
-            maxBD = np.max(landscape)
-            plt.imshow(img, extent=(0,maxBD,0,maxBD))
-        else:
-            plt.imshow(img)
+
+
+        if type(imgs) is not list:
+            imgs = [imgs]
+
+        for i, img in enumerate(imgs):
+            # If you provide a landscape, we can scale the image axes to compare both. Useful for debugging
+            if diagrams:
+                maxBD = np.max(diagrams[i])
+                plt.imshow(img, extent=(0,maxBD,0,maxBD))
+            else:
+                plt.imshow(img)
+            plt.show()
 
