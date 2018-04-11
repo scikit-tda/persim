@@ -6,32 +6,30 @@ import matplotlib.pyplot as plt
 from sklearn.base import BaseEstimator
 
 class PersImage(BaseEstimator):
-    def __init__(self, diagram, is_landscape=False, pixels=20*20):
-        self.diagram = diagram # store original diagram
+    def __init__(self, kernel_type="gaussian", weighting_type="linear", pixels=20*20, kernel_params=0.2):
+        self.kernel_type = kernel_type
+        self.weighting_type = weighting_type
+        self.kernel_params = kernel_params
         
-        dg = np.copy(diagram)
-        self.landscape = PersImage.to_landscape(dg) if not is_landscape else dg
-
         assert int(np.sqrt(pixels)) == np.sqrt(pixels), "Pixels must be a square"
         self.pixels = pixels
     
-    def transform(self):
-        """ 
+    def transform(self, diagram, is_landscape=False):
+        """ Convert the diagram to a persistence image
 
-        
+        TODO: Work on a list of diagrams, returning a list of images.
         """
 
+        dg = np.copy(diagram) 
+        landscape = PersImage.to_landscape(dg) if not is_landscape else dg
 
-        assert self.landscape is not None, "Must generate a landscape first"
-        
-        data = self.landscape
         N = int(np.sqrt(self.pixels))
 
-        weighting = self.weighting()
+        weighting = self.weighting(landscape)
         kernel = self.kernel()
 
         # Define an NxN grid over our landscape
-        maxBD = np.max(data)
+        maxBD = np.max(landscape)
         dx = maxBD / (2 * N) 
         xs = np.linspace(0, maxBD, N) + dx
         ys = np.linspace(0, maxBD, N) + dx
@@ -41,40 +39,42 @@ class PersImage(BaseEstimator):
         img = np.zeros(len(grid))
 
         # weights for each data point
-        weights = np.apply_along_axis(weighting, 1, data) 
+        weights = np.apply_along_axis(weighting, 1, landscape) 
         
         for i, pixel in enumerate(grid):    
             # pixel defines bottom left corner, compute w.r.t center
-            smoothing = kernel(data, pixel)
+            smoothing = kernel(landscape, pixel)
             img[i] = np.dot(smoothing, weights)
 
         img = img.reshape((N,N)).T
         return img
     
-    def weighting(self):
+    def weighting(self, landscape=None):
         ''' Define a weighting function, 
                 for stability results to hold, the function must be 0 at y=0.    
         ''' 
         
         # TODO: Implement a logistic function
-        
-        maxy = np.max(self.landscape[:,1])
+        # TODO: use self.weighting_type to choose function    
+
+        if landscape is not None:
+            maxy = np.max(landscape[:,1])
         
         def linear(interval):
             # linear function of y such that f(0) = 0 and f(max(y)) = N
             d = interval[1]
-            assert d >= 0, "Should not be defined for values below y=0"
-            return len(self.landscape[:,1]) / maxy * d
+            return (1 / maxy) * d if landscape is not None else d
             
         return linear
     
-    def kernel(self, kernel_type="gaussian"):
+    def kernel(self):
         """ This will return whatever kind of kernal we want to use.
             Must have signature (ndarray size NxM, ndarray size 1xM) -> ndarray size Nx1
         """
-        
+        # TODO: use self.kenerl_type to choose function
+
         def gaussian(data, pixel):
-            cov = 0.2
+            cov = self.kernel_params
             return mvn.pdf(data, mean=pixel, cov=cov)
         
         return gaussian
@@ -88,9 +88,13 @@ class PersImage(BaseEstimator):
             
         return diagram
     
-    def show(self, img):
+    def show(self, img, landscape=None):
         """ Visualize the persistence image
         """
-        maxBD= np.max(self.landscape)
-        plt.imshow(img, extent=(0,maxBD,0,maxBD))
+        # If you provide a landscape, we can scale the image axes to compare both. Useful for debugging
+        if landscape:
+            maxBD = np.max(landscape)
+            plt.imshow(img, extent=(0,maxBD,0,maxBD))
+        else:
+            plt.imshow(img)
 
