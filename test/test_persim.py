@@ -1,8 +1,4 @@
 import pytest
+from sklearn import datasets
 
-
-# generate a persistence diagram in the format of Dionysus
-
-
-import ripser
-
+from ripser import Rips
