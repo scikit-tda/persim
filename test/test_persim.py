@@ -1,10 +1,6 @@
 import pytest
 
-from sklearn import datasets
 import numpy as np
-
-from ripser import Rips
-
 from persimmon import PersImage
 
 def test_landscape():

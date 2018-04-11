@@ -7,13 +7,15 @@ setup(name='persimmon',
       description='Python implementation persistent images representation of persistence diagrams.',
       long_description=""" :D """,
       author='Nathaniel Saul',
-      author_email='nat@saulgill.com',
+      author_email='nathaniel.saul@wsu.edu',
       url='https://github.com/sauln/persistence-images',
       license='MIT',
       packages=['persimmon'],
       include_package_data=True,
       install_requires=[
-        'numpy'
+        'numpy',
+        'matplotlib',
+        'scipy'
       ],
       python_requires='>=2.7,!=3.1,!=3.2,!=3.3',
       classifiers=[
