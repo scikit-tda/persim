@@ -3,9 +3,9 @@ from itertools import product
 import numpy as np
 from scipy.stats import multivariate_normal as mvn
 import matplotlib.pyplot as plt
+from sklearn.base import BaseEstimator
 
-
-class PersImage:
+class PersImage(BaseEstimator):
     def __init__(self, diagram, is_landscape=False, pixels=20*20):
         self.diagram = diagram # store original diagram
         
