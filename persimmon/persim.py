@@ -3,13 +3,14 @@ from itertools import product
 import numpy as np
 from scipy.stats import multivariate_normal as mvn
 import matplotlib.pyplot as plt
+
 from sklearn.base import BaseEstimator
 
 class PersImage(BaseEstimator):
-    def __init__(self, kernel_type="gaussian", weighting_type="linear", pixels=20*20, kernel_params=0.2):
+    def __init__(self, kernel_type="gaussian", weighting_type="linear", pixels=20*20, spread=0.2):
         self.kernel_type = kernel_type
         self.weighting_type = weighting_type
-        self.kernel_params = kernel_params
+        self.spread = spread
         
         assert int(np.sqrt(pixels)) == np.sqrt(pixels), "Pixels must be a square"
         self.pixels = pixels
@@ -83,8 +84,7 @@ class PersImage(BaseEstimator):
         # TODO: use self.kenerl_type to choose function
 
         def gaussian(data, pixel):
-            cov = self.kernel_params
-            return mvn.pdf(data, mean=pixel, cov=cov)
+            return mvn.pdf(data, mean=pixel, cov=self.spread)
         
         return gaussian
     
@@ -104,13 +104,15 @@ class PersImage(BaseEstimator):
 
         if type(imgs) is not list:
             imgs = [imgs]
+            if diagrams:
+                diagrams = [diagrams]
 
         for i, img in enumerate(imgs):
             # If you provide a landscape, we can scale the image axes to compare both. Useful for debugging
             if diagrams:
                 maxBD = np.max(diagrams[i])
-                plt.imshow(img, extent=(0,maxBD,0,maxBD))
+                plt.imshow(img, extent=(0,maxBD,0,maxBD), cmap=plt.get_cmap('plasma'))
             else:
-                plt.imshow(img)
+                plt.imshow(img, cmap=plt.get_cmap('plasma'))
             plt.show()
 
