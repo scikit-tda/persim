@@ -1,5 +1,6 @@
-# persimmon
-Python implementation of Persistence Images as first introduced in [https://arxiv.org/abs/1507.06217](https://arxiv.org/abs/1507.06217).
+# Persimmon <img align="right" width="40" height="40" src="https://imgur.com/8p6VwFm">
+
+Persimmon is a Python implementation of Persistence Images as first introduced in [https://arxiv.org/abs/1507.06217](https://arxiv.org/abs/1507.06217).
 
 It is designed to interface with [Ripser](https://github.com/sauln/ripser), though any persistence diagram should work fine.
 
