@@ -1,4 +1,4 @@
-# Persimmon <img align="right" width="40" height="40" src="https://imgur.com/8p6VwFm">
+# Persimmon <img align="right" width="40" height="40" src="https://imgur.com/8p6VwFm.jpg">
 
 Persimmon is a Python implementation of Persistence Images as first introduced in [https://arxiv.org/abs/1507.06217](https://arxiv.org/abs/1507.06217).
 
