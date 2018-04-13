@@ -7,15 +7,15 @@ def readme():
         return readme_file.read()
 
 
-setup(name='persimmon',
+setup(name='persim',
       version='0.0.2',
       description='Python implementation persistent images representation of persistence diagrams.',
       long_description=readme(),
       author='Nathaniel Saul',
       author_email='nathaniel.saul@wsu.edu',
-      url='https://github.com/sauln/persistence-images',
+      url='https://github.com/sauln/persim',
       license='MIT',
-      packages=['persimmon'],
+      packages=['persim'],
       include_package_data=True,
       install_requires=[
         'scikit-learn',

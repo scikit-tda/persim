@@ -1,10 +1,10 @@
-[![Build Status](https://travis-ci.org/sauln/persimmon.svg?branch=master)](https://travis-ci.org/sauln/persimmon)
-[![codecov](https://codecov.io/gh/sauln/persimmon/branch/master/graph/badge.svg)](https://codecov.io/gh/sauln/persimmon)
+[![Build Status](https://travis-ci.org/sauln/persim.svg?branch=master)](https://travis-ci.org/sauln/persim)
+[![codecov](https://codecov.io/gh/sauln/persim/branch/master/graph/badge.svg)](https://codecov.io/gh/sauln/persim)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-# Persimmon <img align="right" width="40" height="40" src="https://imgur.com/8p6VwFm.jpg">
+# Persim <img align="right" width="40" height="40" src="https://imgur.com/8p6VwFm.jpg">
 
-Persimmon is a Python implementation of Persistence Images as first introduced in [https://arxiv.org/abs/1507.06217](https://arxiv.org/abs/1507.06217).
+Persim is a Python implementation of Persistence Images as first introduced in [https://arxiv.org/abs/1507.06217](https://arxiv.org/abs/1507.06217).
 
 It is designed to interface with [Ripser](https://github.com/sauln/ripser), though any persistence diagram should work fine.
 
@@ -13,9 +13,7 @@ It is designed to interface with [Ripser](https://github.com/sauln/ripser), thou
 Currently, the only option is to install the library from source:
 
 ```
-git clone https://github.com/sauln/persimmon
-cd persimmon
-pip install .
+pip install persim
 ```
 
 
@@ -36,7 +34,7 @@ diagram = dgm[1] # Just diagram for H1
 Then from this diagram, we construct the persistence image
 
 ``` Python
-from persimmon import PersImage
+from persim import PersImage
 
 pim = PersImage(diagram)
 img = pim.transform()

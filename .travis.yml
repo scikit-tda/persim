@@ -9,7 +9,7 @@ install:
   - pip install pytest-cov
 
 script:
-  - pytest --cov persimmon
+  - pytest --cov persim
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

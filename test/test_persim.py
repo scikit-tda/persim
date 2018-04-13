@@ -1,7 +1,7 @@
 import pytest
 
 import numpy as np
-from persimmon import PersImage
+from persim import PersImage
 
 def test_landscape():
     bds = np.array([[1,1],[1,2]])
