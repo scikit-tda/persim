@@ -18,6 +18,7 @@ setup(name='persimmon',
       packages=['persimmon'],
       include_package_data=True,
       install_requires=[
+        'scikit-learn',
         'numpy',
         'matplotlib',
         'scipy'
