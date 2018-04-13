@@ -2,15 +2,13 @@
 
 from setuptools import setup
 
-def readme():
-    with open('README.md') as readme_file:
-        return readme_file.read()
-
+with open('README.md') as f:
+    long_description = f.read()
 
 setup(name='persim',
-      version='0.0.2',
+      version='0.0.4',
       description='Python implementation persistent images representation of persistence diagrams.',
-      long_description=readme(),
+      long_description=long_description,
       long_description_content_type="text/markdown",	
       author='Nathaniel Saul',
       author_email='nathaniel.saul@wsu.edu',
