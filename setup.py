@@ -2,10 +2,15 @@
 
 from setuptools import setup
 
+def readme():
+    with open('README.md') as readme_file:
+        return readme_file.read()
+
+
 setup(name='persimmon',
-      version='0.0.1',
+      version='0.0.2',
       description='Python implementation persistent images representation of persistence diagrams.',
-      long_description=""" :D """,
+      long_description=readme(),
       author='Nathaniel Saul',
       author_email='nathaniel.saul@wsu.edu',
       url='https://github.com/sauln/persistence-images',
@@ -19,7 +24,7 @@ setup(name='persimmon',
       ],
       python_requires='>=2.7,!=3.1,!=3.2,!=3.3',
       classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 3 - Alpha',
         'Intended Audience :: Science/Research',
         'Intended Audience :: Education',
         'Intended Audience :: Financial and Insurance Industry',
