@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from sklearn.base import BaseEstimator
 
 class PersImage(BaseEstimator):
-    def __init__(self, kernel_type="gaussian", weighting_type="linear", pixels=20*20, spread=0.2):
+    def __init__(self, kernel_type="gaussian", weighting_type="linear", pixels=20*20, spread=None):
         self.kernel_type = kernel_type
         self.weighting_type = weighting_type
         self.spread = spread
@@ -15,42 +15,49 @@ class PersImage(BaseEstimator):
         assert int(np.sqrt(pixels)) == np.sqrt(pixels), "Pixels must be a square"
         self.pixels = pixels
     
-    def transform(self, diagrams, is_landscape=False):
+    def transform(self, diagrams):
         """ Convert diagram or list of diagrams to a persistence image
         """
 
         if type(diagrams) is not list:
-            imgs = self._transform(diagrams, is_landscape)
+            dg = np.copy(diagrams) # keep original diagram untouched
+            landscape = PersImage.to_landscape(dg)
+            specs = {"maxBD": np.max(landscape)}
+            # import pdb; pdb.set_trace()
+            imgs = self._transform(landscape, specs)
         else:
-            imgs = [self._transform(dgm, is_landscape) for dgm in diagrams]
+            dgs = [np.copy(diagram) for diagram in diagrams]
+            landscapes = [PersImage.to_landscape(dg) for dg in dgs]
+            specs = {'maxBD': np.max([np.max(landscape) for landscape in landscapes])}
+            # import pdb; pdb.set_trace()
+            imgs = [self._transform(dgm, specs) for dgm in landscapes]
         
         return imgs
 
-    def _transform(self, diagram, is_landscape=False):
+    def _transform(self, landscape, specs):
         """ Convert single diagram to a persistence image
         """
 
-        dg = np.copy(diagram) # keep original diagram untouched
-        landscape = PersImage.to_landscape(dg)  if not is_landscape else dg
-
         N = int(np.sqrt(self.pixels))
 
-        weighting = self.weighting(landscape)
-        kernel = self.kernel()
-
         # Define an NxN grid over our landscape
-        maxBD = np.max(landscape)
+        maxBD = specs['maxBD']
         dx = maxBD / (2 * N) 
         xs = np.linspace(0, maxBD, N) + dx
         ys = np.linspace(0, maxBD, N) + dx
         grid = np.array(list(product(xs, reversed(ys))))
         
+        weighting = self.weighting()#landscape)
+
+        # maxBD seems to be a reasonable variance in practice.
+        kernel = self.kernel(spread=self.spread if self.spread else maxBD)
+
         # Define zeros
         img = np.zeros(len(grid))
 
         # weights for each data point
         weights = np.apply_along_axis(weighting, 1, landscape) 
-        
+        # import pdb; pdb.set_trace()
         for i, pixel in enumerate(grid):    
             # pixel defines bottom left corner, compute w.r.t center
             smoothing = kernel(landscape, pixel)
@@ -77,14 +84,14 @@ class PersImage(BaseEstimator):
             
         return linear
     
-    def kernel(self):
+    def kernel(self, spread=1):
         """ This will return whatever kind of kernal we want to use.
             Must have signature (ndarray size NxM, ndarray size 1xM) -> ndarray size Nx1
         """
-        # TODO: use self.kenerl_type to choose function
+        # TODO: use self.kernel_type to choose function
 
         def gaussian(data, pixel):
-            return mvn.pdf(data, mean=pixel, cov=self.spread)
+            return mvn.pdf(data, mean=pixel, cov=spread)
         
         return gaussian
     
@@ -97,22 +104,14 @@ class PersImage(BaseEstimator):
             
         return diagram
     
-    def show(self, imgs, diagrams=None):
+    def show(self, imgs):
         """ Visualize the persistence image
         """
 
-
         if type(imgs) is not list:
             imgs = [imgs]
-            if diagrams:
-                diagrams = [diagrams]
 
         for i, img in enumerate(imgs):
-            # If you provide a landscape, we can scale the image axes to compare both. Useful for debugging
-            if diagrams:
-                maxBD = np.max(diagrams[i])
-                plt.imshow(img, extent=(0,maxBD,0,maxBD), cmap=plt.get_cmap('plasma'))
-            else:
-                plt.imshow(img, cmap=plt.get_cmap('plasma'))
+            plt.imshow(img, cmap=plt.get_cmap('plasma'))
             plt.show()
 
