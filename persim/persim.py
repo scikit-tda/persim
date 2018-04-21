@@ -2,7 +2,7 @@ from itertools import product
 
 import numpy as np
 from scipy.stats import multivariate_normal as mvn
-from scipy.spatial import ConvexHull
+import scipy.spatial as spatial
 import matplotlib.pyplot as plt
 
 from sklearn.base import BaseEstimator
@@ -123,7 +123,6 @@ class PersImage(BaseEstimator):
             plt.show()
 
 
-
 class Integrator():
     def integrate(self, f, center, dx):
         """ Integrate f over a square centered at center with radius dx.
@@ -156,12 +155,19 @@ class Integrator():
         return np.abs(np.einsum('ij,ij->i', a-d, np.cross(b-d, c-d))) / 6
 
     def _convex_hull_volume_bis(self, pts):
-        ch = ConvexHull(pts)
+        """ Calculate volume of convex hull """
+        try:
+            ch = spatial.ConvexHull(pts)
+            simplices = np.column_stack((np.repeat(ch.vertices[0], ch.nsimplex),
+                                        ch.simplices))
+            tets = ch.points[simplices]
+            return np.sum(self._tetrahedron_volume(tets[:, 0], tets[:, 1],
+                                                   tets[:, 2], tets[:, 3]))
 
-        simplices = np.column_stack((np.repeat(ch.vertices[0], ch.nsimplex),
-                                    ch.simplices))
-        tets = ch.points[simplices]
-        return np.sum(self._tetrahedron_volume(tets[:, 0], tets[:, 1],
-                                              tets[:, 2], tets[:, 3]))
+
+        except spatial.qhull.QhullError:
+            # Points are coplanar, probably because f=0 for all points
+            return 0
+
     
 

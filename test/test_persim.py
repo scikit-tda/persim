@@ -89,15 +89,22 @@ class TestIntegration:
         f = lambda center:  center[0]
         assert np.allclose(intr.integrate(f, [2, 10], 2), 32)
 
+    def test_coplanar(self):
+        intr = Integrator()
+        cube = np.array([[0,0,0],[1,0,0],[0,1,0],[1,1,0]])
 
-    def convex_hull_vol(self):
+ 
+        vol = intr._convex_hull_volume_bis(cube)
+        assert np.allclose(vol, 0)
+
+    def test_convex_hull_vol(self):
         intr = Integrator()
 
         cube = np.array([[0,0,0],[1,0,0],[0,1,0],[1,1,0],
                            [0,0,1],[1,0,1],[0,1,1],[1,1,1]])
 
         vol = intr._convex_hull_volume_bis(cube)
-        assert vol == 1
+        assert np.allclose(vol, 1)
 
         vol = intr._convex_hull_volume_bis(cube*2)
-        assert vol == 8
+        assert np.allclose(vol, 8)
