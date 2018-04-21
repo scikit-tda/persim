@@ -1,7 +1,7 @@
 import pytest
 
 import numpy as np
-from persim import PersImage
+from persim import PersImage, Integrator
 
 def test_landscape():
     bds = np.array([[1,1],[1,2]])
@@ -63,14 +63,41 @@ class TestIntegration:
 
         It will be changing, so we need to ensure it works correctly.
     """
-    def test_integrate(self):
-        pim = PersImage()
+    def test_integrate_constant(self):
+        intr = Integrator()
         
         f = lambda center:  1
-        assert pim._integrate(f, [0], 2) == 1 * (2*2)**2
+        assert np.allclose(intr.integrate(f, [0], 2), 1 * (2*2)**2)
         
         f = lambda center:  2
-        assert pim._integrate(f, [0], 2) == 2 * (2*2)**2
+        assert np.allclose(intr.integrate(f, [0], 2), 2 * (2*2)**2)
         
         f = lambda center:  3
-        assert pim._integrate(f, [0], 2) == 3 * (2*2)**2
+        assert np.allclose(intr.integrate(f, [0], 2), 3 * (2*2)**2)
+
+    def test_integrate_(self):
+        # I am not sure these are correct
+        intr = Integrator()
+        
+        f = lambda center:  center[0]
+        
+        assert np.allclose(intr.integrate(f, [0,10], 2), 32)
+        
+        f = lambda center:  center[0]
+        assert np.allclose(intr.integrate(f, [1,10], 2), 32)
+        
+        f = lambda center:  center[0]
+        assert np.allclose(intr.integrate(f, [2, 10], 2), 32)
+
+
+    def convex_hull_vol(self):
+        intr = Integrator()
+
+        cube = np.array([[0,0,0],[1,0,0],[0,1,0],[1,1,0],
+                           [0,0,1],[1,0,1],[0,1,1],[1,1,1]])
+
+        vol = intr._convex_hull_volume_bis(cube)
+        assert vol == 1
+
+        vol = intr._convex_hull_volume_bis(cube*2)
+        assert vol == 8

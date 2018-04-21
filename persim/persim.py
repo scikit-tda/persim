@@ -35,31 +35,6 @@ class PersImage(BaseEstimator):
         
         return imgs
 
-
-    def _integrate(self, f, center, dx):
-        """ Integrate f over a square centered at center with radius dx.
-        """
-
-        # rectangle in the center
-        # height = f(center)
-        # area = 2*dx * 2*dx
-        # return height * area
-
-        # Trapazoid rule using the volume of a convex hull of 8 corners
-        corners_ = np.array([[ dx, dx], 
-                             [ dx,-dx], 
-                             [-dx, dx], 
-                             [-dx,-dx]]) + center
-
-        corners = np.zeros((8,3))
-        corners[:4,:2] = corners_
-        corners[4:,:2] = corners_
-        corners[4:,2] = f(corners_)
-
-        vol = ConvexHull(corners).volume
-        return vol
-
-
     def _transform(self, landscape, specs):
         """ Convert single diagram to a persistence image
         """
@@ -91,10 +66,9 @@ class PersImage(BaseEstimator):
             smoothing = kernel(landscape, point)
             return np.dot(smoothing, weights)
 
-        p_surface = np.vectorize(p_surface, signature='(m)->()')
-
+        integrator = Integrator()
         for i, pixel in enumerate(grid):    
-            img[i] = self._integrate(p_surface, pixel, dx)
+            img[i] = integrator.integrate(p_surface, pixel, dx)
 
         img = img.reshape((N,N)).T
         return img
@@ -147,4 +121,47 @@ class PersImage(BaseEstimator):
         for i, img in enumerate(imgs):
             plt.imshow(img, cmap=plt.get_cmap('plasma'))
             plt.show()
+
+
+
+class Integrator():
+    def integrate(self, f, center, dx):
+        """ Integrate f over a square centered at center with radius dx.
+        """
+
+        # rectangle in the center
+        # height = f(center)
+        # area = 2*dx * 2*dx
+        # return height * area
+
+        if type(f) is not np.vectorize:
+            f = np.vectorize(f, signature='(m)->()')
+
+        # Trapazoid rule using the volume of a convex hull of 8 corners
+        corners_ = np.array([[ dx, dx], 
+                             [ dx,-dx], 
+                             [-dx, dx], 
+                             [-dx,-dx]]) + center
+
+        corners = np.zeros((8,3))
+        corners[:4,:2] = corners_
+        corners[4:,:2] = corners_
+        corners[4:,2] = f(corners_)
+
+        vol = self._convex_hull_volume_bis(corners)
+        return vol
+
+    # https://stackoverflow.com/questions/24733185/volume-of-convex-hull-with-qhull-from-scipy
+    def _tetrahedron_volume(self, a, b, c, d):
+        return np.abs(np.einsum('ij,ij->i', a-d, np.cross(b-d, c-d))) / 6
+
+    def _convex_hull_volume_bis(self, pts):
+        ch = ConvexHull(pts)
+
+        simplices = np.column_stack((np.repeat(ch.vertices[0], ch.nsimplex),
+                                    ch.simplices))
+        tets = ch.points[simplices]
+        return np.sum(self._tetrahedron_volume(tets[:, 0], tets[:, 1],
+                                              tets[:, 2], tets[:, 3]))
+    
 
