@@ -18,6 +18,7 @@ class TestWeighting:
 
         assert wf([1,0]) == 0
         assert wf([100,0]) == 0
+        assert wf([99, 1.4]) == 1.4
 
     def test_scales(self):
         pim = PersImage()
@@ -32,7 +33,7 @@ class TestWeighting:
 class TestKernels:
     def test_kernel_mean(self):
         pim = PersImage()
-        kf = pim.kernel()
+        kf = pim.kernel(2)
 
         data = np.array([[0,0]])
         assert kf(np.array([[0,0]]), [0,0]) >= kf(np.array([[1,1]]), [0,0]), "decreasing away"
@@ -56,3 +57,20 @@ class TestTransforms:
 
         assert len(imgs) == 2
         assert imgs[0].shape == imgs[1].shape
+
+class TestIntegration:
+    """ We can't just take the center point, we need to integrate over the surface.
+
+        It will be changing, so we need to ensure it works correctly.
+    """
+    def test_integrate(self):
+        pim = PersImage()
+        
+        f = lambda center:  1
+        assert pim._integrate(f, [0], 2) == 1 * (2*2)**2
+        
+        f = lambda center:  2
+        assert pim._integrate(f, [0], 2) == 2 * (2*2)**2
+        
+        f = lambda center:  3
+        assert pim._integrate(f, [0], 2) == 3 * (2*2)**2

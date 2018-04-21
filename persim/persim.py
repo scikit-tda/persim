@@ -2,6 +2,7 @@ from itertools import product
 
 import numpy as np
 from scipy.stats import multivariate_normal as mvn
+from scipy.spatial import ConvexHull
 import matplotlib.pyplot as plt
 
 from sklearn.base import BaseEstimator
@@ -34,6 +35,31 @@ class PersImage(BaseEstimator):
         
         return imgs
 
+
+    def _integrate(self, f, center, dx):
+        """ Integrate f over a square centered at center with radius dx.
+        """
+
+        # rectangle in the center
+        # height = f(center)
+        # area = 2*dx * 2*dx
+        # return height * area
+
+        # Trapazoid rule using the volume of a convex hull of 8 corners
+        corners_ = np.array([[ dx, dx], 
+                             [ dx,-dx], 
+                             [-dx, dx], 
+                             [-dx,-dx]]) + center
+
+        corners = np.zeros((8,3))
+        corners[:4,:2] = corners_
+        corners[4:,:2] = corners_
+        corners[4:,2] = f(corners_)
+
+        vol = ConvexHull(corners).volume
+        return vol
+
+
     def _transform(self, landscape, specs):
         """ Convert single diagram to a persistence image
         """
@@ -47,7 +73,7 @@ class PersImage(BaseEstimator):
         ys = np.linspace(0, maxBD, N) + dx
         grid = np.array(list(product(xs, reversed(ys))))
         
-        weighting = self.weighting()#landscape)
+        weighting = self.weighting()
 
         # maxBD seems to be a reasonable variance in practice.
         kernel = self.kernel(spread=self.spread if self.spread else maxBD)
@@ -57,11 +83,18 @@ class PersImage(BaseEstimator):
 
         # weights for each data point
         weights = np.apply_along_axis(weighting, 1, landscape) 
-        # import pdb; pdb.set_trace()
+
+        # Construct a Guassian surface 
+        def p_surface(point):
+            """ Function defining the persistence surface  
+            """
+            smoothing = kernel(landscape, point)
+            return np.dot(smoothing, weights)
+
+        p_surface = np.vectorize(p_surface, signature='(m)->()')
+
         for i, pixel in enumerate(grid):    
-            # pixel defines bottom left corner, compute w.r.t center
-            smoothing = kernel(landscape, pixel)
-            img[i] = np.dot(smoothing, weights)
+            img[i] = self._integrate(p_surface, pixel, dx)
 
         img = img.reshape((N,N)).T
         return img
