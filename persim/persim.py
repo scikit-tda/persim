@@ -15,6 +15,7 @@ class PersImage(BaseEstimator):
         
         assert int(np.sqrt(pixels)) == np.sqrt(pixels), "Pixels must be a square"
         self.pixels = pixels
+        self.N = int(np.sqrt(pixels))
     
     def transform(self, diagrams):
         """ Convert diagram or list of diagrams to a persistence image
@@ -39,7 +40,7 @@ class PersImage(BaseEstimator):
         """ Convert single diagram to a persistence image
         """
 
-        N = int(np.sqrt(self.pixels))
+        N = self.N
 
         # Define an NxN grid over our landscape
         maxBD = specs['maxBD']
@@ -48,10 +49,10 @@ class PersImage(BaseEstimator):
         ys = np.linspace(0, maxBD, N) + dx
         grid = np.array(list(product(xs, reversed(ys))))
         
-        weighting = self.weighting()
+        weighting = self.weighting(landscape)
 
         # maxBD seems to be a reasonable variance in practice.
-        kernel = self.kernel(spread=self.spread if self.spread else maxBD)
+        kernel = self.kernel(spread=self.spread if self.spread else dx)
 
         # Define zeros
         img = np.zeros(len(grid))
@@ -83,12 +84,30 @@ class PersImage(BaseEstimator):
 
         if landscape is not None:
             maxy = np.max(landscape[:,1])
-        
+
         def linear(interval):
             # linear function of y such that f(0) = 0 and f(max(y)) = N
             d = interval[1]
             return (1 / maxy) * d if landscape is not None else d
-            
+
+        def pw_linear(interval):
+            """ This is the function defined as w_b(t) in the original PI paper
+
+                Take b to be maxy/self.N to effectively zero out the bottom pixel row
+            """
+
+            t = interval[1]
+            b = maxy / self.N
+
+            if t <= 0:
+                return 0
+            if 0 < t < b:
+                return t / b
+            if b <= t:
+                return 1
+
+        # if self.kernel_type == "linear":
+            # return linear
         return linear
     
     def kernel(self, spread=1):
