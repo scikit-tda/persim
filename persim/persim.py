@@ -9,53 +9,76 @@ import matplotlib.pyplot as plt
 from sklearn.base import BaseEstimator
 
 class PersImage(BaseEstimator):
-    def __init__(self, kernel_type="gaussian", weighting_type="linear", pixels=20*20, spread=None):
+    def __init__(self, pixels=20*20, 
+                       spread=None,
+                       specs=None,
+                       kernel_type="gaussian", 
+                       weighting_type="linear"):
+
+        self.specs = specs
         self.kernel_type = kernel_type
         self.weighting_type = weighting_type
         self.spread = spread
         
+        # TODO: allow for nonsquare images
         assert int(np.sqrt(pixels)) == np.sqrt(pixels), "Pixels must be a square"
         self.pixels = pixels
         self.N = int(np.sqrt(pixels))
     
-    def transform(self, diagrams, specs=None):
+    def fit(self, X):
+        """ The goal of fit will be to define the specs of the images.
+
+            We need to know the 
+              - range of the grid and
+              - the relative scaling
+
+            This can be derived from a set of diagrams, or given explicitly.
+        """
+
+        pass
+
+    def transform(self, diagrams):
         """ Convert diagram or list of diagrams to a persistence image
         """
+
+        # TODO: refactor the self.specs out
+        #       user can supply data and we can `fit` specs, then transform,
+        #       or user can say `fit_transform`
 
         if type(diagrams) is not list:
             dg = np.copy(diagrams) # keep original diagram untouched
             landscape = PersImage.to_landscape(dg)
 
-            if not specs:
-                specs = {
+            if not self.specs:
+                self.specs = {
                     "maxBD": np.max(landscape),
                     "minBD": np.min(landscape)
                 }
 
-            imgs = self._transform(landscape, specs)
+            imgs = self._transform(landscape)
         else:
             dgs = [np.copy(diagram) for diagram in diagrams]
             landscapes = [PersImage.to_landscape(dg) for dg in dgs]
 
-            if not specs:
-                specs = {
+            if not self.specs:
+                self.specs = {
                     'maxBD': np.max([np.max(landscape) for landscape in landscapes]),
                     'minBD': np.min([np.min(landscape) for landscape in landscapes])
                 }
-            imgs = [self._transform(dgm, specs) for dgm in landscapes]
+            imgs = [self._transform(dgm) for dgm in landscapes]
         
         return imgs
 
-    def _transform(self, landscape, specs):
+    def _transform(self, landscape):
         """ Convert single diagram to a persistence image
         """
-        # import pdb; pdb.set_trace()
+
         N = self.N
 
         # Define an NxN grid over our landscape
-        maxBD = specs['maxBD']
-        minBD = min(specs['minBD'], 0)
-        # import pdb; pdb.set_trace()
+        maxBD = self.specs['maxBD']
+        minBD = min(self.specs['minBD'], 0) # at least show 0, maybe lower
+        
         # Same bins in x and y axis
         dx = maxBD / (N) 
         xs_lower = np.linspace(minBD, maxBD, N)
@@ -63,12 +86,8 @@ class PersImage(BaseEstimator):
 
         ys_lower = np.linspace(0, maxBD, N)
         ys_upper = np.linspace(0, maxBD, N) + dx
-        # bins = list(zip(xs_lower, xs_upper))
-
+ 
         weighting = self.weighting(landscape)
-
-        # maxBD seems to be a reasonable variance in practice.
-        # kernel = self.kernel(spread=self.spread if self.spread else dx)
 
         # Define zeros
         img = np.zeros((N,N))
