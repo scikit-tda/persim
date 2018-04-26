@@ -24,14 +24,19 @@ class PersImage(BaseEstimator):
         if type(diagrams) is not list:
             dg = np.copy(diagrams) # keep original diagram untouched
             landscape = PersImage.to_landscape(dg)
-            specs = {"maxBD": np.max(landscape)}
-            # import pdb; pdb.set_trace()
+            specs = {
+                "maxBD": np.max(landscape),
+                "minBD": np.min(landscape)
+            }
+
             imgs = self._transform(landscape, specs)
         else:
             dgs = [np.copy(diagram) for diagram in diagrams]
             landscapes = [PersImage.to_landscape(dg) for dg in dgs]
-            specs = {'maxBD': np.max([np.max(landscape) for landscape in landscapes])}
-            # import pdb; pdb.set_trace()
+            specs = {
+                'maxBD': np.max([np.max(landscape) for landscape in landscapes]),
+                'minBD': np.min([np.min(landscape) for landscape in landscapes])
+            }
             imgs = [self._transform(dgm, specs) for dgm in landscapes]
         
         return imgs
@@ -39,14 +44,16 @@ class PersImage(BaseEstimator):
     def _transform(self, landscape, specs):
         """ Convert single diagram to a persistence image
         """
-
+        # import pdb; pdb.set_trace()
         N = self.N
 
         # Define an NxN grid over our landscape
         maxBD = specs['maxBD']
+        minBD = min(specs['minBD'], 0)
+
         dx = maxBD / (2 * N) 
-        xs = np.linspace(0, maxBD, N) + dx
-        ys = np.linspace(0, maxBD, N) + dx
+        xs = np.linspace(minBD, maxBD, N) + dx
+        ys = np.linspace(minBD, maxBD, N) + dx
         grid = np.array(list(product(xs, reversed(ys))))
         
         weighting = self.weighting(landscape)
