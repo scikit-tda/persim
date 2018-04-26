@@ -2,6 +2,7 @@ from itertools import product
 
 import numpy as np
 from scipy.stats import multivariate_normal as mvn
+from scipy.stats import norm
 import scipy.spatial as spatial
 import matplotlib.pyplot as plt
 
@@ -17,26 +18,30 @@ class PersImage(BaseEstimator):
         self.pixels = pixels
         self.N = int(np.sqrt(pixels))
     
-    def transform(self, diagrams):
+    def transform(self, diagrams, specs=None):
         """ Convert diagram or list of diagrams to a persistence image
         """
 
         if type(diagrams) is not list:
             dg = np.copy(diagrams) # keep original diagram untouched
             landscape = PersImage.to_landscape(dg)
-            specs = {
-                "maxBD": np.max(landscape),
-                "minBD": np.min(landscape)
-            }
+
+            if not specs:
+                specs = {
+                    "maxBD": np.max(landscape),
+                    "minBD": np.min(landscape)
+                }
 
             imgs = self._transform(landscape, specs)
         else:
             dgs = [np.copy(diagram) for diagram in diagrams]
             landscapes = [PersImage.to_landscape(dg) for dg in dgs]
-            specs = {
-                'maxBD': np.max([np.max(landscape) for landscape in landscapes]),
-                'minBD': np.min([np.min(landscape) for landscape in landscapes])
-            }
+
+            if not specs:
+                specs = {
+                    'maxBD': np.max([np.max(landscape) for landscape in landscapes]),
+                    'minBD': np.min([np.min(landscape) for landscape in landscapes])
+                }
             imgs = [self._transform(dgm, specs) for dgm in landscapes]
         
         return imgs
@@ -50,35 +55,31 @@ class PersImage(BaseEstimator):
         # Define an NxN grid over our landscape
         maxBD = specs['maxBD']
         minBD = min(specs['minBD'], 0)
+        # import pdb; pdb.set_trace()
+        # Same bins in x and y axis
+        dx = maxBD / (N) 
+        xs_lower = np.linspace(minBD, maxBD, N)
+        xs_upper = np.linspace(minBD, maxBD, N) + dx
 
-        dx = maxBD / (2 * N) 
-        xs = np.linspace(minBD, maxBD, N) + dx
-        ys = np.linspace(minBD, maxBD, N) + dx
-        grid = np.array(list(product(xs, reversed(ys))))
-        
+        ys_lower = np.linspace(0, maxBD, N)
+        ys_upper = np.linspace(0, maxBD, N) + dx
+        # bins = list(zip(xs_lower, xs_upper))
+
         weighting = self.weighting(landscape)
 
         # maxBD seems to be a reasonable variance in practice.
-        kernel = self.kernel(spread=self.spread if self.spread else dx)
+        # kernel = self.kernel(spread=self.spread if self.spread else dx)
 
         # Define zeros
-        img = np.zeros(len(grid))
+        img = np.zeros((N,N))
 
-        # weights for each data point
-        weights = np.apply_along_axis(weighting, 1, landscape) 
-
-        # Construct a Guassian surface 
-        def p_surface(point):
-            """ Function defining the persistence surface  
-            """
-            smoothing = kernel(landscape, point)
-            return np.dot(smoothing, weights)
-
-        integrator = Integrator()
-        for i, pixel in enumerate(grid):    
-            img[i] = integrator.integrate(p_surface, pixel, dx)
-
-        img = img.reshape((N,N)).T
+        # Implement this as a `summed-area table` - it'll be way faster
+        spread=self.spread if self.spread else dx
+        for point in landscape:
+            x_smooth = norm.cdf(xs_upper, point[0], spread) - norm.cdf(xs_lower, point[0], spread)
+            y_smooth = norm.cdf(ys_upper, point[1], spread) - norm.cdf(ys_lower, point[1], spread)
+            img += np.outer(x_smooth, y_smooth) * weighting(point)
+        img = img.T[::-1]   
         return img
     
     def weighting(self, landscape=None):
@@ -113,8 +114,6 @@ class PersImage(BaseEstimator):
             if b <= t:
                 return 1
 
-        # if self.kernel_type == "linear":
-            # return linear
         return linear
     
     def kernel(self, spread=1):
@@ -147,53 +146,3 @@ class PersImage(BaseEstimator):
         for i, img in enumerate(imgs):
             plt.imshow(img, cmap=plt.get_cmap('plasma'))
             plt.show()
-
-
-class Integrator():
-    def integrate(self, f, center, dx):
-        """ Integrate f over a square centered at center with radius dx.
-        """
-
-        # rectangle in the center
-        # height = f(center)
-        # area = 2*dx * 2*dx
-        # return height * area
-
-        if type(f) is not np.vectorize:
-            f = np.vectorize(f, signature='(m)->()')
-
-        # Trapazoid rule using the volume of a convex hull of 8 corners
-        corners_ = np.array([[ dx, dx], 
-                             [ dx,-dx], 
-                             [-dx, dx], 
-                             [-dx,-dx]]) + center
-
-        corners = np.zeros((8,3))
-        corners[:4,:2] = corners_
-        corners[4:,:2] = corners_
-        corners[4:,2] = f(corners_)
-
-        vol = self._convex_hull_volume_bis(corners)
-        return vol
-
-    # https://stackoverflow.com/questions/24733185/volume-of-convex-hull-with-qhull-from-scipy
-    def _tetrahedron_volume(self, a, b, c, d):
-        return np.abs(np.einsum('ij,ij->i', a-d, np.cross(b-d, c-d))) / 6
-
-    def _convex_hull_volume_bis(self, pts):
-        """ Calculate volume of convex hull """
-        try:
-            ch = spatial.ConvexHull(pts)
-            simplices = np.column_stack((np.repeat(ch.vertices[0], ch.nsimplex),
-                                        ch.simplices))
-            tets = ch.points[simplices]
-            return np.sum(self._tetrahedron_volume(tets[:, 0], tets[:, 1],
-                                                   tets[:, 2], tets[:, 3]))
-
-
-        except spatial.qhull.QhullError:
-            # Points are coplanar, probably because f=0 for all points
-            return 0
-
-    
-

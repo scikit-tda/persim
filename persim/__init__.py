@@ -1,4 +1,4 @@
-from .persim import PersImage, Integrator
+from .persim import PersImage
 
 # Enable access to version number
 import pkg_resources
