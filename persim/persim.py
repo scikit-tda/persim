@@ -14,16 +14,23 @@ class PersImage(BaseEstimator):
                        specs=None,
                        kernel_type="gaussian", 
                        weighting_type="linear"):
+        """ Initialize a persistence image generator.
+
+            pixels
+
+        """
 
         self.specs = specs
         self.kernel_type = kernel_type
         self.weighting_type = weighting_type
         self.spread = spread
         
-        # TODO: allow for nonsquare images
-        assert int(np.sqrt(pixels)) == np.sqrt(pixels), "Pixels must be a square"
+
         self.pixels = pixels
         self.N = int(np.sqrt(pixels))
+
+        print('PersImage(pixels={}, spread={}, specs={}, kernel_type="{}", weighting_type="{}")'.format(pixels, spread, specs, kernel_type, weighting_type))
+
     
     def fit(self, X):
         """ The goal of fit will be to define the specs of the images.
@@ -41,9 +48,8 @@ class PersImage(BaseEstimator):
         """ Convert diagram or list of diagrams to a persistence image
         """
 
-        # TODO: refactor the self.specs out
-        #       user can supply data and we can `fit` specs, then transform,
-        #       or user can say `fit_transform`
+        # TODO: allow for nonsquare images
+        assert int(np.sqrt(self.pixels)) == np.sqrt(self.pixels), "Pixels must be a square"
 
         if type(diagrams) is not list:
             dg = np.copy(diagrams) # keep original diagram untouched
@@ -164,4 +170,4 @@ class PersImage(BaseEstimator):
 
         for i, img in enumerate(imgs):
             plt.imshow(img, cmap=plt.get_cmap('plasma'))
-            plt.show()
+            # plt.show()

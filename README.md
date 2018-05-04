@@ -25,30 +25,36 @@ First, construct a diagram. In this example, we will use [Ripser](https://github
 ``` Python
 import numpy as np
 from ripser import Rips
+from sklearn import datasets
 
-data = np.random.random((100,2))
+data = np.concatenate([150 * np.random.random((300,2)), 
+                       10 + 10 * datasets.make_circles(n_samples=100)[0],
+                       100 + 20 * datasets.make_circles(n_samples=100)[0]])
+
 rips = Rips()
 dgm = rips.fit_transform(data)
 diagram = dgm[1] # Just diagram for H1
 ```
+
+![data and diagram](docs/images/data-and-pd.png)
+
 
 Then from this diagram, we construct the persistence image
 
 ``` Python
 from persim import PersImage
 
-pim = PersImage(diagram)
-img = pim.transform()
+pim = PersImage()
+img = pim.transform(diagram)
 pim.show(img)
 ```
+
+![pers image of H1 diagram](docs/images/pers-im-h1.png)
 
 
 # TODO
 
-- The API needs a little work, not quite sklearn compliant. Please do offer any suggestions.
-- Implement more varieties of weighting and kernel functions.
-- Build tests.
-
+- Implement a variety of weighting and kernel functions.
 
 # References:
 
