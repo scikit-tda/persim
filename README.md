@@ -36,7 +36,7 @@ dgm = rips.fit_transform(data)
 diagram = dgm[1] # Just diagram for H1
 ```
 
-![data and diagram](docs/images/data-and-pd.png)
+![data and diagram](https://i.imgur.com/U9LUKua.png)
 
 
 Then from this diagram, we construct the persistence image
@@ -49,8 +49,7 @@ img = pim.transform(diagram)
 pim.show(img)
 ```
 
-![pers image of H1 diagram](docs/images/pers-im-h1.png)
-
+![pers image of H1 diagram](https://i.imgur.com/dxC452l.png)
 
 # TODO
 
