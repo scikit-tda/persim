@@ -6,7 +6,7 @@ with open('README.md') as f:
     long_description = f.read()
 
 setup(name='persim',
-      version='0.0.4',
+      version='0.0.5',
       description='Python implementation persistent images representation of persistence diagrams.',
       long_description=long_description,
       long_description_content_type="text/markdown",	
