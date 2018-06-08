@@ -51,9 +51,18 @@ pim.show(img)
 
 ![pers image of H1 diagram](https://i.imgur.com/dxC452l.png)
 
-# TODO
 
-- Implement a variety of weighting and kernel functions.
+## Batch processing
+
+If PersImage is given a list of diagrams, the dimensions will be the same for all resulting images. This is helpful if you want to process diagrams in batch and require them to be comparable. 
+
+```
+diagrams = [rips.fit_transform(obs) for obs in observations]
+imgs = pim.transform(diagrams)
+```
+
+
+
 
 # References:
 
