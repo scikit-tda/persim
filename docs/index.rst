@@ -1,16 +1,24 @@
-
-Persim 
-------
+.. Persim documentation master file, created by
+   sphinx-quickstart on Tue Jul 24 23:08:15 2018.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
 
 |PyPI version| |Build Status| |Codecov|
 
+Welcome to Persim's documentation!
+==================================
 
-Persim is a Python implementation of Persistence Images as first introduced in `https://arxiv.org/abs/1507.06217 <https://arxiv.org/abs/1507.06217>`_.
+
+
+
+Persim is a Python implementation of Persistence Images as first introduced in `this paper <https://arxiv.org/abs/1507.06217>`_.
 
 It is designed to interface with `Ripser <https://github.com/sauln/ripser>`_, though any persistence diagram should work fine.
 
+
+
 Setup
-=======
+--------
 
 Currently, the only option is to install the library from source:
 
@@ -21,9 +29,11 @@ Currently, the only option is to install the library from source:
 
 
 Usage
-======
+-------
 
-First, construct a diagram. In this example, we will use [Ripser](https://github.com/sauln/ripser).
+
+
+First, construct a diagram. In this example, we will use `Ripser <https://github.com/sauln/ripser>`_.
 
 .. code::
 
@@ -47,19 +57,37 @@ Then from this diagram, we construct the persistence image
     pim.show(img)
 
 
-
-References
-============
+Inspiration
+-------------
 
 Persistence Images were first introduced in `Adams et al, 2017 <http://www.jmlr.org/papers/volume18/16-337/16-337.pdf>`_. Much of this work, an examples contained herein are inspired by the work of `Obayashi and Hiraoka, 2017 <https://arxiv.org/abs/1706.10082>`_. Choices of weightings and general methods are often derived from `Kusano, Fukumizu, and Yasuaki Hiraoka, 2016 <https://arxiv.org/abs/1601.01741>`_.
 
-Disclaimer
-============
+Reference
+===========
 
-Standard MIT disclaimer applies, see ``DISCLAIMER.md`` for full text.
 
-Development status is Alpha.
+.. automodule:: persim
+    :members:
 
+.. autoclass:: PersImage
+    :members:
+    :undoc-members:
+
+
+
+
+.. toctree::
+    :maxdepth: 2
+
+
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
 
 
 

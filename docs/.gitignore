@@ -1,0 +1,13 @@
+_build/
+.cache/
+persim/
+persim.egg-info
+venv/
+
+.vscode/
+*.egg-info/
+__pycache__
+.pytest_cache
+.DS_Store
+.coverage
+.ipynb_checkpoints

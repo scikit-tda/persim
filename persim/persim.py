@@ -10,6 +10,28 @@ from sklearn.base import BaseEstimator
 
 
 class PersImage(BaseEstimator):
+    """ Initialize a persistence image generator.
+
+    Parameters
+    -----------
+
+    pixels : pair of ints like (int, int)
+        Tuple representing number of pixels in return image along x and y axis.
+    spread : float
+        Standard deviation of gaussian kernel
+    specs : dict
+        Parameters for shape of image with respect to diagram domain. This is used if you would like images to have a particular range.
+    kernel_type : string or ...
+        TODO: Implement this feature.
+        Determine which type of kernel used in the convolution, or pass in custom kernel. Currently only implements Gaussian.
+    weighting_type : string or ...
+        TODO: Implement this feature.
+        Determine which type of weighting function used, or pass in custom weighting function.
+        Currently only implements linear weighting.
+    """
+
+
+
     def __init__(
         self,
         pixels=(20, 20),
@@ -19,25 +41,6 @@ class PersImage(BaseEstimator):
         weighting_type="linear",
         verbose=True,
     ):
-        """ Initialize a persistence image generator.
-
-        Parameters
-        -----------
-
-        pixels : pair of ints like (int, int)
-            Tuple representing number of pixels in return image along x and y axis.
-        spread : float
-            Standard deviation of gaussian kernel
-        specs : dict
-            Parameters for shape of image with respect to diagram domain. This is used if you would like images to have a particular range.
-        kernel_type : string or ...
-            TODO: Implement this feature.
-            Determine which type of kernel used in the convolution, or pass in custom kernel. Currently only implements Gaussian.
-        weighting_type : string or ...
-            TODO: Implement this feature.
-            Determine which type of weighting function used, or pass in custom weighting function.
-            Currently only implements linear weighting.
-        """
 
         self.specs = specs
         self.kernel_type = kernel_type
@@ -45,11 +48,8 @@ class PersImage(BaseEstimator):
         self.spread = spread
         self.nx, self.ny = pixels
 
-        if verbose:
-            print(
-                'PersImage(pixels={}, spread={}, specs={}, kernel_type="{}", weighting_type="{}")'.format(
-                    pixels, spread, specs, kernel_type, weighting_type
-                )
+        # if verbose:
+        print('PersImage(pixels={}, spread={}, specs={}, kernel_type="{}", weighting_type="{}")'.format(pixels, spread, specs, kernel_type, weighting_type))
 
     def transform(self, diagrams):
         """ Convert diagram or list of diagrams to a persistence image.
