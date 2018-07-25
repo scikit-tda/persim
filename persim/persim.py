@@ -12,7 +12,7 @@ from sklearn.base import BaseEstimator
 class PersImage(BaseEstimator):
     def __init__(
         self,
-        pixels=20 * 20,
+        pixels=(20, 20),
         spread=None,
         specs=None,
         kernel_type="gaussian",
@@ -20,7 +20,11 @@ class PersImage(BaseEstimator):
     ):
         """ Initialize a persistence image generator.
 
-            pixels
+        Parameters
+        -----------
+
+        pixels : pair of ints like (int, int)
+            Tuple representing x and y of pixels along each axis.
 
         """
 
@@ -28,9 +32,7 @@ class PersImage(BaseEstimator):
         self.kernel_type = kernel_type
         self.weighting_type = weighting_type
         self.spread = spread
-
-        self.pixels = pixels
-        self.N = int(np.sqrt(pixels))
+        self.nx, self.ny = pixels
 
         print(
             'PersImage(pixels={}, spread={}, specs={}, kernel_type="{}", weighting_type="{}")'.format(
@@ -41,11 +43,6 @@ class PersImage(BaseEstimator):
     def transform(self, diagrams):
         """ Convert diagram or list of diagrams to a persistence image
         """
-
-        # TODO: allow for nonsquare images
-        assert int(np.sqrt(self.pixels)) == np.sqrt(
-            self.pixels
-        ), "Pixels must be a square"
 
         if type(diagrams) is not list:
             dg = np.copy(diagrams)  # keep original diagram untouched
@@ -72,24 +69,23 @@ class PersImage(BaseEstimator):
         """ Convert single diagram to a persistence image
         """
 
-        N = self.N
-
+    
         # Define an NxN grid over our landscape
         maxBD = self.specs["maxBD"]
         minBD = min(self.specs["minBD"], 0)  # at least show 0, maybe lower
 
         # Same bins in x and y axis
-        dx = maxBD / (N)
-        xs_lower = np.linspace(minBD, maxBD, N)
-        xs_upper = np.linspace(minBD, maxBD, N) + dx
+        dx = maxBD / (self.ny)
+        xs_lower = np.linspace(minBD, maxBD, self.nx)
+        xs_upper = np.linspace(minBD, maxBD, self.nx) + dx
 
-        ys_lower = np.linspace(0, maxBD, N)
-        ys_upper = np.linspace(0, maxBD, N) + dx
+        ys_lower = np.linspace(0, maxBD, self.ny)
+        ys_upper = np.linspace(0, maxBD, self.ny) + dx
 
         weighting = self.weighting(landscape)
 
         # Define zeros
-        img = np.zeros((N, N))
+        img = np.zeros((self.nx, self.ny))
 
         # Implement this as a `summed-area table` - it'll be way faster
         spread = self.spread if self.spread else dx
@@ -123,11 +119,11 @@ class PersImage(BaseEstimator):
         def pw_linear(interval):
             """ This is the function defined as w_b(t) in the original PI paper
 
-                Take b to be maxy/self.N to effectively zero out the bottom pixel row
+                Take b to be maxy/self.ny to effectively zero out the bottom pixel row
             """
 
             t = interval[1]
-            b = maxy / self.N
+            b = maxy / self.ny
 
             if t <= 0:
                 return 0
