@@ -17,6 +17,7 @@ class PersImage(BaseEstimator):
         specs=None,
         kernel_type="gaussian",
         weighting_type="linear",
+        verbose=True,
     ):
         """ Initialize a persistence image generator.
 
@@ -44,11 +45,11 @@ class PersImage(BaseEstimator):
         self.spread = spread
         self.nx, self.ny = pixels
 
-        print(
-            'PersImage(pixels={}, spread={}, specs={}, kernel_type="{}", weighting_type="{}")'.format(
-                pixels, spread, specs, kernel_type, weighting_type
-            )
-        )
+        if verbose:
+            print(
+                'PersImage(pixels={}, spread={}, specs={}, kernel_type="{}", weighting_type="{}")'.format(
+                    pixels, spread, specs, kernel_type, weighting_type
+                )
 
     def transform(self, diagrams):
         """ Convert diagram or list of diagrams to a persistence image.
