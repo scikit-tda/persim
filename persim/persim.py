@@ -24,8 +24,18 @@ class PersImage(BaseEstimator):
         -----------
 
         pixels : pair of ints like (int, int)
-            Tuple representing x and y of pixels along each axis.
-
+            Tuple representing number of pixels in return image along x and y axis.
+        spread : float
+            Standard deviation of gaussian kernel
+        specs : dict
+            Parameters for shape of image with respect to diagram domain. This is used if you would like images to have a particular range.
+        kernel_type : string or ...
+            TODO: Implement this feature.
+            Determine which type of kernel used in the convolution, or pass in custom kernel. Currently only implements Gaussian.
+        weighting_type : string or ...
+            TODO: Implement this feature.
+            Determine which type of weighting function used, or pass in custom weighting function.
+            Currently only implements linear weighting.
         """
 
         self.specs = specs
@@ -41,7 +51,13 @@ class PersImage(BaseEstimator):
         )
 
     def transform(self, diagrams):
-        """ Convert diagram or list of diagrams to a persistence image
+        """ Convert diagram or list of diagrams to a persistence image.
+
+        Parameters
+        -----------
+        diagrams : list of or singleton diagram, list of pairs. [(birth, death)]
+            Persistence diagrams to be converted to persistence images. It is assumed they are in (birth, death) format. Can input a list of diagrams or a single diagram.
+
         """
 
         if type(diagrams) is not list:
@@ -69,7 +85,6 @@ class PersImage(BaseEstimator):
         """ Convert single diagram to a persistence image
         """
 
-    
         # Define an NxN grid over our landscape
         maxBD = self.specs["maxBD"]
         minBD = min(self.specs["minBD"], 0)  # at least show 0, maybe lower
