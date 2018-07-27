@@ -1,4 +1,5 @@
 from itertools import product
+import collections
 
 import numpy as np
 from scipy.stats import multivariate_normal as mvn
@@ -30,8 +31,6 @@ class PersImage(BaseEstimator):
         Currently only implements linear weighting.
     """
 
-
-
     def __init__(
         self,
         pixels=(20, 20),
@@ -48,8 +47,12 @@ class PersImage(BaseEstimator):
         self.spread = spread
         self.nx, self.ny = pixels
 
-        # if verbose:
-        print('PersImage(pixels={}, spread={}, specs={}, kernel_type="{}", weighting_type="{}")'.format(pixels, spread, specs, kernel_type, weighting_type))
+        if verbose:
+            print(
+                'PersImage(pixels={}, spread={}, specs={}, kernel_type="{}", weighting_type="{}")'.format(
+                    pixels, spread, specs, kernel_type, weighting_type
+                )
+            )
 
     def transform(self, diagrams):
         """ Convert diagram or list of diagrams to a persistence image.
@@ -61,23 +64,10 @@ class PersImage(BaseEstimator):
 
         """
 
-        # Convert whatever type is given into a list of ndarrays.
-        # if list of tuples or list of pairs
-        #   convert to a numpy array and put in a list.
-        # if a list of list of tuples
-        #   convert to a list of numpy arrays
-        # if a list of numpy arrays:
-        #   keep as is.
-
-        # start by finding out if the pairs are 2 layers deep or 3 layers deep. 2 layers mean its a single diagram, 3 layers means we have a list of diagrams.
-        
-        import collections
-        
         # if first entry of first entry is not iterable, then diagrams is singular and we need to make it a list of diagrams
         singular = not isinstance(diagrams[0][0], collections.Iterable)
         if singular:
             diagrams = [diagrams]
-
 
         dgs = [np.copy(diagram) for diagram in diagrams]
         landscapes = [PersImage.to_landscape(dg) for dg in dgs]
