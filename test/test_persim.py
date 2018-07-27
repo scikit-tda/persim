@@ -10,6 +10,26 @@ def test_landscape():
 
     np.testing.assert_array_equal(ldsp, [[1,0],[1,1]])
 
+def test_integer_diagrams():
+    """ This test is inspired by gh issue #3 by gh user muszyna25.
+
+    Integer diagrams return nan values.
+
+    This does not work: dgm = [[0, 2], [0, 6], [0, 8]];
+
+    This one works fine: dgm = [[0.0, 2.0], [0.0, 6.0], [0.0, 8.0]];
+
+    """
+
+    dgm = [[0, 2], [0, 6], [0, 8]]
+    dgm2 = [[0.0, 2.0], [0.0, 6.0], [0.0, 8.0]]
+    pim = PersImage()
+    res = pim.transform(dgm2)
+    res2 = pim.transform(dgm)
+
+    np.testing.assert_array_equal(res, res2)
+    
+
 class TestWeighting:
     def test_zero_on_xaxis(self):
         pim = PersImage()
@@ -41,6 +61,14 @@ class TestKernels:
 
 
 class TestTransforms:
+    def test_lists_of_lists(self):
+        pim = PersImage(pixels=(3,3))
+        diagram = [[0,1], [1,1], [3,5]]
+        img = pim.transform(diagram)
+
+        assert img.shape == (3,3)
+
+
     def test_n_pixels(self):
         pim = PersImage(pixels=(3,3))
         diagram = np.array([[0,1], [1,1],[3,5]])

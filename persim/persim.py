@@ -61,24 +61,37 @@ class PersImage(BaseEstimator):
 
         """
 
-        if type(diagrams) is not list:
-            dg = np.copy(diagrams)  # keep original diagram untouched
-            landscape = PersImage.to_landscape(dg)
+        # Convert whatever type is given into a list of ndarrays.
+        # if list of tuples or list of pairs
+        #   convert to a numpy array and put in a list.
+        # if a list of list of tuples
+        #   convert to a list of numpy arrays
+        # if a list of numpy arrays:
+        #   keep as is.
 
-            if not self.specs:
-                self.specs = {"maxBD": np.max(landscape), "minBD": np.min(landscape)}
+        # start by finding out if the pairs are 2 layers deep or 3 layers deep. 2 layers mean its a single diagram, 3 layers means we have a list of diagrams.
+        
+        import collections
+        
+        # if first entry of first entry is not iterable, then diagrams is singular and we need to make it a list of diagrams
+        singular = not isinstance(diagrams[0][0], collections.Iterable)
+        if singular:
+            diagrams = [diagrams]
 
-            imgs = self._transform(landscape)
-        else:
-            dgs = [np.copy(diagram) for diagram in diagrams]
-            landscapes = [PersImage.to_landscape(dg) for dg in dgs]
 
-            if not self.specs:
-                self.specs = {
-                    "maxBD": np.max([np.max(landscape) for landscape in landscapes]),
-                    "minBD": np.min([np.min(landscape) for landscape in landscapes]),
-                }
-            imgs = [self._transform(dgm) for dgm in landscapes]
+        dgs = [np.copy(diagram) for diagram in diagrams]
+        landscapes = [PersImage.to_landscape(dg) for dg in dgs]
+
+        if not self.specs:
+            self.specs = {
+                "maxBD": np.max([np.max(landscape) for landscape in landscapes]),
+                "minBD": np.min([np.min(landscape) for landscape in landscapes]),
+            }
+        imgs = [self._transform(dgm) for dgm in landscapes]
+
+        # Make sure we return one item.
+        if singular:
+            imgs = imgs[0]
 
         return imgs
 
