@@ -6,13 +6,13 @@ with open('README.md') as f:
     long_description = f.read()
 
 setup(name='persim',
-      version='0.0.6',
+      version='0.0.7',
       description='Python implementation persistent images representation of persistence diagrams.',
       long_description=long_description,
       long_description_content_type="text/markdown",	
       author='Nathaniel Saul',
       author_email='nathaniel.saul@wsu.edu',
-      url='https://github.com/sauln/persim',
+      url='https://github.com/scikit-tda/persim',
       license='MIT',
       packages=['persim'],
       include_package_data=True,

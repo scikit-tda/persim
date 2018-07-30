@@ -1,13 +1,13 @@
 [![PyPI version](https://badge.fury.io/py/persim.svg)](https://badge.fury.io/py/persim)
-[![Build Status](https://travis-ci.org/sauln/persim.svg?branch=master)](https://travis-ci.org/sauln/persim)
-[![codecov](https://codecov.io/gh/sauln/persim/branch/master/graph/badge.svg)](https://codecov.io/gh/sauln/persim)
+[![Build Status](https://travis-ci.org/scikit-tda/persim.svg?branch=master)](https://travis-ci.org/scikit-tda/persim)
+[![codecov](https://codecov.io/gh/scikit-tda/persim/branch/master/graph/badge.svg)](https://codecov.io/gh/scikit-tda/persim)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # Persim <img align="right" width="40" height="40" src="https://imgur.com/8p6VwFm.jpg">
 
 Persim is a Python implementation of Persistence Images as first introduced in [https://arxiv.org/abs/1507.06217](https://arxiv.org/abs/1507.06217).
 
-It is designed to interface with [Ripser](https://github.com/sauln/ripser), though any persistence diagram should work fine.
+It is designed to interface with [Ripser](https://github.com/scikit-tda/ripser), though any persistence diagram should work fine.
 
 # Setup
 
@@ -20,7 +20,7 @@ pip install persim
 
 # Usage
 
-First, construct a diagram. In this example, we will use [Ripser](https://github.com/sauln/ripser).
+First, construct a diagram. In this example, we will use [Ripser](https://github.com/scikit-tda/ripser).
 
 ``` Python
 import numpy as np
