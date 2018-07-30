@@ -13,14 +13,11 @@ if mo:
 else:
     raise RuntimeError("Unable to find version string in %s." % (VERSIONFILE,))
 
-
-
-
 with open('README.md') as f:
     long_description = f.read()
 
 setup(name='persim',
-      version='0.0.7',
+      version=verstr,
       description='Python implementation persistent images representation of persistence diagrams.',
       long_description=long_description,
       long_description_content_type="text/markdown",	
