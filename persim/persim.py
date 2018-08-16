@@ -7,10 +7,10 @@ from scipy.stats import norm
 import scipy.spatial as spatial
 import matplotlib.pyplot as plt
 
-from sklearn.base import BaseEstimator
+from sklearn.base import TransformerMixin
 
 
-class PersImage(BaseEstimator):
+class PersImage(TransformerMixin):
     """ Initialize a persistence image generator.
 
     Parameters
