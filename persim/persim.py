@@ -174,13 +174,17 @@ class PersImage(TransformerMixin):
 
         return diagram
 
-    def show(self, imgs):
+    def show(self, imgs, ax=None):
         """ Visualize the persistence image
+
         """
+
+        ax = ax or plt.gca()
 
         if type(imgs) is not list:
             imgs = [imgs]
 
         for i, img in enumerate(imgs):
-            plt.imshow(img, cmap=plt.get_cmap("plasma"))
-            # plt.show()
+            ax.imshow(img, cmap=plt.get_cmap("plasma"))
+            ax.axis('off')
+

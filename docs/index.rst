@@ -5,16 +5,13 @@
 
 |PyPI version| |Build Status| |Codecov|
 
-Welcome to Persim's documentation!
+Persim
 ==================================
 
 
+Persim is a Python implementation of Persistence Images, as first introduced in `this paper <https://arxiv.org/abs/1507.06217>`_.
 
-
-Persim is a Python implementation of Persistence Images as first introduced in `this paper <https://arxiv.org/abs/1507.06217>`_.
-
-It is designed to interface with `Ripser <https://github.com/sauln/ripser>`_, though any persistence diagram should work fine.
-
+It is designed to interface with `Ripser <https://github.com/sauln/ripser>`_, though works fine for any persistence diagrams.
 
 
 Setup
@@ -22,20 +19,17 @@ Setup
 
 Currently, the only option is to install the library from source:
 
-.. code::
+.. code:: Bash
 
     pip install persim
-
 
 
 Usage
 -------
 
-
-
 First, construct a diagram. In this example, we will use `Ripser <https://github.com/sauln/ripser>`_.
 
-.. code::
+.. code:: Python
 
     import numpy as np
     from ripser import Rips
@@ -45,10 +39,11 @@ First, construct a diagram. In this example, we will use `Ripser <https://github
     dgm = rips.fit_transform(data)
     diagram = dgm[1] # Just diagram for H1
 
+.. image:: images/data-and-pd.png
 
 Then from this diagram, we construct the persistence image
 
-.. code::
+.. code:: Python
 
     from persim import PersImage
 
@@ -57,14 +52,37 @@ Then from this diagram, we construct the persistence image
     pim.show(img)
 
 
-Inspiration
--------------
+.. image:: images/pers-im-h1.png
 
-Persistence Images were first introduced in `Adams et al, 2017 <http://www.jmlr.org/papers/volume18/16-337/16-337.pdf>`_. Much of this work, an examples contained herein are inspired by the work of `Obayashi and Hiraoka, 2017 <https://arxiv.org/abs/1706.10082>`_. Choices of weightings and general methods are often derived from `Kusano, Fukumizu, and Yasuaki Hiraoka, 2016 <https://arxiv.org/abs/1601.01741>`_.
+
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Background
+
+    about
+    notebooks/Basic Usage
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Tutorials
+
+    notebooks/Classification with persistence images
+
+
+.. toctree::
+    :maxdepth: 2
+    :caption: API Reference
+    
+    reference
+
+
+
+
+
 
 Reference
 ===========
-
 
 .. automodule:: persim
     :members:
@@ -73,13 +91,8 @@ Reference
     :members:
     :undoc-members:
 
-
-
-
 .. toctree::
     :maxdepth: 2
-
-
 
 
 Indices and tables
