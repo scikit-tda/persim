@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-|PyPI version| |Build Status| |Codecov|
+|PyPI version| |Build Status| |Codecov| |License: MIT|
 
 Persim
 ==================================
@@ -106,10 +106,12 @@ Indices and tables
 
 .. |PyPI version| image:: https://badge.fury.io/py/persim.svg
    :target: https://badge.fury.io/py/persim
-.. |Build Status| image:: https://travis-ci.org/sauln/persim.svg?branch=master
-   :target: https://travis-ci.org/sauln/persim
-.. |Codecov| image:: https://codecov.io/gh/sauln/persim/branch/master/graph/badge.svg
-   :target: https://codecov.io/gh/sauln/persim
+.. |Build Status| image:: https://travis-ci.org/scikit-tda/persim.svg?branch=master
+   :target: https://travis-ci.org/scikit-tda/persim
+.. |Codecov| image:: https://codecov.io/gh/scikit-tda/persim/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/scikit-tda/persim
+.. |License: MIT| image:: https://img.shields.io/badge/License-MIT-yellow.svg
+   :target: https://opensource.org/licenses/MIT)
 
 
 
