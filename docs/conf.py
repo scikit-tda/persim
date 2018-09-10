@@ -15,7 +15,7 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
-
+from persim import __version__
 
 # -- Project information -----------------------------------------------------
 
@@ -24,9 +24,9 @@ copyright = u'2018, Nathaniel Saul'
 author = u'Nathaniel Saul'
 
 # The short X.Y version
-version = u''
+version = __version__
 # The full version, including alpha/beta/rc tags
-release = u'0.0.6'
+release = __version__
 
 
 # -- General configuration ---------------------------------------------------
