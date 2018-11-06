@@ -54,8 +54,6 @@ Then from this diagram, we construct the persistence image
 
 .. image:: images/pers-im-h1.png
 
-
-
 .. toctree::
     :maxdepth: 2
     :caption: Background

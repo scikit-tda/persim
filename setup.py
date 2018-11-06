@@ -31,7 +31,8 @@ setup(name='persim',
         'scikit-learn',
         'numpy',
         'matplotlib',
-        'scipy'
+        'scipy',
+        'hopcroftkarp'
       ],
       python_requires='>=2.7,!=3.1,!=3.2,!=3.3',
       classifiers=[
