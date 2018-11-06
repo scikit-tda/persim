@@ -19,17 +19,24 @@ def bottleneck(dgm1, dgm2, matching=False):
     points, but allows for other coordinate columns (which are ignored in
     diagonal matching)
 
-    Inputs
-    ------
+    Parameters
+    -----------
     dgm1: Mx(>=2) 
         array of birth/death pairs for PD 1
-    dgm2: Nx(>=2) array of birth/death paris for PD 2
-    
+    dgm2: Nx(>=2) 
+        array of birth/death paris for PD 2
+    matching: bool, default False
+        if True, return matching information
+
     Returns
     --------
 
-    if matching:
-        (total cost, tuples of matched indices,  (N+M)x(N+M) cross-similarity)
+    d: float
+        bottleneck distance between dgm1 and dgm2
+    matching: tuples of matched indices
+        if input `matching=True`, then return matching
+    D: (N+M)x(N+M) cross-similarity matrix
+        if input `matching=True`, then return D
     """
 
     return_matching = matching

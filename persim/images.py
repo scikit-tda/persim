@@ -60,6 +60,7 @@ class PersImage(TransformerMixin):
 
         Parameters
         -----------
+
         diagrams : list of or singleton diagram, list of pairs. [(birth, death)]
             Persistence diagrams to be converted to persistence images. It is assumed they are in (birth, death) format. Can input a list of diagrams or a single diagram.
 
@@ -87,9 +88,6 @@ class PersImage(TransformerMixin):
         return imgs
 
     def _transform(self, landscape):
-        """ Convert single diagram to a persistence image
-        """
-
         # Define an NxN grid over our landscape
         maxBD = self.specs["maxBD"]
         minBD = min(self.specs["minBD"], 0)  # at least show 0, maybe lower

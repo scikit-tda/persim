@@ -18,7 +18,7 @@ with open('README.md') as f:
 
 setup(name='persim',
       version=verstr,
-      description='Python implementation persistent images representation of persistence diagrams.',
+      description='Distances and representations of persistence diagrams',
       long_description=long_description,
       long_description_content_type="text/markdown",	
       author='Nathaniel Saul',
@@ -49,6 +49,7 @@ setup(name='persim',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
       ],
-      keywords='persistent homology, persistence images, persistence diagrams, topology data analysis, algebraic topology, unsupervised learning'
+      keywords='persistent homology, persistence images, persistence diagrams, topology data analysis, algebraic topology, unsupervised learning, sliced wasserstein distance, bottleneck distance'
      )

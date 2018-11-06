@@ -2,4 +2,8 @@ API Reference
 --------------
 
 .. automodule:: persim
-    :members: PersImage, sliced_wasserstein
+    :members: bottleneck, sliced_wasserstein, heat
+
+
+.. autoclass:: PersImage
+    :members: transform

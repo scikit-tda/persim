@@ -31,15 +31,15 @@ def heat(dgm1, dgm2, sigma=0.4):
     Return the pseudo-metric between two diagrams based on the continuous
     heat kernel as described in "A Stable Multi-Scale Kernel for Topological Machine Learning" by Jan Reininghaus, Stefan Huber, Ulrich Bauer, and Roland Kwitt (CVPR 2015)
 
-    Inputs
-    -------
+    Parameters
+    -----------
 
     dgm1: np.array (m,2)
         A persistence diagram
     dgm2: np.array (n,2)
         A persistence diagram
     sigma: float
-
+        Heat diffusion parameter (larger sigma makes blurrier)
     Returns
     --------
 
