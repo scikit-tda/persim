@@ -62,37 +62,14 @@ Then from this diagram, we construct the persistence image
 
     about
     Basic Usage
+    reference
+
 
 .. toctree::
     :maxdepth: 2
     :caption: Tutorials
 
     Classification with persistence images
-
-
-.. toctree::
-    :maxdepth: 2
-    :caption: API Reference
-    
-    reference
-
-
-
-
-
-
-Reference
-===========
-
-.. automodule:: persim
-    :members:
-
-.. autoclass:: PersImage
-    :members:
-    :undoc-members:
-
-.. toctree::
-    :maxdepth: 2
 
 
 Indices and tables
