@@ -1,0 +1,1 @@
+from persim import sliced_wasserstein
