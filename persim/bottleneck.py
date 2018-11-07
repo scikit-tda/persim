@@ -59,13 +59,13 @@ def bottleneck(dgm1, dgm2, matching=False):
 
     # Put diagonal elements into the matrix, being mindful that Linfinity
     # balls meet the diagonal line at a diamond vertex
-    D = np.zeros((N+M, N+M))
+    D = np.zeros((N + M, N + M))
     D[0:N, 0:M] = DUL
-    UR = np.max(D)*np.ones((N, N))
-    np.fill_diagonal(UR, 0.5*(S[:, 1]-S[:, 0]))
+    UR = np.max(D) * np.ones((N, N))
+    np.fill_diagonal(UR, 0.5 * (S[:, 1] - S[:, 0]))
     D[0:N, M::] = UR
-    UL = np.max(D)*np.ones((M, M))
-    np.fill_diagonal(UL, 0.5*(T[:, 1]-T[:, 0]))
+    UL = np.max(D) * np.ones((M, M))
+    np.fill_diagonal(UL, 0.5 * (T[:, 1] - T[:, 0]))
     D[N::, 0:M] = UL
 
     # Step 2: Perform a binary search + Hopcroft Karp to find the
@@ -79,23 +79,21 @@ def bottleneck(dgm1, dgm2, matching=False):
     while len(ds) >= 1:
         idx = 0
         if len(ds) > 1:
-            idx = bisect_left(range(ds.size), int(ds.size/2))
+            idx = bisect_left(range(ds.size), int(ds.size / 2))
         d = ds[idx]
         graph = {}
         for i in range(N):
-            graph['%s'%i] = {j for j in range(N) if D[i, j] <= d}
+            graph["%s" % i] = {j for j in range(N) if D[i, j] <= d}
         res = HopcroftKarp(graph).maximum_matching()
-        if len(res) == 2*N and d < bdist:
+        if len(res) == 2 * N and d < bdist:
             bdist = d
             matching = res
             ds = ds[0:idx]
         else:
-            ds = ds[idx+1::]
+            ds = ds[idx + 1 : :]
 
     if return_matching:
-        matchidx = [(i, matching['%i'%i]) for i in range(N)]
+        matchidx = [(i, matching["%i" % i]) for i in range(N)]
         return bdist, (matchidx, D)
     else:
         return bdist
-
-

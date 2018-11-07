@@ -63,6 +63,29 @@ class TestBottleneck:
         # These are very loose bounds
         assert d == pytest.approx(0.1, 0.001)
 
+    def test_matching(self):
+        dgm1 = np.array([
+            [0.5, 1],
+            [0.6, 1.1]
+        ])
+        dgm2 =  np.array([
+            [0.5, 1.1],
+            [0.6, 1.1],
+            [0.8, 1.1],
+            [1.0, 1.1],
+        ])
+
+        d, (m, D) = bottleneck(
+            dgm1, dgm2,
+            matching=True
+        )
+
+        # These are very loose bounds
+        assert len(m) == len(dgm1) + len(dgm2)
+        assert D.shape  == (len(dgm1) + len(dgm2), len(dgm1) + len(dgm2))
+
+
+
 class TestSliced:
     def test_single(self):
         d = sliced_wasserstein(

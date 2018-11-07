@@ -13,6 +13,8 @@ matrix:
       sudo: true
 
 install:
+  - pip install Cython 
+  - pip install ripser
   - pip install .
   - pip install pytest-cov
 

@@ -1,5 +1,3 @@
-
-
 """
     Implementation of the "multiscale heat kernel" (CVPR 2015), 
 
@@ -22,8 +20,10 @@ def evalHeatKernel(dgm1, dgm2, sigma):
         for j in range(I2.shape[0]):
             q = I2[j, 0:2]
             qc = I2[j, 1::-1]
-            kSigma += np.exp(-(np.sum((p-q)**2))/(8*sigma)) - np.exp(-(np.sum((p-qc)**2))/(8*sigma))
-    return kSigma / (8*np.pi*sigma)
+            kSigma += np.exp(-(np.sum((p - q) ** 2)) / (8 * sigma)) - np.exp(
+                -(np.sum((p - qc) ** 2)) / (8 * sigma)
+            )
+    return kSigma / (8 * np.pi * sigma)
 
 
 def heat(dgm1, dgm2, sigma=0.4):
@@ -47,4 +47,8 @@ def heat(dgm1, dgm2, sigma=0.4):
         heat kernel distance between dgm1 and dgm2
 
     """
-    return np.sqrt(evalHeatKernel(dgm1, dgm1, sigma) + evalHeatKernel(dgm2, dgm2, sigma) - 2*evalHeatKernel(dgm1, dgm2, sigma))
+    return np.sqrt(
+        evalHeatKernel(dgm1, dgm1, sigma)
+        + evalHeatKernel(dgm2, dgm2, sigma)
+        - 2 * evalHeatKernel(dgm1, dgm2, sigma)
+    )

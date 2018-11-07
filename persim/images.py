@@ -184,5 +184,4 @@ class PersImage(TransformerMixin):
 
         for i, img in enumerate(imgs):
             ax.imshow(img, cmap=plt.get_cmap("plasma"))
-            ax.axis('off')
-
+            ax.axis("off")

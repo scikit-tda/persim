@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.spatial.distance import cityblock
 
+
 def sliced_wasserstein(PD1, PD2, M=50):
     """ Implementation of Sliced Wasserstein distance as described in 
         Sliced Wasserstein Kernel for Persistence Diagrams by Mathieu Carriere, Marco Cuturi, Steve Oudot (https://arxiv.org/abs/1706.03358)
