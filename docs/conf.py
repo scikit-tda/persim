@@ -34,8 +34,11 @@ release = __version__
 # If your documentation needs a minimal Sphinx version, state it here.
 #
 # needs_sphinx = '1.0'
-googleanalytics_id = 'UA-124965309-3'
 
+html_context = {'google_code': 'UA-124965309-3'}
+
+# nbsphinx_kernel_name = 'python3'
+nbsphinx_allow_errors = True
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
@@ -53,7 +56,7 @@ extensions = [
     'nbsphinx',
     'numpydoc',
     'IPython.sphinxext.ipython_console_highlighting',
-    'sphinxcontrib.googleanalytics',
+    # 'sphinxcontrib.googleanalytics',
 ]
 
 

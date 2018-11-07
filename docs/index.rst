@@ -1,98 +1,50 @@
-.. Persim documentation master file, created by
-   sphinx-quickstart on Tue Jul 24 23:08:15 2018.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-|PyPI version| |Build Status| |Codecov| |License: MIT|
 
 Persim
 ==================================
 
+|PyPI version| |Build Status| |Codecov| |License: MIT|
 
-Persim is a Python implementation of Persistence Images, as first introduced in `this paper <https://arxiv.org/abs/1507.06217>`_.
+Persim is a Python package for many tools used in analyzing Persistence Diagrams.  It currently houses implementations of 
 
-It is designed to interface with `Ripser <https://github.com/sauln/ripser>`_, though works fine for any persistence diagrams.
-
+- Persistence Images
+- Bottleneck distance
+- Sliced Wasserstein Kernel
+- Heat Kernel
 
 Setup
 --------
 
-Currently, the only option is to install the library from source:
+The latest version of persim can be found on Pypi and installed with pip:
 
 .. code:: Bash
 
     pip install persim
 
 
-Usage
--------
+Contributions
+--------------
 
-First, construct a diagram. In this example, we will use `Ripser <https://github.com/sauln/ripser>`_.
+We welcome contributions of all shapes and sizes. There are lots of opportunities for potential projects, so please get in touch if you would like to help out. Everything from an implementation of your favorite distance, notebooks, examples, and documentation are all equally valuable so please don't feel you can't contribute. 
 
-.. code:: Python
-
-    import numpy as np
-    from ripser import Rips
-
-    data = np.random.random((100,2))
-    rips = Rips()
-    dgm = rips.fit_transform(data)
-    diagram = dgm[1] # Just diagram for H1
-
-.. image:: images/data-and-pd.png
-
-Then from this diagram, we construct the persistence image
-
-.. code:: Python
-
-    from persim import PersImage
-
-    pim = PersImage(diagram)
-    img = pim.transform()
-    pim.show(img)
+To contribute please fork the project make your changes and submit a pull request. We will do our best to work through any issues with you and get your code merged into the main branch.
 
 
-.. image:: images/pers-im-h1.png
-
-
+Documentation
+--------------
 
 .. toctree::
-    :maxdepth: 2
-    :caption: Background
+    :maxdepth: 1
 
-    about
-    Basic Usage
-
-.. toctree::
-    :maxdepth: 2
-    :caption: Tutorials
-
-    Classification with persistence images
-
-
-.. toctree::
-    :maxdepth: 2
-    :caption: API Reference
-    
+    Persistence Images
+    distances
     reference
 
 
-
-
-
-
-Reference
-===========
-
-.. automodule:: persim
-    :members:
-
-.. autoclass:: PersImage
-    :members:
-    :undoc-members:
-
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
+    :caption: Tutorials
+
+    Classification with persistence images
 
 
 Indices and tables

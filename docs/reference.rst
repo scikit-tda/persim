@@ -1,11 +1,9 @@
-Reference
-===========
-
+API Reference
+--------------
 
 .. automodule:: persim
-    :members:
+    :members: bottleneck, sliced_wasserstein, heat
+
 
 .. autoclass:: PersImage
-    :members:
-    :undoc-members:
-
+    :members: transform
