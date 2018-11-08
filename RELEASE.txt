@@ -1,0 +1,4 @@
+0.0.7
+    - Implementation of sliced wasserstein (thanks Alice Patania)
+    - Implementation of heat kernel and bottleneck distance (thanks Chris Tralie)
+    - Expansion of documentation
