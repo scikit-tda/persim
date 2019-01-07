@@ -65,9 +65,15 @@ class PersImage(TransformerMixin):
             Persistence diagrams to be converted to persistence images. It is assumed they are in (birth, death) format. Can input a list of diagrams or a single diagram.
 
         """
-
+        # if diagram is empty, return empty image
+        if len(diagrams) == 0:
+            return np.zeros((self.nx, self.ny))
         # if first entry of first entry is not iterable, then diagrams is singular and we need to make it a list of diagrams
-        singular = not isinstance(diagrams[0][0], collections.Iterable)
+        try:
+            singular = not isinstance(diagrams[0][0], collections.Iterable)
+        except IndexError:
+            singular = False
+
         if singular:
             diagrams = [diagrams]
 
@@ -76,8 +82,10 @@ class PersImage(TransformerMixin):
 
         if not self.specs:
             self.specs = {
-                "maxBD": np.max([np.max(landscape) for landscape in landscapes]),
-                "minBD": np.min([np.min(landscape) for landscape in landscapes]),
+                "maxBD": np.max([np.max(np.vstack((landscape, np.zeros((1, 2))))) 
+                                 for landscape in landscapes] + [0]),
+                "minBD": np.min([np.min(np.vstack((landscape, np.zeros((1, 2))))) 
+                                 for landscape in landscapes] + [0]),
             }
         imgs = [self._transform(dgm) for dgm in landscapes]
 
@@ -127,7 +135,10 @@ class PersImage(TransformerMixin):
         # TODO: use self.weighting_type to choose function
 
         if landscape is not None:
-            maxy = np.max(landscape[:, 1])
+            if len(landscape) > 0:
+                maxy = np.max(landscape[:, 1])
+            else: 
+                maxy = 1
 
         def linear(interval):
             # linear function of y such that f(0) = 0 and f(max(y)) = 1
