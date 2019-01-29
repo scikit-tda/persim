@@ -20,7 +20,7 @@ from persim import __version__
 # -- Project information -----------------------------------------------------
 
 project = u'Persim'
-copyright = u'2018, Nathaniel Saul'
+copyright = u'2019, Nathaniel Saul'
 author = u'Nathaniel Saul'
 
 # The short X.Y version

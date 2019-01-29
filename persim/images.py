@@ -22,7 +22,14 @@ class PersImage(TransformerMixin):
     spread : float
         Standard deviation of gaussian kernel
     specs : dict
-        Parameters for shape of image with respect to diagram domain. This is used if you would like images to have a particular range.
+        Parameters for shape of image with respect to diagram domain. This is used if you would like images to have a particular range. Shaped like 
+        ::
+        
+            {
+                "maxBD": float,
+                "minBD": float
+            }
+
     kernel_type : string or ...
         TODO: Implement this feature.
         Determine which type of kernel used in the convolution, or pass in custom kernel. Currently only implements Gaussian.
@@ -30,6 +37,12 @@ class PersImage(TransformerMixin):
         TODO: Implement this feature.
         Determine which type of weighting function used, or pass in custom weighting function.
         Currently only implements linear weighting.
+
+
+    Usage
+    ------
+
+
     """
 
     def __init__(
