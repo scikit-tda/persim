@@ -7,6 +7,7 @@
 
 import numpy as np
 
+__all__ = ["heat"]
 
 def evalHeatKernel(dgm1, dgm2, sigma):
     """

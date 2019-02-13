@@ -1,11 +1,33 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from ripser import ripser, plot_dgms
+from .visuals import plot_diagrams
+
+__all__ = ["bottleneck_matching", "wasserstein_matching"]
 
 
 def bottleneck_matching(I1, I2, matchidx, D, labels=["dgm1", "dgm2"], ax=None):
-    plot_dgms([I1, I2], labels=labels)# ax=ax) # <- not supported until next ripser release
+    """ Visualize bottleneck matching between two diagrams
+
+    Parameters
+    ===========
+
+    I1: array
+        A diagram
+    I2: array
+        A diagram
+    matchidx: tuples of matched indices
+        if input `matching=True`, then return matching
+    D: array
+        cross-similarity matrix
+    labels: list of strings
+        names of diagrams for legend. Default = ["dgm1", "dgm2"], 
+    ax: matplotlib Axis object
+        For plotting on a particular axis.
+
+    """
+
+    plot_diagrams([I1, I2], labels=labels, ax=ax) 
     cp = np.cos(np.pi / 4)
     sp = np.sin(np.pi / 4)
     R = np.array([[cp, -sp], [sp, cp]])
@@ -32,7 +54,7 @@ def bottleneck_matching(I1, I2, matchidx, D, labels=["dgm1", "dgm2"], ax=None):
 
 
 def wasserstein_matching(I1, I2, matchidx, labels=["dgm1", "dgm2"]):
-    plot_dgms([I1, I2], labels=labels)
+    plot_diagrams([I1, I2], labels=labels)
     cp = np.cos(np.pi / 4)
     sp = np.sin(np.pi / 4)
     R = np.array([[cp, -sp], [sp, cp]])

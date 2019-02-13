@@ -33,7 +33,7 @@ Documentation
 
     notebooks/Persistence Images
     notebooks/distances
-    reference
+    reference/index
 
 
 .. toctree::

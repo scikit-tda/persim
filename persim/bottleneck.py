@@ -11,6 +11,7 @@ import numpy as np
 from bisect import bisect_left
 from hopcroftkarp import HopcroftKarp
 
+__all__ = ["bottleneck"]
 
 def bottleneck(dgm1, dgm2, matching=False):
     """

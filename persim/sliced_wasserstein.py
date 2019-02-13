@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.spatial.distance import cityblock
 
+__all__ = ["sliced_wasserstein"]
 
 def sliced_wasserstein(PD1, PD2, M=50):
     """ Implementation of Sliced Wasserstein distance as described in 

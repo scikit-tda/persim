@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 
 from sklearn.base import TransformerMixin
 
+__all__ = ["PersImage"]
 
 class PersImage(TransformerMixin):
     """ Initialize a persistence image generator.
