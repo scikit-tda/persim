@@ -1,7 +1,3 @@
-
-Persim
-==================================
-
 |PyPI version| |Build Status| |Codecov| |License: MIT|
 
 Persim is a Python package for many tools used in analyzing Persistence Diagrams.  It currently houses implementations of 
@@ -35,8 +31,8 @@ Documentation
 .. toctree::
     :maxdepth: 1
 
-    Persistence Images
-    distances
+    notebooks/Persistence Images
+    notebooks/distances
     reference
 
 
@@ -44,7 +40,7 @@ Documentation
     :maxdepth: 1
     :caption: Tutorials
 
-    Classification with persistence images
+    notebooks/Classification with persistence images
 
 
 Indices and tables
