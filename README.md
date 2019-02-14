@@ -2,8 +2,7 @@
 [![Build Status](https://travis-ci.org/scikit-tda/persim.svg?branch=master)](https://travis-ci.org/scikit-tda/persim)
 [![codecov](https://codecov.io/gh/scikit-tda/persim/branch/master/graph/badge.svg)](https://codecov.io/gh/scikit-tda/persim)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
-# Persim <img align="right" width="40" height="40" src="https://imgur.com/8p6VwFm.jpg">
+<img align="right" width="40" height="40" src="https://imgur.com/8p6VwFm.jpg">
 
 Persim is a Python package for many tools used in analyzing Persistence Diagrams.  It currently houses implementations of 
 
