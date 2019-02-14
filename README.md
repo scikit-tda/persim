@@ -11,6 +11,7 @@ Persim is a Python package for many tools used in analyzing Persistence Diagrams
 - Bottleneck distance
 - Sliced Wasserstein Kernel
 - Heat Kernel
+- Diagram plotting
 
 
 ## Setup
@@ -23,7 +24,7 @@ pip install persim
 
 ## Documentation and Usage
 
-Documentation about the library, it's API, and examples of how to use it can be found at [persim.scikit-tda.org](http://persim.scikit-tda.org) or in [notebooks folder](https://github.com/scikit-tda/persim/tree/master/notebooks).
+Documentation about the library, it's API, and examples of how to use it can be found at [persim.scikit-tda.org](http://persim.scikit-tda.org).
 
 ## Contributions
 
