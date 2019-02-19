@@ -6,6 +6,7 @@ Persim is a Python package for many tools used in analyzing Persistence Diagrams
 - Bottleneck distance
 - Sliced Wasserstein Kernel
 - Heat Kernel
+- Diagram plotting
 
 Setup
 --------
