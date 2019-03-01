@@ -1,4 +1,4 @@
-|PyPI version| |Build Status| |Codecov| |License: MIT|
+|PyPI version| |Downloads| |Build Status| |Codecov| |License: MIT|
 
 Persim is a Python package for many tools used in analyzing Persistence Diagrams.  It currently houses implementations of 
 
@@ -52,7 +52,8 @@ Indices and tables
 * :ref:`search`
 
 
-
+.. |Downloads| image:: https://pypip.in/download/persim/badge.svg
+    :target: https://pypi.python.org/pypi/persim/
 .. |PyPI version| image:: https://badge.fury.io/py/persim.svg
    :target: https://badge.fury.io/py/persim
 .. |Build Status| image:: https://travis-ci.org/scikit-tda/persim.svg?branch=master
