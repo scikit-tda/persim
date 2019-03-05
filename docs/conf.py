@@ -16,6 +16,7 @@ html_theme_options.update({
   # Google Analytics info
   'ga_ua': 'UA-124965309-3',
   'ga_domain': '',
+  'gh_url': 'scikit-tda/persim'
 })
 
 html_short_title = project
