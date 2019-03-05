@@ -39,10 +39,7 @@ setup(name='persim',
           'pytest' 
         ],
         'docs': [ # `pip install -e ".[docs]"``
-          'sphinx',
-          'nbsphinx',
-          'sphinx-better-theme',
-          'sphinxcontrib-fulltoc'
+          'sktda_docs_config'
         ]
       },
       python_requires='>=2.7,!=3.1,!=3.2,!=3.3',
