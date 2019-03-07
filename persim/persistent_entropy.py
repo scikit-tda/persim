@@ -36,7 +36,7 @@ def pentropy(dgms,inf = 0,valInf = 100 , norm = 0):
 
     if inf == 0:
         dgms = [(dgm[dgm[:,1] !=np.inf]) for dgm in dgms]
-    else:
+    if inf == 1:
         dgms = np.where(dgms==np.inf,valInf,dgms)
             
     # Step 2: Normalization of the persistence barcodes if norm = 1
