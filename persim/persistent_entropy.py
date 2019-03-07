@@ -29,7 +29,7 @@ def pentropy(dgms,inf = 0,valInf = 100 , norm = 0):
     Returns
     --------
 
-    ps: array of persistent entropy values corresponding for each persistence barcode.
+    ps: array of persistent entropy values corresponding to each persistence barcode.
 
     """
     # Step 1: Remove infinity bars if inf = 1. If inf = 0, infinity value is substituted by valInf.
