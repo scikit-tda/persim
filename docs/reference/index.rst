@@ -36,3 +36,15 @@ Diagram Visualization
     persim.plot_diagrams
     persim.bottleneck_matching
     persim.wasserstein_matching
+
+
+
+    
+Persistence barcode measure
+======================
+
+.. autosummary::
+    :toctree: stubs
+    :nosignatures:
+
+    persim.persistent_entropy
