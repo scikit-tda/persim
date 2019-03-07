@@ -3,6 +3,7 @@
     Implementation of persistent entropy
 
     Author: cimagroup (University of Seville) 
+    contact: epaluzo@us.es
 
 """
 
@@ -11,7 +12,7 @@ import numpy as np
 
 __all__ = ["persistent_entropy"]
 
-def pentropy(dgms, inf = 0, valInf = 100, norm = 0):
+def pentropy(dgms, inf = 0, valInf = -1, norm = 0):
     """
     Perform the persistent entropy values of a family of persistence barcodes (or persistence diagrams).
     Assumes that the input diagrams are from a determined dimension. If the infinity bars have any meaning
@@ -37,7 +38,12 @@ def pentropy(dgms, inf = 0, valInf = 100, norm = 0):
     if inf == 0:
         dgms = [(dgm[dgm[:,1] !=np.inf]) for dgm in dgms]
     if inf == 1:
-        dgms = np.where(dgms==np.inf,valInf,dgms)
+        if valInf !=-1:
+            dgms = np.where(dgms==np.inf,valInf,dgms)
+        else:
+            print("Remember: You need to provide a value to infinity bars if you want to keep them.")
+            break
+            
         
     # Step 2: Persistent entropy computation.
     ps = []
