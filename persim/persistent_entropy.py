@@ -39,10 +39,10 @@ def pentropy(dgms, inf = 0, valInf = -1, norm = 0):
         dgms = [(dgm[dgm[:,1] !=np.inf]) for dgm in dgms]
     if inf == 1:
         if valInf !=-1:
-            dgms = np.where(dgms==np.inf,valInf,dgms)
+            dgms =  [np.where(dgm==np.inf,valInf,dgm) for dgm in dgms]
         else:
             print("Remember: You need to provide a value to infinity bars if you want to keep them.")
-            break
+            
             
         
     # Step 2: Persistent entropy computation.
