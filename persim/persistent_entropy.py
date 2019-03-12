@@ -52,7 +52,7 @@ def pentropy(dgms, inf = 0, valInf = -1, norm = 0):
         L = np.sum(l)
         p = l/L
         E = -np.sum(p*np.log(p))
-        if norm ==1
+        if norm ==1:
             E = E/np.log(len(l))
         ps.append(E)
 
