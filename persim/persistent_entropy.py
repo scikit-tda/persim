@@ -2,7 +2,7 @@
 
     Implementation of persistent entropy
 
-    Author: cimagroup (University of Seville) 
+    Author: Eduardo Paluzo Hidalgo (cimagroup, University of Seville)
     contact: epaluzo@us.es
 
 """
