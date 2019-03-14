@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
     Implementation of the modified Gromov-Hausdorff distance as defined
     in:
@@ -11,16 +12,18 @@
 
     Notations:
 
-    V(G) denotes vertex set of graph G.
-
     |X| denotes the number of elements in set X.
+
+    X → Y denotes the set of all mappings of set X into set Y.
+
+    V(G) denotes vertex set of graph G.
 
     mGH(X, Y) denotes the modified Gromov-Hausdorff distance between
     compact metric spaces X and Y.
 
     ===================================================================
 
-    Terms:
+    Glossary:
 
     Distance matrix of metric space X is a |X|×|X| matrix whose
     (i, j)-th entry holds the distance between i-th and j-th points of
@@ -55,8 +58,8 @@ from pyscipopt import Model
 __all__ = ["gromov_hausdorff_between_graphs", "gromov_hausdorff"]
 
 
-# To sample O(√|X| * log |X|) mappings from X → Y by default.
-DEFAULT_MAPPING_SAMPLE_SIZE_ORDER = (.5, 1)
+# To sample √|X| * log (|X| + 1) mappings from X → Y by default.
+DEFAULT_MAPPING_SAMPLE_SIZE_ORDER = np.array([.5, 1])
 
 
 def gromov_hausdorff_between_graphs(
@@ -73,7 +76,7 @@ def gromov_hausdorff_between_graphs(
         adjacency matrices if A_H=None.
     A_H: np.array (|V(H)|×|V(H)|)
         (Sparse) adjacency matrix of graph H, or None.
-    mapping_sample_size_order: 2-tuple of floats
+    mapping_sample_size_order: np.array (2)
         Parameter that regulates the number of mappings to sample when
         tightening upper bound of the modified Gromov-Hausdorff
         distance.
@@ -222,7 +225,7 @@ def gromov_hausdorff(D_X, D_Y, mapping_sample_size_order=DEFAULT_MAPPING_SAMPLE_
         Integer distance matrix of X.
     D_Y: np.array (|Y|×|Y|)
         Integer distance matrix of Y.
-    mapping_sample_size_order: 2-tuple of floats
+    mapping_sample_size_order: np.array (2)
         Parameter that regulates the number of mappings to sample when
         tightening upper bound of mGH(X, Y).
 
@@ -302,14 +305,14 @@ def find_largest_size_bounded_curvature(D_X, diam_X, d):
 
     Parameters
     ----------
-    D_X: np.array (|X|, |X|)
+    D_X: np.array (|X|×|X|)
         Integer distance matrix of X.
     diam_X: int
         Largest distance in X.
 
     Returns
     --------
-    K: np.array (N, N)
+    K: np.array (N×N)
         d-bounded curvature of X of largest size; N ≤ |K|.
     """
     # Initialize curvature K with entire distance matrix.
@@ -337,9 +340,9 @@ def confirm_lb_using_bounded_curvature(d, K, D_Y, max_distance):
     ----------
     d: int
         Lower bound candidate for 2*mGH(X, Y).
-    K: np.array (N, N)
+    K: np.array (N×N)
         d-bounded curvature of X; N ≥ 3.
-    D_Y: np.array (|Y|, |Y|)
+    D_Y: np.array (|Y|×|Y|)
         Integer distance matrix of Y.
     max_distance: int
         Largest distance in X and Y.
@@ -367,9 +370,9 @@ def confirm_lb_using_bounded_curvature_principal_subrows(d, K, D_Y, max_distance
     ----------
     d: int
         Lower bound candidate for 2*mGH(X, Y).
-    K: np.array (N, N)
+    K: np.array (N×N)
         d-bounded curvature of X; N ≥ 3.
-    D_Y: np.array (|Y|, |Y|)
+    D_Y: np.array (|Y|×|Y|)
         Integer distance matrix of Y; |Y| ≥ N.
     max_distance: int
         Largest distance in X and Y.
@@ -413,14 +416,14 @@ def represents_distance_matrix_rows_as_distributions(D, max_distance):
 
     Parameters
     ----------
-    D: np.array (N, N)
+    D: np.array (N×N)
         Integer distance matrix.
     max_distance: int
         Max distance of the distribution, upper bound of entries in D.
 
     Returns
     --------
-    D_rows_distributons: np.array (N, max_distance)
+    D_rows_distributons: np.array (N×max_distance)
         Each row holds frequencies of each distance from 1 to
         max_distance in the corresponding row of D:
         (i, j)-th entry holds frequency of distance (max_distance - j)
@@ -451,7 +454,7 @@ def find_unique_maximal_distributions(distributions):
 
     Parameters
     ----------
-    distributions: np.array (N, max_distance)
+    distributions: np.array (N×max_distance)
         Frequency distributions of N positive vectors of the same size,
         i.e. the row sums are all equal.
 
@@ -479,10 +482,10 @@ def confirm_distance_between_curvature_sets_lb(rs_distributions, D_Y_rows_distri
 
     Parameters
     ----------
-    rs_distributions: np.array (m, max_distance)
+    rs_distributions: np.array (m×max_distance)
         Frequency distributions of the rows of some m×m d-bounded
         curvature of X; m ≥ 3.
-    D_Y_rows_distributions: np.array (|Y|, max_distance)
+    D_Y_rows_distributions: np.array (|Y|×max_distance)
         Frequency distributions of the rows of distance matrix of Y;
         |Y| ≥ m.
     d: int
@@ -522,12 +525,12 @@ def remove_smallest_entry_from_vectors(distributions):
 
     Parameters
     ----------
-    distributions: np.array (N, max_distance)
+    distributions: np.array (N×max_distance)
         Frequency distributions of N positive vectors.
 
     Returns
     --------
-    updated_distributions: np.array (N, max_distance)
+    updated_distributions: np.array (N×max_distance)
         Frequency distributions of N vectors, obtained by removing
         smallest entry from each of the input vectors.
     """
@@ -613,11 +616,11 @@ def find_ub(D_X, D_Y, mapping_sample_size_order=DEFAULT_MAPPING_SAMPLE_SIZE_ORDE
 
     Parameters
     ----------
-    D_X: np.array (|X|, |X|)
+    D_X: np.array (|X|×|X|)
         Integer distance matrix of X.
-    D_Y: np.array (|Y|, |Y|)
+    D_Y: np.array (|Y|×|Y|)
         Integer distance matrix of Y.
-    mapping_sample_size_order: 2-tuple of floats
+    mapping_sample_size_order: np.array (2)
         Parameter that regulates the number of mappings to sample when
         tightening the upper bound.
     double_lb: float
@@ -649,13 +652,13 @@ def find_ub_of_min_distortion(D_X, D_Y,
 
     Parameters
     ----------
-    D_X: np.array (|X|, |X|)
+    D_X: np.array (|X|×|X|)
         Integer distance matrix of X.
-    D_Y: np.array (|Y|, |Y|)
+    D_Y: np.array (|Y|×|Y|)
         Integer distance matrix of Y.
-    mapping_sample_size_order: 2-tuple of floats
-        Exponents a, b that define the sample size
-        O(|X|^a * (log |X|)^b) of the mappings in X → Y.
+    mapping_sample_size_order: np.array (2)
+        Exponents of |X| and log (|X|+1) in their product that defines
+        how many mappings from X → Y to sample.
     goal_distortion: float
         No need to look for distortion smaller than this.
 
@@ -664,15 +667,17 @@ def find_ub_of_min_distortion(D_X, D_Y,
     ub_of_smallest_distortion: float
         Upper bound of smallest distortion of a mapping in X → Y.
     """
-    ub_of_smallest_distortion = np.inf
-    goal_distortion_is_matched = False
-    all_sampled_permutations_are_tried = False
-    n_mappings_to_sample = compute_sample_size(len(D_X), mapping_sample_size_order)
-    permutations_generator = (np.random.permutation(len(D_X)) for _ in range(n_mappings_to_sample))
+    # Compute the numper of mappings to sample.
+    n_mappings_to_sample = np.prod(
+        np.array([len(D_X), np.log(len(D_X) + 1)])**mapping_sample_size_order)
     # Construct each mapping in X → Y in |X| steps by choosing the image
     # of π(i)-th point in X at i-th step, where π is randomly sampled
     # |X|-permutation. Image of each point is chosen to minimize the
     # intermediate distortion at each step.
+    permutations_generator = (np.random.permutation(len(D_X)) for _ in range(n_mappings_to_sample))
+    ub_of_smallest_distortion = np.inf
+    goal_distortion_is_matched = False
+    all_sampled_permutations_are_tried = False
     pi = next(permutations_generator)
     while not goal_distortion_is_matched and not all_sampled_permutations_are_tried:
         # Map π(1)-th point in X to a random point in Y, due to the
@@ -702,26 +707,3 @@ def find_ub_of_min_distortion(D_X, D_Y,
             all_sampled_permutations_are_tried = True
 
     return ub_of_smallest_distortion
-
-
-def compute_sample_size(n, sample_size_order):
-    """
-    Compute sample size from its order of magnitude and the population
-    size.
-
-    Parameters
-    ----------
-    n: int
-        Population size; n > 0.
-    sample_size_order: 2-tuple of floats
-        Exponents a, b that define the sample size O(n^a * (log n)^b).
-
-    Returns
-    --------
-    sample_size: int
-        Computed sample size.
-    """
-    a, b = sample_size_order
-    sample_size = int(np.ceil(n**a * np.log(n + 1)**b))
-
-    return sample_size
