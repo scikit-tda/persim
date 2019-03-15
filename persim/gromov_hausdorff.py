@@ -668,8 +668,8 @@ def find_ub_of_min_distortion(D_X, D_Y,
         Upper bound of smallest distortion of a mapping in X → Y.
     """
     # Compute the numper of mappings to sample.
-    n_mappings_to_sample = np.prod(
-        np.array([len(D_X), np.log(len(D_X) + 1)])**mapping_sample_size_order)
+    n_mappings_to_sample = int(np.ceil(np.prod(
+        np.array([len(D_X), np.log(len(D_X) + 1)])**mapping_sample_size_order)))
     # Construct each mapping in X → Y in |X| steps by choosing the image
     # of π(i)-th point in X at i-th step, where π is randomly sampled
     # |X|-permutation. Image of each point is chosen to minimize the
