@@ -54,7 +54,7 @@ import scipy.sparse as sps
 from scipy.sparse.csgraph import shortest_path, connected_components
 
 
-__all__ = ["gromov_hausdorff_between_graphs", "gromov_hausdorff"]
+__all__ = ["gromov_hausdorff_between_graphs"]
 
 
 # To sample √|X| * log (|X| + 1) mappings from X → Y by default.
@@ -508,7 +508,7 @@ def confirm_distance_between_curvature_sets_lb(rs_distributions, D_Y_rows_distri
         j = 0
         while distance_between_curvature_sets_lb_is_confirmed and j < len(D_Y_rows_distributions):
             distance_between_curvature_sets_lb_is_confirmed = \
-                confirm_distance_to_principal_subrows_lb_2(#!!
+                confirm_distance_to_principal_subrows_lb(
                     rs_distributions[i], D_Y_rows_distributions[j], d)
             j += 1
 
@@ -543,7 +543,7 @@ def remove_smallest_entry_from_vectors(distributions):
     return updated_distributions
 
 
-def confirm_distance_to_principal_subrows_lb_2(r_distribution, s_distribution, d):
+def confirm_distance_to_principal_subrows_lb(r_distribution, s_distribution, d):
     """
     For vectors r of size m and s, a row of some n×n distance matrix D,
     try to confirm that l∞-distance from r to the set of those rows of
@@ -618,7 +618,7 @@ def confirm_distance_to_principal_subrows_lb_2(r_distribution, s_distribution, d
             reversed_r_distribution[i] -= reversed_s_distribution[j]
             j = next_j(i, j + 1)
 
-    distance_to_principal_subrows_lb_is_confirmed = (i is None)
+    distance_to_principal_subrows_lb_is_confirmed = (j is None)
 
     return distance_to_principal_subrows_lb_is_confirmed
 
