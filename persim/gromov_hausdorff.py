@@ -595,16 +595,16 @@ def confirm_distance_to_principal_subrows_lb(r_distribution, s_distribution, d):
         # which r entries, corresponding to a given reversed r
         # distribution index, can be assigned to.
         try:
-            j = next(k for k in range(min_j, min(i + (d - 1),
+            j = next(j for j in range(min_j, min(i + (d - 1),
                                                  len(reversed_s_distribution) - 1) + 1)
-                     if reversed_s_distribution[k] > 0)
+                     if reversed_s_distribution[j] > 0)
         except StopIteration:
             # No s entries left to assign to.
             j = None
 
         return j
 
-    # Copy to allow modifications and stay pure; flip for the
+    # Copy to allow modifications and stay pure; reverse for the
     # frequencies of smaller entries to come first, to be compatible
     # even for distributions of different lengths.
     reversed_r_distribution = r_distribution[::-1].copy()
