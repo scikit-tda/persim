@@ -33,7 +33,6 @@ setup(name='persim',
         'matplotlib',
         'scipy',
         'hopcroftkarp',
-        'pyscipopt'
       ],
       extras_require={ # use `pip install -e ".[testing]"``
         'testing': [

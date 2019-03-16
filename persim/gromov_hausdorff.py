@@ -52,7 +52,6 @@ import numpy as np
 import warnings
 import scipy.sparse as sps
 from scipy.sparse.csgraph import shortest_path, connected_components
-from pyscipopt import Model
 
 
 __all__ = ["gromov_hausdorff_between_graphs", "gromov_hausdorff"]
@@ -509,7 +508,7 @@ def confirm_distance_between_curvature_sets_lb(rs_distributions, D_Y_rows_distri
         j = 0
         while distance_between_curvature_sets_lb_is_confirmed and j < len(D_Y_rows_distributions):
             distance_between_curvature_sets_lb_is_confirmed = \
-                confirm_distance_to_principal_subrows_lb(
+                confirm_distance_to_principal_subrows_lb_2(#!!
                     rs_distributions[i], D_Y_rows_distributions[j], d)
             j += 1
 
@@ -544,7 +543,7 @@ def remove_smallest_entry_from_vectors(distributions):
     return updated_distributions
 
 
-def confirm_distance_to_principal_subrows_lb(r_distribution, s_distribution, d):
+def confirm_distance_to_principal_subrows_lb_2(r_distribution, s_distribution, d):
     """
     For vectors r of size m and s, a row of some n×n distance matrix D,
     try to confirm that l∞-distance from r to the set of those rows of
@@ -553,10 +552,10 @@ def confirm_distance_to_principal_subrows_lb(r_distribution, s_distribution, d):
     Parameters
     ----------
     r_distribution: np.array (max_distance)
-        Frequency distribution of r, positive integer vector of size m.
+        Frequency distribution of r, positive integer vector.
     s_distribution: np.array (max_distance)
-        Frequency distribution of s, positive integer vector of size n;
-        n ≥ m.
+        Frequency distribution of s, positive integer vector no smaller
+        in length than r;
     d: int
         Lower bound candidate for l∞-distance from r to the set of
         those rows of m×m principal submatrices of D that are
@@ -569,43 +568,57 @@ def confirm_distance_to_principal_subrows_lb(r_distribution, s_distribution, d):
         rows of m×m principal submatrices of D that are subvectors of
         s is ≥ d.
     """
-    # For each distance, find distances that are closer than d to it.
-    allowed_assignments_by_entry_distribution_index = \
-        {entry_distribution_index: range(
-            max(entry_distribution_index - (d - 1), 0),
-            min(entry_distribution_index + (d - 1), len(r_distribution) - 1) + 1)
-         for entry_distribution_index in range(len(r_distribution))}
-    model = Model()
-    # Set linear bottleneck assignment problem that is feasible if and
-    # only if l∞-distance from r to the set of those rows of m×m
-    # principal submatrices of D that are subvectors of s, is < d.
-    n_assignments_of_r_entries_to_s_entries = dict()
-    for r_entry_distribution_index, r_entry_frequency in enumerate(r_distribution):
-        # Only allow to assign a distance from r to a distance from s
-        # if they are closer than d to each other.
-        for s_entry_distribution_index in \
-                allowed_assignments_by_entry_distribution_index[r_entry_distribution_index]:
-            s_entry_frequency = s_distribution[s_entry_distribution_index]
-            n_assignments_of_r_distance_to_s_distance = model.addVar(
-                "n_assignments_of_r{}_to_s{}".format(r_entry_distribution_index,
-                                                     s_entry_distribution_index),
-                vtype="INTEGER", ub=min(r_entry_frequency, s_entry_frequency))
-            try:
-                n_assignments_of_r_entries_to_s_entries[r_entry_distribution_index][
-                    s_entry_distribution_index] = n_assignments_of_r_distance_to_s_distance
-            except KeyError:
-                n_assignments_of_r_entries_to_s_entries[r_entry_distribution_index] = \
-                    {s_entry_distribution_index: n_assignments_of_r_distance_to_s_distance}
-        # Ensure assigning every distance from r.
-        model.addCons(r_entry_frequency == sum(
-            n_assignments_of_r_entries_to_s_entries[r_entry_distribution_index].values()))
+    # Check if every entry in r can be injectively assigned to some
+    # entry in s so that their difference is < d.
 
-    # Solve linear bottleneck assignment problem.
-    model.hideOutput()
-    model.optimize()
-    status = model.getStatus()
-    distance_to_principal_subrows_lb_is_confirmed = (status == "infeasible")
-    model.freeProb()
+    def next_i_and_j(min_i, min_j):
+        # Find reversed r distribution index of smallest r entries yet
+        # to be assigned. Then find index in reversed s distribution of
+        # smallest s entries to which the r entries can be assigned to.
+        try:
+            i = next(i for i in range(min_i, len(reversed_r_distribution))
+                     if reversed_r_distribution[i] > 0)
+        except StopIteration:
+            # All r entries are already assigned.
+            i = None
+            j = min_j
+        else:
+            j = next_j(i, max(i - (d - 1), min_j))
+
+        return i, j
+
+    def next_j(i, min_j):
+        # Find reversed s distribution index of smallest s entries to
+        # which r entries, corresponding to a given reversed r
+        # distribution index, can be assigned to.
+        try:
+            j = next(k for k in range(min_j, min(i + (d - 1),
+                                                 len(reversed_s_distribution) - 1) + 1)
+                     if reversed_s_distribution[k] > 0)
+        except StopIteration:
+            # No s entries left to assign to.
+            j = None
+
+        return j
+
+    # Copy to allow modifications and stay pure; flip for the
+    # frequencies of smaller entries to come first, to be compatible
+    # even for distributions of different lengths.
+    reversed_r_distribution = r_distribution[::-1].copy()
+    reversed_s_distribution = s_distribution[::-1].copy()
+    # Assign r entries to s entries if their difference is < d, going
+    # from smallest to largest entries in both r and s, until all r
+    # entries are assigned or such assignment deems impossible.
+    i, j = next_i_and_j(0, 0)
+    while i is not None and j is not None:
+        if reversed_r_distribution[i] <= reversed_s_distribution[j]:
+            reversed_s_distribution[j] -= reversed_r_distribution[i]
+            i, j = next_i_and_j(i + 1, j)
+        else:
+            reversed_r_distribution[i] -= reversed_s_distribution[j]
+            j = next_j(i, j + 1)
+
+    distance_to_principal_subrows_lb_is_confirmed = (i is None)
 
     return distance_to_principal_subrows_lb_is_confirmed
 
