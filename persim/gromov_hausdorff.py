@@ -511,7 +511,7 @@ def confirm_distance_between_curvature_sets_lb(rs_distributions, D_Y_rows_distri
         j = 0
         while distance_between_curvature_sets_lb_is_confirmed and j < len(D_Y_rows_distributions):
             distance_between_curvature_sets_lb_is_confirmed = \
-                confirm_distance_to_principal_subrows_lb(
+                check_distance_to_permuted_principal_subrows_lb(
                     rs_distributions[i], D_Y_rows_distributions[j], d)
             j += 1
 
@@ -546,11 +546,12 @@ def remove_smallest_entry_from_vectors(distributions):
     return updated_distributions
 
 
-def confirm_distance_to_principal_subrows_lb(r_distribution, s_distribution, d):
+def check_distance_to_permuted_principal_subrows_lb(r_distribution, s_distribution, d):
     """
     For vectors r of size m and s, a row of some n×n distance matrix D,
-    try to confirm that l∞-distance from r to the set of those rows of
-    m×m principal submatrices of D that are subvectors of s is ≥ d.
+    check if l∞-distance from r to the set P, comprised of permutations
+    of those subvectors of s that are a row of some m×m principal
+    submatrix of D, is ≥ d.
 
     Parameters
     ----------
@@ -560,20 +561,13 @@ def confirm_distance_to_principal_subrows_lb(r_distribution, s_distribution, d):
         Frequency distribution of s, positive integer vector no smaller
         in length than r;
     d: int
-        Lower bound candidate for l∞-distance from r to the set of
-        those rows of m×m principal submatrices of D that are
-        subvectors of s; d > 0.
+        Lower bound candidate for l∞-distance from r to P; d > 0.
 
     Returns
     --------
-    distance_to_principal_subrows_lb_is_confirmed: bool
-        Whether confirmed that l∞-distance from r to the set of those
-        rows of m×m principal submatrices of D that are subvectors of
-        s is ≥ d.
+    d_is_distance_to_permuted_principal_subrows_lb: bool
+        Whether l∞-distance from r to P is ≥ d.
     """
-    # Check if every entry in r can be injectively assigned to some
-    # entry in s so that their difference is < d.
-
     def next_i_and_j(min_i, min_j):
         # Find reversed r distribution index of smallest r entries yet
         # to be assigned. Then find index in reversed s distribution of
@@ -582,7 +576,7 @@ def confirm_distance_to_principal_subrows_lb(r_distribution, s_distribution, d):
             i = next(i for i in range(min_i, len(reversed_r_distribution))
                      if reversed_r_distribution[i] > 0)
         except StopIteration:
-            # All r entries are already assigned.
+            # All r entries are assigned.
             i = None
             j = min_j
         else:
@@ -599,19 +593,20 @@ def confirm_distance_to_principal_subrows_lb(r_distribution, s_distribution, d):
                                                  len(reversed_s_distribution) - 1) + 1)
                      if reversed_s_distribution[j] > 0)
         except StopIteration:
-            # No s entries left to assign to.
+            # No s entries left to assign the particular r entries to.
             j = None
 
         return j
 
     # Copy to allow modifications and stay pure; reverse for the
     # frequencies of smaller entries to come first, to be compatible
-    # even for distributions of different lengths.
-    reversed_r_distribution = r_distribution[::-1].copy()
-    reversed_s_distribution = s_distribution[::-1].copy()
-    # Assign r entries to s entries if their difference is < d, going
-    # from smallest to largest entries in both r and s, until all r
-    # entries are assigned or such assignment deems impossible.
+    # even with distributions of different lengths.
+    reversed_r_distribution = list(r_distribution[::-1])
+    reversed_s_distribution = list(s_distribution[::-1])
+    # Injectively assign r entries to s entries if their difference
+    # is < d, going from smallest to largest entries in both r and s,
+    # until all r entries are assigned or such assignment proves
+    # unfeasible.
     i, j = next_i_and_j(0, 0)
     while i is not None and j is not None:
         if reversed_r_distribution[i] <= reversed_s_distribution[j]:
@@ -621,9 +616,12 @@ def confirm_distance_to_principal_subrows_lb(r_distribution, s_distribution, d):
             reversed_r_distribution[i] -= reversed_s_distribution[j]
             j = next_j(i, j + 1)
 
-    distance_to_principal_subrows_lb_is_confirmed = (j is None)
+    # The assignment is feasible if and only if |r - p| < d for some
+    # p ∈ P, and therefore infeasible if and only if l∞-distance from
+    # r to P is ≥ d.
+    d_is_distance_to_permuted_principal_subrows_lb = (j is None)
 
-    return distance_to_principal_subrows_lb_is_confirmed
+    return d_is_distance_to_permuted_principal_subrows_lb
 
 
 def find_ub(D_X, D_Y, mapping_sample_size_order=DEFAULT_MAPPING_SAMPLE_SIZE_ORDER, double_lb=0):
