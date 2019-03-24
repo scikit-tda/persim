@@ -1,6 +1,14 @@
 """
     
+    The persistent entropy has been defined in [1]. A precursor of this definition was given in [2]
+    to measure how different bars of the barcode are in length.
     
+    [1] M. Rucco, F. Castiglione, E. Merelli, M. Pettini, Characterisation of the
+    idiotypic immune network through persistent entropy, in: Proc. Complex, 2015.
+    [2] H. Chintakunta, T. Gentimis, R. Gonzalez-Diaz, M.-J. Jimenez,
+    H. Krim, An entropy-based persistence barcode, Pattern Recognition
+    48 (2) (2015) 391–401.
+        
     Implementation of persistent entropy
 
     Author: Eduardo Paluzo Hidalgo (cimagroup, University of Seville)
