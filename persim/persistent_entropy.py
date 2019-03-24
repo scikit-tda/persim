@@ -13,7 +13,7 @@ import numpy as np
 
 __all__ = ["persistent_entropy"]
 
-def persitent_entropy(dgms, keep_inf = False, val_inf = None, normalize = False):
+def persistent_entropy(dgms, keep_inf = False, val_inf = None, normalize = False):
     """
     Perform the persistent entropy values of a family of persistence barcodes (or persistence diagrams).
     Assumes that the input diagrams are from a determined dimension. If the infinity bars have any meaning
@@ -39,11 +39,10 @@ def persitent_entropy(dgms, keep_inf = False, val_inf = None, normalize = False)
     if keep_inf == False:
         dgms = [(dgm[dgm[:,1] !=np.inf]) for dgm in dgms]
     if keep_inf == True:
-        if val_inf !=-1:
+        if val_inf != None:
             dgms =  [np.where(dgm==np.inf,val_inf,dgm) for dgm in dgms]
         else:
-            print("Remember: You need to provide a value to infinity bars if you want to keep them.")
-            
+            raise Exception("Remember: You need to provide a value to infinity bars if you want to keep them.")            
             
         
     # Step 2: Persistent entropy computation.
