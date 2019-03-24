@@ -1,5 +1,6 @@
 """
-
+    
+    
     Implementation of persistent entropy
 
     Author: Eduardo Paluzo Hidalgo (cimagroup, University of Seville)
@@ -12,20 +13,20 @@ import numpy as np
 
 __all__ = ["persistent_entropy"]
 
-def persitent_entropy(dgms, inf = 0, valInf = -1, norm = 0):
+def persitent_entropy(dgms, keep_inf = False, val_Inf = None, normalize = False):
     """
     Perform the persistent entropy values of a family of persistence barcodes (or persistence diagrams).
     Assumes that the input diagrams are from a determined dimension. If the infinity bars have any meaning
-    in your experiment and you want to keep them, remember to give the value you desire to valInf.
+    in your experiment and you want to keep them, remember to give the value you desire to val_Inf.
 
     Parameters
     -----------
-    dgms: array of arrays of birth/death pairs of a persistence barcode of a determined dimension.
-    inf: if 0 the infinity bars are removed.
-         if 1 the infinity bars remain.
-    valInf: substitution value to infinity.
-    norm: if 0 the persistent entropy values are not normalized.
-          if 1 the persistent entropy values are normalized.
+    dgms:  array of arrays of birth/death pairs of a persistence barcode of a determined dimension.
+    keep_inf: if False the infinity bars are removed.
+              if True the infinity bars remain.
+    val_Inf: substitution value to infinity.
+    normalize: if False the persistent entropy values are not normalized.
+               if True the persistent entropy values are normalized.
           
     Returns
     --------
@@ -33,11 +34,11 @@ def persitent_entropy(dgms, inf = 0, valInf = -1, norm = 0):
     ps: array of persistent entropy values corresponding to each persistence barcode.
 
     """
-    # Step 1: Remove infinity bars if inf = 1. If inf = 0, infinity value is substituted by valInf.
+    # Step 1: Remove infinity bars if keep_inf = False. If keep_inf = True, infinity value is substituted by val_Inf.
 
-    if inf == 0:
+    if keep_inf == False:
         dgms = [(dgm[dgm[:,1] !=np.inf]) for dgm in dgms]
-    if inf == 1:
+    if keep_inf == True:
         if valInf !=-1:
             dgms =  [np.where(dgm==np.inf,valInf,dgm) for dgm in dgms]
         else:
@@ -52,7 +53,7 @@ def persitent_entropy(dgms, inf = 0, valInf = -1, norm = 0):
         L = np.sum(l)
         p = l/L
         E = -np.sum(p*np.log(p))
-        if norm ==1:
+        if normalize == True:
             E = E/np.log(len(l))
         ps.append(E)
 
