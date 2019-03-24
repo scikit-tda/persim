@@ -24,7 +24,7 @@ def persitent_entropy(dgms, keep_inf = False, val_inf = None, normalize = False)
     dgms:  array of arrays of birth/death pairs of a persistence barcode of a determined dimension.
     keep_inf: if False the infinity bars are removed.
               if True the infinity bars remain.
-    val_Inf: substitution value to infinity.
+    val_inf: substitution value to infinity.
     normalize: if False the persistent entropy values are not normalized.
                if True the persistent entropy values are normalized.
           
