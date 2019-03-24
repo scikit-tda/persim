@@ -12,7 +12,7 @@ import numpy as np
 
 __all__ = ["persistent_entropy"]
 
-def pentropy(dgms, inf = 0, valInf = -1, norm = 0):
+def persitent_entropy(dgms, inf = 0, valInf = -1, norm = 0):
     """
     Perform the persistent entropy values of a family of persistence barcodes (or persistence diagrams).
     Assumes that the input diagrams are from a determined dimension. If the infinity bars have any meaning
