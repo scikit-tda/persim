@@ -41,7 +41,7 @@ Diagram Visualization
 
     
 Persistence barcode measure
-======================
+=============================
 
 .. autosummary::
     :toctree: stubs
