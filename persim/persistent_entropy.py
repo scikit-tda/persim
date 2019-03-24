@@ -24,8 +24,8 @@ def persistent_entropy(
 
     Parameters
     -----------
-    dgms:   
-        array of arrays of birth/death pairs of a persistence barcode of a determined dimension.
+    dgms: ndarray (n_pairs, 2) or list of diagrams   
+        array or list of arrays of birth/death pairs of a persistence barcode of a determined dimension.
     keep_inf: bool, default False
         if False, the infinity bars are removed.
         if True, the infinity bars remain.
@@ -38,9 +38,14 @@ def persistent_entropy(
     Returns
     --------
 
-    ps: array of persistent entropy values corresponding to each persistence barcode.
+    ps: ndarray (n_pairs,)
+        array of persistent entropy values corresponding to each persistence barcode.
 
     """
+
+    if isinstance(dgms, list) == False:
+        dgms = [dgms]
+
     # Step 1: Remove infinity bars if keep_inf = False. If keep_inf = True, infinity value is substituted by val_inf.
 
     if keep_inf == False:
