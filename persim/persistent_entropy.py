@@ -73,11 +73,14 @@ def persistent_entropy(
     ps = []
     for dgm in dgms:
         l = dgm[:, 1] - dgm[:, 0]
-        L = np.sum(l)
-        p = l / L
-        E = -np.sum(p * np.log(p))
-        if normalize == True:
-            E = E / np.log(len(l))
-        ps.append(E)
+        if all(l>0):
+            L = np.sum(l)
+            p = l / L
+            E = -np.sum(p * np.log(p))
+            if normalize == True:
+                E = E / np.log(len(l))
+            ps.append(E)
+        else:
+            raise Exception("A bar is born after dying")
 
     return np.array(ps)
