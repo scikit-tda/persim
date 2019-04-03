@@ -1,4 +1,6 @@
-# -*- import
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 """
     
     The persistent entropy has been defined in [1]. A precursor of this definition was given in [2]
