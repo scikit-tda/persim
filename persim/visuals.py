@@ -174,5 +174,44 @@ def plot_diagrams(
     if show is True:
         plt.show()
 
+def plot_a_bar(p, q, c='b', linestyle='-'):
+    plt.plot([p[0], q[0]], [p[1], q[1]], c=c, linestyle=linestyle, linewidth=1)
 
+def plot_barcode(diagrams, show=False):
 
+    if not isinstance(diagrams, list):
+        # Must have diagrams as a list for processing downstream
+        diagrams = [diagrams]
+
+    dimensions = len(diagrams)
+
+    # barcodes
+    for dim in range(dimensions):
+        number_of_bars = len(diagrams[dim])
+        print "Number of bars in dimension %d: %d" % (dim, number_of_bars)
+        
+        number_of_bars_fin = 0
+        number_of_bars_inf = 0 
+
+        if number_of_bars > 0:
+            fig = plt.figure()
+            ax = plt.subplot("111")
+
+            for i in range(number_of_bars):
+                birth = [diagrams[dim][i, 0], i]
+                death = [diagrams[dim][i, 1], i]
+                maximum_death = np.nanmax(diagrams[dim][diagrams[dim] < 1E308].flatten())
+                if np.isinf(death[0]):
+                    number_of_bars_inf += 1
+                    plot_a_bar(birth, [1.05 * maximum_death, i])
+                    plt.scatter([1.05 * maximum_death], [i], c='b', s=10, marker='>')
+                else:
+                    number_of_bars_fin += 1
+                    plot_a_bar(birth, death)
+            ## the line below is to plot a vertical red line showing the maximal finite bar length
+            plt.plot([maximum_death, maximum_death], [0, number_of_bars - 1], c='r', linestyle='--', linewidth=0.5)
+
+            if show is True:
+                title = "%d-dimensional bars: %d finite, %d infinite" % (dim, number_of_bars_fin, number_of_bars_inf)
+                ax.set_title(title, fontsize=10)
+                plt.show()
