@@ -188,7 +188,7 @@ def plot_barcode(diagrams, show=False):
     # barcodes
     for dim in range(dimensions):
         number_of_bars = len(diagrams[dim])
-        print "Number of bars in dimension %d: %d" % (dim, number_of_bars)
+        print("Number of bars in dimension %d: %d" % (dim, number_of_bars))
         
         number_of_bars_fin = 0
         number_of_bars_inf = 0 
