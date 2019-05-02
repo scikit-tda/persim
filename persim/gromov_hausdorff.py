@@ -31,12 +31,12 @@
     and non-negative, their diagonal entries are 0 and off-diagonal
     entries are positive.
 
-    Curvature of metric space X generalizes a distance matrix, induced
-    by an n-tuple of points from X (i.e. by an element of X^n). The
-    (i, j)-th entry of this n×n matrix holds the distance between the
-    points from X contained at i-th and j-th positions of the tuple.
-    However, the points contained in an element of X^n need not be
-    distinct, and so the off-diagonal entries of a curvature can be 0.
+    Curvature is a generalization of distance matrix that allows
+    repetitions in the underlying points of a metric space. Curvature
+    of an n-tuple of points from metric space X is an n×n matrix whose
+    (i, j)-th entry holds the distance between the points from i-th and
+    j-th positions of the tuple. Since these points need not be
+    distinct, the off-diagonal entries of a curvature can equal 0.
 
     n-th curvature set of metric space X is the set of all curvatures
     of X that are of size n×n.
@@ -94,7 +94,7 @@ def gromov_hausdorff_between_graphs(
     # Form iterable with adjacency matrices.
     if A_H is None:
         if len(A_G) < 2:
-            raise ValueError("`estimate_between_unweighted_graphs` needs at least"
+            raise ValueError("'estimate_between_unweighted_graphs' needs at least"
                              "2 graphs to discriminate")
         As = A_G
     else:
@@ -611,10 +611,12 @@ def check_distance_to_permuted_principal_subrows_lb(r_distribution, s_distributi
     while i is not None and j is not None:
         if reversed_r_distribution[i] <= reversed_s_distribution[j]:
             reversed_s_distribution[j] -= reversed_r_distribution[i]
-            i, j = next_i_and_j(i + 1, j)
+            reversed_r_distribution[i] = 0
+            i, j = next_i_and_j(i, j)
         else:
             reversed_r_distribution[i] -= reversed_s_distribution[j]
-            j = next_j(i, j + 1)
+            reversed_s_distribution[j] = 0
+            j = next_j(i, j)
 
     # The assignment is feasible if and only if |r - p| < d for some
     # p ∈ P, and therefore infeasible if and only if l∞-distance from
@@ -678,7 +680,7 @@ def find_ub_of_min_distortion(D_X, D_Y,
 
     Returns
     --------
-    ub_of_smallest_distortion: float
+    ub_of_min_distortion: float
         Upper bound of smallest distortion of a mapping in X → Y.
     """
     # Compute the numper of mappings to sample.
@@ -689,30 +691,14 @@ def find_ub_of_min_distortion(D_X, D_Y,
     # |X|-permutation. Image of each point is chosen to minimize the
     # intermediate distortion at each step.
     permutations_generator = (np.random.permutation(len(D_X)) for _ in range(n_mappings_to_sample))
-    ub_of_smallest_distortion = np.inf
+    ub_of_min_distortion = np.inf
     goal_distortion_is_matched = False
     all_sampled_permutations_are_tried = False
     pi = next(permutations_generator)
     while not goal_distortion_is_matched and not all_sampled_permutations_are_tried:
-        # Map π(1)-th point in X to a random point in Y, due to the
-        # lack of better criterion.
-        mapped_xs = [pi[0]]
-        mapped_xs_images = [np.random.choice(len(D_Y))]
-        distortion = 0
-        # Map π(i)-th point in X for each i = 2,...,|X|.
-        for x in pi[1:]:
-            # Choose point in Y that minimizes the distortion after
-            # mapping π(i)-th point in X to it.
-            bottlenecks_from_mapping_x = np.max(
-                np.abs(D_X[x, mapped_xs] - D_Y[:, mapped_xs_images]), axis=1)
-            y = np.argmin(bottlenecks_from_mapping_x)
-            # Map π(i)-th point in X to the chosen point in Y.
-            mapped_xs.append(x)
-            mapped_xs_images.append(y)
-            distortion = max(bottlenecks_from_mapping_x[y], distortion)
-
-        ub_of_smallest_distortion = min(distortion, ub_of_smallest_distortion)
-        if ub_of_smallest_distortion <= goal_distortion:
+        mapped_xs_images, distortion = construct_mapping(D_X, D_Y, pi)
+        ub_of_min_distortion = min(distortion, ub_of_min_distortion)
+        if ub_of_min_distortion <= goal_distortion:
             goal_distortion_is_matched = True
 
         try:
@@ -720,4 +706,46 @@ def find_ub_of_min_distortion(D_X, D_Y,
         except StopIteration:
             all_sampled_permutations_are_tried = True
 
-    return ub_of_smallest_distortion
+    return ub_of_min_distortion
+
+
+def construct_mapping(D_X, D_Y, pi):
+    """
+    # Construct a mapping from X → Y in |X| steps by choosing the image
+    # of π(i)-th point in X at i-th step, for some |X|-permutation π.
+    Image of each point is chosen to minimize the intermediate
+    distortion at the corresponding step.
+
+    D_X: np.array (|X|×|X|)
+        Integer distance matrix of X.
+    D_Y: np.array (|Y|×|Y|)
+        Integer distance matrix of Y.
+    pi: np.array (|X|)
+        |X|-permutation specifying the order in which the points in X
+        are mapped.
+    Returns
+    --------
+    mapped_xs_images: list
+        image of the constructed mapping.
+    distortion: float
+        distortion of the constructed mapping.
+    """
+    # Map π(1)-th point in X to a random point in Y, due to the
+    # lack of better criterion.
+    mapped_xs = [pi[0]]
+    mapped_xs_images = [np.random.choice(len(D_Y))]
+    distortion = 0
+    # Map π(i)-th point in X for each i = 2,...,|X|.
+    for x in pi[1:]:
+        # Choose point in Y that minimizes the distortion after
+        # mapping π(i)-th point in X to it.
+        bottlenecks_from_mapping_x = np.max(
+            np.abs(D_X[x, mapped_xs] - D_Y[:, mapped_xs_images]), axis=1)
+        y = np.argmin(bottlenecks_from_mapping_x)
+        # Map π(i)-th point in X to the chosen point in Y.
+        mapped_xs.append(x)
+        mapped_xs_images.append(y)
+        distortion = max(bottlenecks_from_mapping_x[y], distortion)
+        
+    return mapped_xs_images, distortion
+
