@@ -383,7 +383,7 @@ def confirm_lb_using_bounded_curvature_principal_subrows(d, K, D_Y, max_distance
     """
     # Represent rows of D_Y as distance distributions.
     D_Y_rows_distance_distributions = \
-        represents_distance_matrix_rows_as_distributions(D_Y, max_distance)
+        represent_distance_matrix_rows_as_distributions(D_Y, max_distance)
 
     # For each m ≥ 3, select those rows of m×m principal
     # submatrices of K whose entries are the largest, represent them as
@@ -392,7 +392,7 @@ def confirm_lb_using_bounded_curvature_principal_subrows(d, K, D_Y, max_distance
     # entailing 2*mGH(X, Y) ≥ d. The case of m = 2 is disregarded as
     # 2×2 curvatures are already accounted for in trivial lower bound.
     K_principal_subrows_distance_distributions = find_unique_maximal_distributions(
-        represents_distance_matrix_rows_as_distributions(K, max_distance))
+        represent_distance_matrix_rows_as_distributions(K, max_distance))
     lb_is_confirmed = confirm_distance_between_curvature_sets_lb(
         K_principal_subrows_distance_distributions, D_Y_rows_distance_distributions, d)
     m = len(K) - 1
@@ -408,7 +408,7 @@ def confirm_lb_using_bounded_curvature_principal_subrows(d, K, D_Y, max_distance
     return lb_is_confirmed
 
 
-def represents_distance_matrix_rows_as_distributions(D, max_distance):
+def represent_distance_matrix_rows_as_distributions(D, max_distance):
     """
     Represent each row of a distance matrix by frequency distribution
     of distances in it. The only distance 0 in each row is omitted.
