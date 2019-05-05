@@ -46,7 +46,8 @@
 
     Positive-bounded curvature is a curvature whose off-diagonal
     entries are all positive, i.e. the points in the underlying tuple
-    are distinct.
+    are distinct. Equivalently, positive-bounded curvatures are
+    distance matrices on the subsets of a metric space.
 """
 import numpy as np
 import warnings
@@ -428,16 +429,21 @@ def represent_distance_matrix_rows_as_distributions(D, max_distance):
         (i, j)-th entry holds frequency of distance (max_distance - j)
         in the i-th row of D.
     """
+    # Add imaginary part to distinguish identical distances from
+    # different rows of D.
     unique_distances, distance_frequencies = np.unique(
         D + 1j * np.arange(len(D))[:, None], return_counts=True)
-    optimal_int_type = determine_optimal_int_type(len(D))
     # Type is signed integer to allow subtractions.
+    optimal_int_type = determine_optimal_int_type(len(D))
     D_rows_distributons = np.zeros((len(D), max_distance + 1), dtype=optimal_int_type)
-    # Make larger distances appear on the left in the distributions.
-    D_rows_distributons[
+    # Construct index pairs for distance frequencies, so that the
+    # frequencies of larger distances appear on the left.
+    distance_frequencies_index_pairs = \
         (np.imag(unique_distances).astype(optimal_int_type),
-         max_distance - np.real(unique_distances).astype(optimal_int_type))] = distance_frequencies
-    # Remove frequency of distance 0 from each row.
+         max_distance - np.real(unique_distances).astype(max_distance.dtype))
+    # Fill frequency distributions of D rows.
+    D_rows_distributons[distance_frequencies_index_pairs] = distance_frequencies
+    # Remove (unit) frequency of distance 0 from each row.
     D_rows_distributons = D_rows_distributons[:, :-1]
 
     return D_rows_distributons
