@@ -17,24 +17,37 @@
     graph from their adjacency matrices. Note that it suffices to fill
     only the upper triangle of an adjacency matrix.
 
-        A_G = [[0, 1, 1, 1], [0, 0, 1, 1], [0, 0, 0, 1], [0, 0, 0, 0]]
-        A_H = [[0]]
-        lb, ub = gromov_hausdorff_between_graphs(A_G, A_H)
+    >>> A_G = [[0, 1, 1, 1], [0, 0, 1, 1], [0, 0, 0, 1], [0, 0, 0, 0]]
+    >>> A_H = [[0]]
+    >>> lb, ub = gromov_hausdorff_between_graphs(A_G, A_H)
+    >>> lb, ub
+    (0.5, 0.5)
 
     2) Estimating the mGH distance between cycle graphs of length 2 and
     4 from their adjacency matrices. Note that the adjacency matrices
     can be given in both dense and sparse SciPy formats.
 
-        A_I = np.array([[0, 1], [0, 0]])
-        A_J = sps.csr_matrix(([1]*4, ([0, 0, 1, 2], [1, 3, 2, 3])), shape=(4, 4))
-        lb, ub = gromov_hausdorff_between_graphs(A_I, A_J)
+    >>> A_I = np.array([[0, 1], [0, 0]])
+    >>> A_J = sps.csr_matrix(([1] * 5, ([0, 0, 1, 2, 3], [1, 4, 2, 3, 4])), shape=(5, 5))
+    >>> lb, ub = gromov_hausdorff_between_graphs(A_I, A_J)
+    >>> print(lb, ub)
+    (0.5, 1.0)
 
     3) Estimating all pairwise mGH distances between multiple graphs
-    from their adjacency matrices as an iterable. The output LB and UB
-    are both symmetric 4×4 matrices with zeros on the main diagonal.
+    from their adjacency matrices as an iterable.
 
-        As = [A_G, A_H, A_I, A_J]
-        LB, UB = gromov_hausdorff_between_graphs(As)
+    >>> As = [A_G, A_H, A_I, A_J]
+    >>> LB, UB = gromov_hausdorff_between_graphs(As)
+    >>> LB
+    [[0.  0.5 0.5 0.5]
+     [0.5 0.  0.5 1. ]
+     [0.5 0.5 0.  0.5]
+     [0.5 1.  0.5 0. ]]
+    >>> UB
+    [[0.  0.5 0.5 0.5]
+     [0.5 0.  0.5 1. ]
+     [0.5 0.5 0.  1. ]
+     [0.5 1.  1.  0. ]]
 
     ===================================================================
 
