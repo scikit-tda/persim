@@ -1,12 +1,40 @@
 # -*- coding: utf-8 -*-
 """
-    Implementation of the modified Gromov-Hausdorff distance as defined
-    in:
+    Implementation of the modified Gromov-Hausdorff (mGH) distance
+    between compact metric spaces induced by unweighted graphs based on
+    their shortest path length. The mGH distance was first defined in:
 
     Mémoli, F. (2012). Some properties of Gromov–Hausdorff distances.
     Discrete & Computational Geometry, 48(2), 416-440.
 
     Author: Vladyslav Oles
+
+    ===================================================================
+
+    Usage examples:
+
+    1) Estimating the mGH distance between 4-clique and single-vertex
+    graph from their adjacency matrices. Note that it suffices to fill
+    only the upper triangle of an adjacency matrix.
+
+        A_G = [[0, 1, 1, 1], [0, 0, 1, 1], [0, 0, 0, 1], [0, 0, 0, 0]]
+        A_H = [[0]]
+        lb, ub = gromov_hausdorff_between_graphs(A_G, A_H)
+
+    2) Estimating the mGH distance between cycle graphs of length 2 and
+    4 from their adjacency matrices. Note that the adjacency matrices
+    can be given in both dense and sparse SciPy formats.
+
+        A_I = np.array([[0, 1], [0, 0]])
+        A_J = sps.csr_matrix(([1]*4, ([0, 0, 1, 2], [1, 3, 2, 3])), shape=(4, 4))
+        lb, ub = gromov_hausdorff_between_graphs(A_I, A_J)
+
+    3) Estimating all pairwise mGH distances between multiple graphs
+    from their adjacency matrices as an iterable. The output LB and UB
+    are both symmetric 4×4 matrices with zeros on the main diagonal.
+
+        As = [A_G, A_H, A_I, A_J]
+        LB, UB = gromov_hausdorff_between_graphs(As)
 
     ===================================================================
 
