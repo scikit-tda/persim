@@ -2,10 +2,9 @@
 """
     Implementation of the modified Gromov-Hausdorff (mGH) distance
     between compact metric spaces induced by unweighted graphs based on
-    their shortest path length. The mGH distance was first defined in:
-
-    Mémoli, F. (2012). Some properties of Gromov–Hausdorff distances.
-    Discrete & Computational Geometry, 48(2), 416-440.
+    their shortest path length. The mGH distance was first defined in
+    "Some properties of Gromov–Hausdorff distances" by F. Mémoli
+    (Discrete & Computational Geometry, 2012).
 
     Author: Vladyslav Oles
 
@@ -19,17 +18,17 @@
 
     >>> A_G = [[0, 1, 1, 1], [0, 0, 1, 1], [0, 0, 0, 1], [0, 0, 0, 0]]
     >>> A_H = [[0]]
-    >>> lb, ub = gromov_hausdorff_between_graphs(A_G, A_H)
+    >>> lb, ub = gromov_hausdorff(A_G, A_H)
     >>> lb, ub
     (0.5, 0.5)
 
     2) Estimating the mGH distance between cycle graphs of length 2 and
-    4 from their adjacency matrices. Note that the adjacency matrices
+    5 from their adjacency matrices. Note that the adjacency matrices
     can be given in both dense and sparse SciPy formats.
 
     >>> A_I = np.array([[0, 1], [0, 0]])
     >>> A_J = sps.csr_matrix(([1] * 5, ([0, 0, 1, 2, 3], [1, 4, 2, 3, 4])), shape=(5, 5))
-    >>> lb, ub = gromov_hausdorff_between_graphs(A_I, A_J)
+    >>> lb, ub = gromov_hausdorff(A_I, A_J)
     >>> print(lb, ub)
     (0.5, 1.0)
 
@@ -37,7 +36,7 @@
     from their adjacency matrices as an iterable.
 
     >>> As = [A_G, A_H, A_I, A_J]
-    >>> LB, UB = gromov_hausdorff_between_graphs(As)
+    >>> LB, UB = gromov_hausdorff(As)
     >>> LB
     [[0.  0.5 0.5 0.5]
      [0.5 0.  0.5 1. ]
@@ -96,19 +95,19 @@ import scipy.sparse as sps
 from scipy.sparse.csgraph import shortest_path, connected_components
 
 
-__all__ = ["gromov_hausdorff_between_graphs"]
+__all__ = ["gromov_hausdorff"]
 
 
 # To sample √|X| * log (|X| + 1) mappings from X → Y by default.
 DEFAULT_MAPPING_SAMPLE_SIZE_ORDER = np.array([.5, 1])
 
 
-def gromov_hausdorff_between_graphs(
+def gromov_hausdorff(
         A_G, A_H=None, mapping_sample_size_order=DEFAULT_MAPPING_SAMPLE_SIZE_ORDER):
     """
-    Estimate the modified Gromov-Hausdorff distance between simple
-    unweighted graphs, represented as compact metric spaces based on
-    their shortest path lengths.
+    Estimate the mGH distance between simple unweighted graphs,
+    represented as compact metric spaces based on their shortest
+    path lengths.
 
     Parameters
     -----------
@@ -119,19 +118,16 @@ def gromov_hausdorff_between_graphs(
         (Sparse) adjacency matrix of graph H, or None.
     mapping_sample_size_order: np.array (2)
         Parameter that regulates the number of mappings to sample when
-        tightening upper bound of the modified Gromov-Hausdorff
-        distance.
+        tightening upper bound of the mGH distance.
 
     Returns
     --------
     lb: float
-        Lower bound of the modified Gromov-Hausdorff distance, or a
-        square matrix of lower bounds of pairwise modified
-        Gromov-Hausdorff distances if A_H=None.
+        Lower bound of the mGH distance, or a square matrix holding
+        lower bounds of pairwise mGH distances if A_H=None.
     ub: float
-        Upper bound of the modified Gromov-Hausdorff distance, or a
-        square matrix of upper bounds of pairwise modified
-        Gromov-Hausdorff distances if A_H=None.
+        Upper bound of the mGH distance, or a square matrix holding
+        upper bounds of pairwise mGH distances if A_H=None.
     """
     # Form iterable with adjacency matrices.
     if A_H is None:
@@ -143,8 +139,8 @@ def gromov_hausdorff_between_graphs(
         As = (A_G, A_H)
 
     n = len(As)
-    # Find lower and upper bounds of each pairwise modified
-    # Gromov-Hausdorff distance between the graphs.
+    # Find lower and upper bounds of each pairwise mGH distance between
+    # the graphs.
     lbs = np.zeros((n, n))
     ubs = np.zeros((n, n))
     for i in range(n):
@@ -153,14 +149,14 @@ def gromov_hausdorff_between_graphs(
             # distance matrices.
             D_X = make_distance_matrix_from_adjacency_matrix(As[i])
             D_Y = make_distance_matrix_from_adjacency_matrix(As[j])
-            # Find lower and upper bounds of the modified
-            # Gromov-Hausdorff distance between the pair of graphs.
-            lbs[i, j], ubs[i, j] = gromov_hausdorff(
+            # Find lower and upper bounds of the mGH distance between
+            # the pair of graphs.
+            lbs[i, j], ubs[i, j] = estimate(
                 D_X, D_Y, mapping_sample_size_order=mapping_sample_size_order)
 
     if A_H is None:
         # Symmetrize matrices with lower and upper bounds of pairwise
-        # modified Gromov-Hausdorff distances between the graphs.
+        # mGH distances between the graphs.
         lower_triangle_indices = np.tril_indices(n, -1)
         lbs[lower_triangle_indices] = lbs.T[lower_triangle_indices]
         ubs[lower_triangle_indices] = ubs.T[lower_triangle_indices]
@@ -256,7 +252,7 @@ def determine_optimal_int_type(value):
     return optimal_int_type
 
 
-def gromov_hausdorff(D_X, D_Y, mapping_sample_size_order=DEFAULT_MAPPING_SAMPLE_SIZE_ORDER):
+def estimate(D_X, D_Y, mapping_sample_size_order=DEFAULT_MAPPING_SAMPLE_SIZE_ORDER):
     """
     For X, Y metric spaces, find lower and upper bounds of mGH(X, Y).
 
