@@ -1,10 +1,12 @@
 import numpy as np
+import scipy.sparse as sps
 
 import pytest
 
 from persim import bottleneck
 from persim import sliced_wasserstein
 from persim import heat
+from persim import gromov_hausdorff, gromov_hausdorff
 
 class TestBottleneck:
     def test_single(self):
@@ -139,3 +141,47 @@ class TestHeat:
 
         # These are very loose bounds
         assert d1 < d2
+
+
+class TestModifiedGromovHausdorff:
+    def test_single_point(self):
+        A_G = sps.csr_matrix(([1]*4, ([0, 0, 1, 2], [1, 3, 2, 3])), shape=(4, 4))
+        A_H = sps.csr_matrix(([], ([], [])), shape=(1, 1))
+        lb, ub = gromov_hausdorff(A_G, A_H)
+
+        assert lb == 1
+        assert ub == 1
+
+    def test_isomorphic(self):
+        A_G = sps.csr_matrix(([1]*6, ([0, 0, 0, 1, 1, 2], [1, 2, 3, 2, 3, 3])), shape=(4, 4))
+        A_H = sps.csr_matrix(([1]*6, ([0, 0, 0, 1, 1, 2], [1, 2, 3, 2, 3, 3])), shape=(4, 4))
+        lb, ub = gromov_hausdorff(A_G, A_H)
+
+        assert lb == 0
+        assert ub == 0
+
+    def test_cliques(self):
+        A_G = sps.csr_matrix(([1], ([0], [1])), shape=(2, 2))
+        A_H = sps.csr_matrix(([1]*6, ([0, 0, 0, 1, 1, 2], [1, 2, 3, 2, 3, 3])), shape=(4, 4))
+        lb, ub = gromov_hausdorff(A_G, A_H)
+
+        assert lb == 0.5
+        assert ub == 0.5
+
+    def test_same_size(self):
+        A_G = sps.csr_matrix(([1]*6, ([0, 0, 0, 1, 1, 2], [1, 2, 3, 2, 3, 3])), shape=(4, 4))
+        A_H = sps.csr_matrix(([1]*4, ([0, 0, 1, 2], [1, 3, 2, 3])), shape=(4, 4))
+        lb, ub = gromov_hausdorff(A_G, A_H)
+
+        assert lb == 0.5
+        assert ub == 0.5
+
+    def test_many_graphs(self):
+        A_G = sps.csr_matrix(([1], ([0], [1])), shape=(2, 2))
+        A_H = sps.csr_matrix(([1]*6, ([0, 0, 0, 1, 1, 2], [1, 2, 3, 2, 3, 3])), shape=(4, 4))
+        A_I = sps.csr_matrix(([1]*4, ([0, 0, 1, 2], [1, 3, 2, 3])), shape=(4, 4))
+        lbs, ubs = gromov_hausdorff([A_G, A_H, A_I])
+
+        np.testing.assert_array_equal(lbs, np.array([[0, 0.5, 0.5], [0.5, 0, 0.5], [0.5, 0.5, 0]]))
+        np.testing.assert_array_equal(ubs, np.array([[0, 0.5, 0.5], [0.5, 0, 0.5], [0.5, 0.5, 0]]))
+
