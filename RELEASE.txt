@@ -1,3 +1,5 @@
+0.0.9
+    - Include modified Gromov--Hausdorff distance
 0.0.8
     - Include diagram plotting
     - revamped documentation
