@@ -25,6 +25,13 @@ def bottleneck_matching(I1, I2, matchidx, D, labels=["dgm1", "dgm2"], ax=None):
     ax: matplotlib Axis object
         For plotting on a particular axis.
 
+
+    Examples
+    ==========
+
+    bn_matching, (matchidx, D) = persim.bottleneck(A_h1, B_h1, matching=True)
+    persim.bottleneck_matching(A_h1, B_h1, matchidx, D)
+
     """
 
     plot_diagrams([I1, I2], labels=labels, ax=ax) 
@@ -53,8 +60,32 @@ def bottleneck_matching(I1, I2, matchidx, D, labels=["dgm1", "dgm2"], ax=None):
         plt.plot([I1[i, 0], I2[j, 0]], [I1[i, 1], I2[j, 1]], "g")
 
 
-def wasserstein_matching(I1, I2, matchidx, labels=["dgm1", "dgm2"]):
-    plot_diagrams([I1, I2], labels=labels)
+def wasserstein_matching(I1, I2, matchidx, labels=["dgm1", "dgm2"], ax=None):
+    """ Visualize bottleneck matching between two diagrams
+
+    Parameters
+    ===========
+
+    I1: array
+        A diagram
+    I2: array
+        A diagram
+    matchidx: tuples of matched indices
+        if input `matching=True`, then return matching
+    labels: list of strings
+        names of diagrams for legend. Default = ["dgm1", "dgm2"], 
+    ax: matplotlib Axis object
+        For plotting on a particular axis.
+
+    Examples
+    ==========
+
+    bn_matching, (matchidx, D) = persim.wasserstien(A_h1, B_h1, matching=True)
+    persim.wasserstein_matching(A_h1, B_h1, matchidx, D)
+
+    """
+
+    plot_diagrams([I1, I2], labels=labels, ax=ax)
     cp = np.cos(np.pi / 4)
     sp = np.sin(np.pi / 4)
     R = np.array([[cp, -sp], [sp, cp]])
