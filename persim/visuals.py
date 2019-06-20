@@ -214,4 +214,5 @@ def plot_barcode(diagrams, show=False):
             if show is True:
                 title = "%d-dimensional bars: %d finite, %d infinite" % (dim, number_of_bars_fin, number_of_bars_inf)
                 ax.set_title(title, fontsize=10)
+                plt.yticks([])
                 plt.show()
