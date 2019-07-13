@@ -9,6 +9,7 @@ Distances
     :toctree: stubs
     :nosignatures:
 
+    persim.wasserstein
     persim.bottleneck
     persim.sliced_wasserstein
     persim.heat

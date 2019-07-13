@@ -2,7 +2,6 @@ import numpy as np
 from sklearn import metrics
 from scipy import optimize
 
-
 __all__ = ["wasserstein"]
 
 
@@ -11,10 +10,28 @@ def wasserstein(dgm1, dgm2, matching=False):
     Perform the Wasserstein distance matching between persistence diagrams.
     Assumes first two columns of dgm1 and dgm2 are the coordinates of the persistence
     points, but allows for other coordinate columns (which are ignored in
-    diagonal matching)
-    :param dgm1: Mx(>=2) array of birth/death pairs for PD 1
-    :param dgm2: Nx(>=2) array of birth/death paris for PD 2
-    :returns (tuples of matched indices, total cost, (N+M)x(N+M) cross-similarity)
+    diagonal matching).
+
+    See the `distances` notebook for an example of how to use this.
+
+    Parameters
+    ------------
+
+    dgm1: Mx(>=2) 
+        array of birth/death pairs for PD 1
+    dgm2: Nx(>=2) 
+        array of birth/death paris for PD 2
+    matching: bool, default False
+        if True, return matching infromation and cross-similarity matrix
+
+    Returns 
+    ---------
+
+    d: float
+        Wasserstein distance between dgm1 and dgm2
+    (matching, D): Only returns if `matching=True`
+        (tuples of matched indices, (N+M)x(N+M) cross-similarity matrix)
+
     """
 
     # Step 1: Compute CSM between S and dgm2, including points on diagonal
