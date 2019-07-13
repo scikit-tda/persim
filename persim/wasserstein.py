@@ -1,7 +1,10 @@
 import numpy as np
-import sklearn
+from sklearn import metrics
+from scipy import optimize
+
 
 __all__ = ["wasserstein"]
+
 
 def wasserstein(dgm1, dgm2, matching=False):
     """
@@ -13,23 +16,22 @@ def wasserstein(dgm1, dgm2, matching=False):
     :param dgm2: Nx(>=2) array of birth/death paris for PD 2
     :returns (tuples of matched indices, total cost, (N+M)x(N+M) cross-similarity)
     """
-    import hungarian #Requires having compiled the library
 
     # Step 1: Compute CSM between S and dgm2, including points on diagonal
     N = dgm1.shape[0]
     M = dgm2.shape[0]
-    #Handle the cases where there are no points in the diagrams
+    # Handle the cases where there are no points in the diagrams
     if N == 0:
         dgm1 = np.array([[0, 0]])
         N = 1
     if M == 0:
         dgm2 = np.array([[0, 0]])
         M = 1
-    DUL = sklearn.metrics.pairwise.pairwise_distances(dgm1, dgm2)
+    DUL = metrics.pairwise.pairwise_distances(dgm1, dgm2)
 
-    #Put diagonal elements into the matrix
-    #Rotate the diagrams to make it easy to find the straight line
-    #distance to the diagonal
+    # Put diagonal elements into the matrix
+    # Rotate the diagrams to make it easy to find the straight line
+    # distance to the diagonal
     cp = np.cos(np.pi/4)
     sp = np.sin(np.pi/4)
     R = np.array([[cp, -sp], [sp, cp]])
@@ -46,7 +48,8 @@ def wasserstein(dgm1, dgm2, matching=False):
     D = D.tolist()
 
     # Step 2: Run the hungarian algorithm
-    matchidx = hungarian.lap(D)[0]
+    matchidx2 = optimize.linear_sum_assignment(D)[0]
+
     matchidx = [(i, matchidx[i]) for i in range(len(matchidx))]
     matchdist = 0
     for pair in matchidx:
@@ -55,5 +58,5 @@ def wasserstein(dgm1, dgm2, matching=False):
 
     if matching:
         return matchdist, (matchidx, D)
-    
+
     return matchdist
