@@ -48,7 +48,7 @@ def wasserstein(dgm1, dgm2, matching=False):
     D = D.tolist()
 
     # Step 2: Run the hungarian algorithm
-    matchidx2 = optimize.linear_sum_assignment(D)[0]
+    matchidx = optimize.linear_sum_assignment(D)[0]
 
     matchidx = [(i, matchidx[i]) for i in range(len(matchidx))]
     matchdist = 0
