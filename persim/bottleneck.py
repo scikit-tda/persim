@@ -19,7 +19,9 @@ def bottleneck(dgm1, dgm2, matching=False):
     Perform the Bottleneck distance matching between persistence diagrams.
     Assumes first two columns of S and T are the coordinates of the persistence
     points, but allows for other coordinate columns (which are ignored in
-    diagonal matching)
+    diagonal matching).
+
+    See the `distances` notebook for an example of how to use this.
 
     Parameters
     -----------
