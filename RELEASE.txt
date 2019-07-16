@@ -1,3 +1,6 @@
+0.1.0
+    - Include Wasserstein distance.
+
 0.0.10
     - Add license and README to distributed packages
 0.0.9
