@@ -13,12 +13,15 @@ from hopcroftkarp import HopcroftKarp
 
 __all__ = ["bottleneck"]
 
+
 def bottleneck(dgm1, dgm2, matching=False):
     """
     Perform the Bottleneck distance matching between persistence diagrams.
     Assumes first two columns of S and T are the coordinates of the persistence
     points, but allows for other coordinate columns (which are ignored in
-    diagonal matching)
+    diagonal matching).
+
+    See the `distances` notebook for an example of how to use this.
 
     Parameters
     -----------
@@ -27,17 +30,15 @@ def bottleneck(dgm1, dgm2, matching=False):
     dgm2: Nx(>=2) 
         array of birth/death paris for PD 2
     matching: bool, default False
-        if True, return matching information
+        if True, return matching infromation and cross-similarity matrix
 
     Returns
     --------
 
     d: float
         bottleneck distance between dgm1 and dgm2
-    matching: tuples of matched indices
-        if input `matching=True`, then return matching
-    D: (N+M)x(N+M) cross-similarity matrix
-        if input `matching=True`, then return D
+    (matching, D): Only returns if `matching=True`
+        (tuples of matched indices, (N+M)x(N+M) cross-similarity matrix)
     """
 
     return_matching = matching
@@ -91,7 +92,7 @@ def bottleneck(dgm1, dgm2, matching=False):
             matching = res
             ds = ds[0:idx]
         else:
-            ds = ds[idx + 1 : :]
+            ds = ds[idx + 1::]
 
     if return_matching:
         matchidx = [(i, matching["%i" % i]) for i in range(N)]
