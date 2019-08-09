@@ -511,10 +511,12 @@ def find_unique_maximal_distributions(distributions):
         np.all(pairwise_distribution_differences >= 0, axis=2),
         np.any(pairwise_distribution_differences > 0, axis=2))
     distributions_are_maximal = ~np.any(pairwise_distribution_less_thans, axis=1)
-    # `np.unique` replaced for compatibility with Python 3.4/NumPy 1.12.
-    # unique_maximal_distributions = np.unique(distributions[distributions_are_maximal], axis=0)
-    unique_maximal_distributions = np.vstack(
-        {tuple(distribution) for distribution in distributions[distributions_are_maximal]})
+    try:
+        unique_maximal_distributions = np.unique(distributions[distributions_are_maximal], axis=0)
+    except AttributeError:
+        # `np.unique` is not implemented in NumPy 1.12 (Python 3.4).
+        unique_maximal_distributions = np.vstack(
+            {tuple(distribution) for distribution in distributions[distributions_are_maximal]})
 
     return unique_maximal_distributions
 
