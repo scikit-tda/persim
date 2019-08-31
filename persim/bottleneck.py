@@ -73,9 +73,7 @@ def bottleneck(dgm1, dgm2, matching=False):
     # Step 2: Perform a binary search + Hopcroft Karp to find the
     # bottleneck distance
     N = D.shape[0]
-    ds = np.unique(D.flatten())
-    ds = ds[ds > 0]
-    ds = np.sort(ds)
+    ds = np.sort(np.unique(D.flatten()))
     bdist = ds[-1]
     matching = {}
     while len(ds) >= 1:
