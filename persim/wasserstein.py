@@ -62,18 +62,13 @@ def wasserstein(dgm1, dgm2, matching=False):
     UL = np.max(D)*np.ones((M, M))
     np.fill_diagonal(UL, dgm2[:, 1])
     D[N:M+N, 0:M] = UL
-    D = D.tolist()
 
     # Step 2: Run the hungarian algorithm
-    matchidx = optimize.linear_sum_assignment(D)[0]
-
-    matchidx = [(i, matchidx[i]) for i in range(len(matchidx))]
-    matchdist = 0
-    for pair in matchidx:
-        (i, j) = pair
-        matchdist += D[i][j]
+    matchi, matchj = optimize.linear_sum_assignment(D)
+    matchdist = np.sum(D[matchi, matchj])
 
     if matching:
+        matchidx = [(i, j) for i, j in zip(matchi, matchj)]
         return matchdist, (matchidx, D)
 
     return matchdist
