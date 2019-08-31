@@ -85,7 +85,16 @@ class TestBottleneck:
         # These are very loose bounds
         assert len(m) == len(dgm1) + len(dgm2)
         assert D.shape == (len(dgm1) + len(dgm2), len(dgm1) + len(dgm2))
-
+    
+    def test_matching_to_self(self):
+        # Matching a diagram to itself should yield 0
+        pd = np.array([[0.        , 1.71858561],
+                      [0.        , 1.74160683],
+                      [0.        , 2.43430877],
+                      [0.        , 2.56949258],
+                      [0.        , np.inf]])
+        dist = bottleneck(pd, pd)
+        assert dist == 0
 
 class TestWasserstein:
     def test_single(self):
@@ -111,6 +120,15 @@ class TestWasserstein:
 
         # These are very loose bounds
         assert d == pytest.approx(0.3, 0.001)
+
+    def test_matching_to_self(self):
+        # Matching a diagram to itself should yield 0
+        pd = np.array([[0.        , 1.71858561],
+                      [0.        , 1.74160683],
+                      [0.        , 2.43430877],
+                      [0.        , 2.56949258]])
+        dist = wasserstein(pd, pd)
+        assert dist == 0
 
 
 class TestSliced:
