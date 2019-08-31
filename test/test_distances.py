@@ -100,8 +100,8 @@ class TestWasserstein:
     def test_some(self):
         d = wasserstein(
             np.array([
-                [0.5, 1],
-                [0.6, 1.1]
+                [0.6, 1.1],
+                [0.5, 1]
             ]),
             np.array([
                 [0.5, 1.1],
