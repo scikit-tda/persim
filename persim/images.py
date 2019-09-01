@@ -23,9 +23,9 @@ class PersImage(TransformerMixin):
     spread : float
         Standard deviation of gaussian kernel
     specs : dict
-        Parameters for shape of image with respect to diagram domain. This is used if you would like images to have a particular range. Shaped like 
+        Parameters for shape of image with respect to diagram domain. This is used if you would like images to have a particular range. Shaped like
         ::
-        
+
             {
                 "maxBD": float,
                 "minBD": float
@@ -60,7 +60,7 @@ class PersImage(TransformerMixin):
         self.kernel_type = kernel_type
         self.weighting_type = weighting_type
         self.spread = spread
-        self.nx, self.ny = pixels
+        self.nx_b, self.ny_p = pixels
 
         if verbose:
             print(
@@ -96,9 +96,9 @@ class PersImage(TransformerMixin):
 
         if not self.specs:
             self.specs = {
-                "maxBD": np.max([np.max(np.vstack((landscape, np.zeros((1, 2))))) 
+                "maxBD": np.max([np.max(np.vstack((landscape, np.zeros((1, 2)))))
                                  for landscape in landscapes] + [0]),
-                "minBD": np.min([np.min(np.vstack((landscape, np.zeros((1, 2))))) 
+                "minBD": np.min([np.min(np.vstack((landscape, np.zeros((1, 2)))))
                                  for landscape in landscapes] + [0]),
             }
         imgs = [self._transform(dgm) for dgm in landscapes]
@@ -111,24 +111,27 @@ class PersImage(TransformerMixin):
 
     def _transform(self, landscape):
         # Define an NxN grid over our landscape
-        maxBD = self.specs["maxBD"]
+        maxB = self.specs["maxB"]
+        maxP = self.specs["maxP"]
         minBD = min(self.specs["minBD"], 0)  # at least show 0, maybe lower
 
-        # Same bins in x and y axis
-        dx = maxBD / (self.ny)
-        xs_lower = np.linspace(minBD, maxBD, self.nx)
-        xs_upper = np.linspace(minBD, maxBD, self.nx) + dx
+        # Different bins for x and y axis: x by birth, y by persistence
+        dx_b = maxB / (self.nx_b)
+        dy_p = maxP / (self.ny_p)
 
-        ys_lower = np.linspace(0, maxBD, self.ny)
-        ys_upper = np.linspace(0, maxBD, self.ny) + dx
+        xs_lower = np.linspace(minBD, maxB, self.nx_b)
+        xs_upper = np.linspace(minBD, maxB, self.nx_b) + dx_b
+
+        ys_lower = np.linspace(0, maxP, self.ny_p)
+        ys_upper = np.linspace(0, maxP, self.ny_p) + dy_p
 
         weighting = self.weighting(landscape)
 
         # Define zeros
-        img = np.zeros((self.nx, self.ny))
+        img = np.zeros((self.nx_b, self.ny_p))
 
         # Implement this as a `summed-area table` - it'll be way faster
-        spread = self.spread if self.spread else dx
+        spread = self.spread if self.spread else dx_b
         for point in landscape:
             x_smooth = norm.cdf(xs_upper, point[0], spread) - norm.cdf(
                 xs_lower, point[0], spread
@@ -141,8 +144,8 @@ class PersImage(TransformerMixin):
         return img
 
     def weighting(self, landscape=None):
-        """ Define a weighting function, 
-                for stability results to hold, the function must be 0 at y=0.    
+        """ Define a weighting function,
+                for stability results to hold, the function must be 0 at y=0.
         """
 
         # TODO: Implement a logistic function
@@ -151,7 +154,7 @@ class PersImage(TransformerMixin):
         if landscape is not None:
             if len(landscape) > 0:
                 maxy = np.max(landscape[:, 1])
-            else: 
+            else:
                 maxy = 1
 
         def linear(interval):
