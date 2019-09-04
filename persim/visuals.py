@@ -286,3 +286,175 @@ def wasserstein_matching(dgm1, dgm2, matching, labels=["dgm1", "dgm2"], ax=None)
                 ax.plot([dgm1[i, 0], dgm2[j, 0]], [dgm1[i, 1], dgm2[j, 1]], "g")
 
     plot_diagrams([dgm1, dgm2], labels=labels, ax=ax)
+
+class Barcode():
+    def __init__(self, diagrams):
+        '''
+        parameters:
+        ===========
+            diagrams: list-like
+                typically the output of ripser(nodes)['dgms']
+
+        examples:
+        ===========
+
+        n = 300
+        t = np.linspace(0, 2 * np.pi, n)
+        noise = np.random.normal(0, 0.1, size=n)
+
+        data = np.vstack([((3+d) * np.cos(t[i]+d), (3+d) * np.sin(t[i]+d)) for i, d in enumerate(noise)])
+        diagrams = ripser(data)
+
+        bc = Barcode(diagrams['dgms'])
+        bc.plot_barcode()
+        '''
+        if not isinstance(diagrams, list):
+            diagrams = [diagrams]
+
+        if len(diagrams) == 2:
+            self.plot_barcode = self._plot_H0_H1
+
+        else:
+            self.plot_barcode = self._plot_Hn
+
+        self.diagrams = diagrams
+
+    def _plot_H0_H1(self, **kwargs):
+        '''
+        parameters:
+        ===========
+            figsize: tuple
+                figure size, default=(6,6)
+
+            show: boolean
+                show the figure via plt.show()
+
+            export_png: boolean
+                write image to png data, returned as io.BytesIO() instance, default=False
+                
+            **kwargs: artist paramters for the barcodes, defaults:
+                c='grey'
+                linestyle='-'
+                linewidth=0.5
+                dpi=100 (for png export)
+
+        returns:
+        ===========
+            list of png exports or []
+        '''
+        import io
+
+        fsize = kwargs.get('figsize', (6, 6))
+        show = kwargs.get('show', True)
+        export = kwargs.get('export_png', False)
+        dpi = kwargs.get('dpi', 100)
+
+        out = []
+
+        fig, ax = plt.subplots(2, 1, figsize=fsize)
+
+        for dim, diagram in enumerate(self.diagrams):
+            self._plot_many_bars(dim, diagram, dim, ax, **kwargs)
+
+        if export:
+            fp = io.BytesIO()
+            plt.savefig(fp, dpi=dpi)
+            fp.seek(0)
+
+            out += [fp]
+
+        if show:
+            plt.show()
+
+        return out
+
+    def _plot_Hn(self, **kwargs):
+        '''
+        parameters:
+        ===========
+            figsize: tuple
+                figure size, default=(6,6)
+
+            show: boolean
+                show the figure via plt.show()
+
+            export_png: boolean
+                write image to png data, returned as io.BytesIO() instance, default=False
+                
+            **kwargs: artist paramters for the barcodes, defaults:
+                c='grey'
+                linestyle='-'
+                linewidth=0.5
+                dpi=100 (for png export)
+
+        returns:
+        ===========
+            list of png exports or []
+        '''
+        fsize = kwargs.get('figsize', (6, 4))
+        show = kwargs.get('show', True)
+        export = kwargs.get('export_png', False)
+        dpi = kwargs.get('dpi', 100)
+
+        out = []
+
+        for dim, diagram in enumerate(self.diagrams):
+            fig, ax = plt.subplots(1, 1, figsize=fsize)
+
+            self._plot_many_bars(dim, diagram, 0, [ax], **kwargs)
+
+            if export:
+                fp = io.BytesIO()
+                plt.savefig(fp, dpi=dpi)
+                fp.seek(0)
+
+                out += [fp]
+
+            if show:
+                plt.show()
+
+        return out
+
+    def _plot_many_bars(self, dim, diagram, idx, ax, **kwargs):
+        number_of_bars = len(diagram)
+        print("Number of bars in dimension %d: %d" % (dim, number_of_bars))
+
+        if number_of_bars > 0:
+            births = np.vstack([(elem[0], i) for i, elem in enumerate(diagram)])
+            deaths = np.vstack([(elem[1], i) for i, elem in enumerate(diagram)])
+
+            inf_bars = np.where(np.isinf(deaths))[0]
+            max_death = deaths[np.isfinite(deaths[:, 0]), 0].max()
+
+            number_of_bars_fin = births.shape[0] - inf_bars.shape[0]
+            number_of_bars_inf = inf_bars.shape[0]
+
+            _ = [self._plot_a_bar(ax[idx], birth, deaths[i], max_death, **kwargs) for i, birth in enumerate(births)]
+
+        # the line below is to plot a vertical red line showing the maximal finite bar length
+        ax[idx].plot([max_death, max_death], [0, number_of_bars - 1],
+            c='r',
+            linestyle='--',
+            linewidth=0.5)
+
+        title = "H%d barcode: %d finite, %d infinite" % (dim, number_of_bars_fin, number_of_bars_inf)
+        ax[idx].set_title(title, fontsize=10)
+        ax[idx].set_yticks([])
+
+        ax[idx].spines['right'].set_visible(False)
+        ax[idx].spines['left'].set_visible(False)
+        ax[idx].spines['top'].set_visible(False)
+
+    @staticmethod
+    def _plot_a_bar(ax, birth, death, max_death, c='gray', linestyle='-', linewidth=0.5):
+        if np.isinf(death[0]):
+            death[0] = 1.05 * max_death
+            ax.plot(death[0], death[1],
+                c=c,
+                markersize=4,
+                marker='>')
+
+        ax.plot([birth[0], death[0]], [birth[1], death[1]], 
+            c=c,
+            linestyle=linestyle,
+            linewidth=linewidth)
