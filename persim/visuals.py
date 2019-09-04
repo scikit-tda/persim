@@ -446,7 +446,7 @@ class Barcode():
         ax[idx].spines['top'].set_visible(False)
 
     @staticmethod
-    def _plot_a_bar(ax, birth, death, max_death, c='gray', linestyle='-', linewidth=0.5):
+    def _plot_a_bar(ax, birth, death, max_death, c='gray', linestyle='-', linewidth=0.5, **kwargs):
         if np.isinf(death[0]):
             death[0] = 1.05 * max_death
             ax.plot(death[0], death[1],
