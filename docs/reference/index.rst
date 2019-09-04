@@ -59,6 +59,7 @@ Diagram Visualization
     persim.plot_diagrams
     persim.bottleneck_matching
     persim.wasserstein_matching
+    persim.Barcode
     persim.plot_landscape
     persim.plot_landscape_simple
 
