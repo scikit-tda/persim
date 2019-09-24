@@ -17,7 +17,10 @@ def plot_diagrams(
     lifetime=False,
     legend=True,
     show=False,
-    ax=None
+    ax=None,
+    save=False,
+    figures_directory=None,
+    filename=None
 ):
     """A helper function to plot persistence diagrams. 
 
@@ -174,6 +177,9 @@ def plot_diagrams(
 
     if show is True:
         plt.show()
+
+    if save is True:
+        plt.savefig(figures_directory + filename)
 
 
 def bottleneck_matching(I1, I2, matchidx, D, labels=["dgm1", "dgm2"], ax=None):
