@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-    Implementation of the modified Gromov-Hausdorff (mGH) distance
-    between compact metric spaces induced by unweighted graphs based on
-    their shortest path length. The mGH distance was first defined in
-    "Some properties of Gromov–Hausdorff distances" by F. Mémoli
-    (Discrete & Computational Geometry, 2012).
+    Implementation of the modified Gromov–Hausdorff (mGH) distance
+    between compact metric spaces induced by unweighted graphs. This
+    code complements the results from "Efficient estimation of a
+    Gromov–Hausdorff distance between unweighted graphs" by V. Oles et
+    al. (https://arxiv.org/pdf/1909.09772). The mGH distance was first
+    defined in "Some properties of Gromov–Hausdorff distances" by F.
+    Mémoli (Discrete & Computational Geometry, 2012).
 
     Author: Vladyslav Oles
 
@@ -29,7 +31,7 @@
     >>> A_I = np.array([[0, 1], [0, 0]])
     >>> A_J = sps.csr_matrix(([1] * 5, ([0, 0, 1, 2, 3], [1, 4, 2, 3, 4])), shape=(5, 5))
     >>> lb, ub = gromov_hausdorff(A_I, A_J)
-    >>> print(lb, ub)
+    >>> lb, ub
     (0.5, 1.0)
 
     3) Estimating all pairwise mGH distances between multiple graphs
@@ -38,15 +40,15 @@
     >>> As = [A_G, A_H, A_I, A_J]
     >>> LB, UB = gromov_hausdorff(As)
     >>> LB
-    [[0.  0.5 0.5 0.5]
-     [0.5 0.  0.5 1. ]
-     [0.5 0.5 0.  0.5]
-     [0.5 1.  0.5 0. ]]
+    array([[0. , 0.5, 0.5, 0.5],
+           [0.5, 0. , 0.5, 1. ],
+           [0.5, 0.5, 0. , 0.5],
+           [0.5, 1. , 0.5, 0. ]])
     >>> UB
-    [[0.  0.5 0.5 0.5]
-     [0.5 0.  0.5 1. ]
-     [0.5 0.5 0.  1. ]
-     [0.5 1.  1.  0. ]]
+    array([[0. , 0.5, 0.5, 0.5],
+           [0.5, 0. , 0.5, 1. ],
+           [0.5, 0.5, 0. , 1. ],
+           [0.5, 1. , 1. , 0. ]])
 
     ===================================================================
 
@@ -58,7 +60,7 @@
 
     V(G) denotes vertex set of graph G.
 
-    mGH(X, Y) denotes the modified Gromov-Hausdorff distance between
+    mGH(X, Y) denotes the modified Gromov–Hausdorff distance between
     compact metric spaces X and Y.
 
     ===================================================================
@@ -793,4 +795,3 @@ def construct_mapping(D_X, D_Y, pi):
         distortion = max(bottlenecks_from_mapping_x[y], distortion)
         
     return mapped_xs_images, distortion
-
