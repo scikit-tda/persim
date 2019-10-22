@@ -6,7 +6,7 @@ import pytest
 from persim import bottleneck, wasserstein
 from persim import sliced_wasserstein
 from persim import heat
-from persim import gromov_hausdorff, gromov_hausdorff
+from persim import gromov_hausdorff
 
 
 class TestBottleneck:
