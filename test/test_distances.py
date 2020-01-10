@@ -96,6 +96,11 @@ class TestBottleneck:
         dist = bottleneck(pd, pd)
         assert dist == 0
 
+    def test_single_point_same(self):
+        dgm = np.array([[0.11371516, 4.45734882]])
+        dist = bottleneck(dgm, dgm)
+        assert dist == 0
+
 class TestWasserstein:
     def test_single(self):
         d = wasserstein(
