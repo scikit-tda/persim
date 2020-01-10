@@ -135,6 +135,11 @@ class TestWasserstein:
         dist = wasserstein(pd, pd)
         assert dist == 0
 
+    def test_single_point_same(self):
+        dgm = np.array([[0.11371516, 4.45734882]])
+        dist = wasserstein(dgm, dgm)
+        assert dist == 0
+
 
 class TestSliced:
     def test_single(self):
@@ -175,6 +180,10 @@ class TestSliced:
         # These are very loose bounds
         assert d == pytest.approx(0.314, 0.1)
 
+    def test_single_point_same(self):
+        dgm = np.array([[0.11371516, 4.45734882]])
+        dist = sliced_wasserstein(dgm, dgm)
+        assert dist == 0
 
 class TestHeat:
     def test_compare(self):
@@ -190,6 +199,11 @@ class TestHeat:
 
         # These are very loose bounds
         assert d1 < d2
+
+    def test_single_point_same(self):
+        dgm = np.array([[0.11371516, 4.45734882]])
+        dist = heat(dgm, dgm)
+        assert dist == 0
 
 
 class TestModifiedGromovHausdorff:
