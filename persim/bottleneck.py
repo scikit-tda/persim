@@ -43,6 +43,9 @@ def bottleneck(dgm1, dgm2, matching=False):
 
     return_matching = matching
 
+    if np.all(dgm1 == dgm2):
+        return 0.0 if not matching else (0.0, (None, None))
+
     S = np.array(dgm1)
     S = S[np.isfinite(S[:, 1]), :]
     T = np.array(dgm2)
