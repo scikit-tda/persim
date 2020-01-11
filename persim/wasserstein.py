@@ -35,8 +35,8 @@ def wasserstein(dgm1, dgm2, matching=False):
     """
 
     # Step 1: Compute CSM between S and dgm2, including points on diagonal
-    N = dgm1.shape[0]
-    M = dgm2.shape[0]
+    N = min(dgm1.shape[0], dgm1.size)
+    M = min(dgm2.shape[0], dgm2.size)
     # Handle the cases where there are no points in the diagrams
     if N == 0:
         dgm1 = np.array([[0, 0]])

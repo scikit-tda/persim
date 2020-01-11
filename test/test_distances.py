@@ -112,6 +112,15 @@ class TestBottleneck:
         empty = np.array([[]])
         dist = bottleneck(dgm1, empty)
         assert dist == 0.5
+    
+    def test_inf_deathtime(self):
+        dgm = np.array([[1, 2]])
+        empty = np.array([[0, np.inf]])
+        with pytest.warns(UserWarning, match="dgm1 has points with non-finite death") as w:
+            dist1 = bottleneck(empty, dgm)
+        with pytest.warns(UserWarning, match="dgm2 has points with non-finite death") as w:
+            dist2 = bottleneck(dgm, empty)
+        assert (dist1 == 0.5) and (dist2 == 0.5)
 
 class TestWasserstein:
     def test_single(self):

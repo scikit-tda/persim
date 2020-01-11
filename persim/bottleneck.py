@@ -10,6 +10,7 @@ import numpy as np
 
 from bisect import bisect_left
 from hopcroftkarp import HopcroftKarp
+import warnings
 
 __all__ = ["bottleneck"]
 
@@ -44,12 +45,32 @@ def bottleneck(dgm1, dgm2, matching=False):
     return_matching = matching
 
     S = np.array(dgm1)
-    S = S[np.isfinite(S[:, 1]), :]
+    N = min(S.shape[0], S.size)
+    if S.size > 0:
+        S = S[np.isfinite(S[:, 1]), :]
+        if S.shape[0] < N:
+            warnings.warn(
+                "dgm1 has points with non-finite death times;"+
+                "ignoring those points"
+            )
+            N = S.shape[0]
     T = np.array(dgm2)
-    T = T[np.isfinite(T[:, 1]), :]
+    M = min(T.shape[0], T.size)
+    if T.size > 0:
+        T = T[np.isfinite(T[:, 1]), :]
+        if T.shape[0] < M:
+            warnings.warn(
+                "dgm2 has points with non-finite death times;"+
+                "ignoring those points"
+            )
+            M = T.shape[0]
 
-    N = S.shape[0]
-    M = T.shape[0]
+    if N == 0:
+        S = np.array([[0, 0]])
+        N = 1
+    if M == 0:
+        T = np.array([[0, 0]])
+        M = 1
 
     # Step 1: Compute CSM between S and T, including points on diagonal
     # L Infinity distance
