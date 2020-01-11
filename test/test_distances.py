@@ -106,6 +106,12 @@ class TestBottleneck:
         dgm2 = np.array([[4, 10], [9, 10]])
         dist = bottleneck(dgm1, dgm2)
         assert dist == 2
+    
+    def test_one_empty(self):
+        dgm1 = np.array([[1, 2]])
+        empty = np.array([[]])
+        dist = bottleneck(dgm1, empty)
+        assert dist == 0.5
 
 class TestWasserstein:
     def test_single(self):
@@ -145,6 +151,12 @@ class TestWasserstein:
         dgm = np.array([[0.11371516, 4.45734882]])
         dist = wasserstein(dgm, dgm)
         assert dist == 0
+    
+    def test_one_empty(self):
+        dgm1 = np.array([[1, 2]])
+        empty = np.array([])
+        dist = wasserstein(dgm1, empty)
+        assert np.allclose(dist, np.sqrt(2)/2)
 
 
 class TestSliced:
