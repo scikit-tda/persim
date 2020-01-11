@@ -96,6 +96,17 @@ class TestBottleneck:
         dist = bottleneck(pd, pd)
         assert dist == 0
 
+    def test_single_point_same(self):
+        dgm = np.array([[0.11371516, 4.45734882]])
+        dist = bottleneck(dgm, dgm)
+        assert dist == 0
+    
+    def test_2x2_bisect_bug(self):
+        dgm1 = np.array([[6, 9], [6, 8]])
+        dgm2 = np.array([[4, 10], [9, 10]])
+        dist = bottleneck(dgm1, dgm2)
+        assert dist == 2
+
 class TestWasserstein:
     def test_single(self):
         d = wasserstein(
@@ -128,6 +139,11 @@ class TestWasserstein:
                       [0.        , 2.43430877],
                       [0.        , 2.56949258]])
         dist = wasserstein(pd, pd)
+        assert dist == 0
+
+    def test_single_point_same(self):
+        dgm = np.array([[0.11371516, 4.45734882]])
+        dist = wasserstein(dgm, dgm)
         assert dist == 0
 
 
@@ -170,6 +186,10 @@ class TestSliced:
         # These are very loose bounds
         assert d == pytest.approx(0.314, 0.1)
 
+    def test_single_point_same(self):
+        dgm = np.array([[0.11371516, 4.45734882]])
+        dist = sliced_wasserstein(dgm, dgm)
+        assert dist == 0
 
 class TestHeat:
     def test_compare(self):
@@ -185,6 +205,11 @@ class TestHeat:
 
         # These are very loose bounds
         assert d1 < d2
+
+    def test_single_point_same(self):
+        dgm = np.array([[0.11371516, 4.45734882]])
+        dist = heat(dgm, dgm)
+        assert dist == 0
 
 
 class TestModifiedGromovHausdorff:

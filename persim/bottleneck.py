@@ -85,7 +85,7 @@ def bottleneck(dgm1, dgm2, matching=False):
         for i in range(N):
             graph["%s" % i] = {j for j in range(N) if D[i, j] <= d}
         res = HopcroftKarp(graph).maximum_matching()
-        if len(res) == 2 * N and d < bdist:
+        if len(res) == 2 * N and d <= bdist:
             bdist = d
             matching = res
             ds = ds[0:idx]
