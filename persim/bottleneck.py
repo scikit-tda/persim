@@ -43,9 +43,6 @@ def bottleneck(dgm1, dgm2, matching=False):
 
     return_matching = matching
 
-    if np.all(dgm1 == dgm2):
-        return 0.0 if not matching else (0.0, (None, None))
-
     S = np.array(dgm1)
     S = S[np.isfinite(S[:, 1]), :]
     T = np.array(dgm2)
@@ -88,7 +85,7 @@ def bottleneck(dgm1, dgm2, matching=False):
         for i in range(N):
             graph["%s" % i] = {j for j in range(N) if D[i, j] <= d}
         res = HopcroftKarp(graph).maximum_matching()
-        if len(res) == 2 * N and d < bdist:
+        if len(res) == 2 * N and d <= bdist:
             bdist = d
             matching = res
             ds = ds[0:idx]
