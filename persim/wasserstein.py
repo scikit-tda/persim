@@ -1,6 +1,15 @@
+"""
+
+    Implementation of the Wasserstein distance using
+    the Hungarian algorithm
+
+    Author: Chris Tralie
+
+"""
 import numpy as np
 from sklearn import metrics
 from scipy import optimize
+import warnings
 
 __all__ = ["wasserstein"]
 
@@ -22,7 +31,7 @@ def wasserstein(dgm1, dgm2, matching=False):
     dgm2: Nx(>=2) 
         array of birth/death paris for PD 2
     matching: bool, default False
-        if True, return matching infromation and cross-similarity matrix
+        if True, return matching information and cross-similarity matrix
 
     Returns 
     ---------
@@ -34,17 +43,35 @@ def wasserstein(dgm1, dgm2, matching=False):
 
     """
 
-    # Step 1: Compute CSM between S and dgm2, including points on diagonal
-    N = min(dgm1.shape[0], dgm1.size)
-    M = min(dgm2.shape[0], dgm2.size)
-    # Handle the cases where there are no points in the diagrams
-    if N == 0:
-        dgm1 = np.array([[0, 0]])
-        N = 1
+    S = np.array(dgm1)
+    M = min(S.shape[0], S.size)
+    if S.size > 0:
+        S = S[np.isfinite(S[:, 1]), :]
+        if S.shape[0] < M:
+            warnings.warn(
+                "dgm1 has points with non-finite death times;"+
+                "ignoring those points"
+            )
+            M = S.shape[0]
+    T = np.array(dgm2)
+    N = min(T.shape[0], T.size)
+    if T.size > 0:
+        T = T[np.isfinite(T[:, 1]), :]
+        if T.shape[0] < N:
+            warnings.warn(
+                "dgm2 has points with non-finite death times;"+
+                "ignoring those points"
+            )
+            N = T.shape[0]
+
     if M == 0:
-        dgm2 = np.array([[0, 0]])
+        S = np.array([[0, 0]])
         M = 1
-    DUL = metrics.pairwise.pairwise_distances(dgm1, dgm2)
+    if N == 0:
+        T = np.array([[0, 0]])
+        N = 1
+    # Step 1: Compute CSM between S and dgm2, including points on diagonal
+    DUL = metrics.pairwise.pairwise_distances(S, T)
 
     # Put diagonal elements into the matrix
     # Rotate the diagrams to make it easy to find the straight line
@@ -52,16 +79,16 @@ def wasserstein(dgm1, dgm2, matching=False):
     cp = np.cos(np.pi/4)
     sp = np.sin(np.pi/4)
     R = np.array([[cp, -sp], [sp, cp]])
-    dgm1 = dgm1[:, 0:2].dot(R)
-    dgm2 = dgm2[:, 0:2].dot(R)
-    D = np.zeros((N+M, N+M))
-    D[0:N, 0:M] = DUL
-    UR = np.max(D)*np.ones((N, N))
-    np.fill_diagonal(UR, dgm1[:, 1])
-    D[0:N, M:M+N] = UR
-    UL = np.max(D)*np.ones((M, M))
-    np.fill_diagonal(UL, dgm2[:, 1])
-    D[N:M+N, 0:M] = UL
+    S = S[:, 0:2].dot(R)
+    T = T[:, 0:2].dot(R)
+    D = np.zeros((M+N, M+N))
+    D[0:M, 0:N] = DUL
+    UR = np.max(D)*np.ones((M, M))
+    np.fill_diagonal(UR, S[:, 1])
+    D[0:M, N:N+M] = UR
+    UL = np.max(D)*np.ones((N, N))
+    np.fill_diagonal(UL, T[:, 1])
+    D[M:N+M, 0:N] = UL
 
     # Step 2: Run the hungarian algorithm
     matchi, matchj = optimize.linear_sum_assignment(D)
