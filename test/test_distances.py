@@ -106,6 +106,21 @@ class TestBottleneck:
         dgm2 = np.array([[4, 10], [9, 10]])
         dist = bottleneck(dgm1, dgm2)
         assert dist == 2
+    
+    def test_one_empty(self):
+        dgm1 = np.array([[1, 2]])
+        empty = np.array([[]])
+        dist = bottleneck(dgm1, empty)
+        assert dist == 0.5
+    
+    def test_inf_deathtime(self):
+        dgm = np.array([[1, 2]])
+        empty = np.array([[0, np.inf]])
+        with pytest.warns(UserWarning, match="dgm1 has points with non-finite death") as w:
+            dist1 = bottleneck(empty, dgm)
+        with pytest.warns(UserWarning, match="dgm2 has points with non-finite death") as w:
+            dist2 = bottleneck(dgm, empty)
+        assert (dist1 == 0.5) and (dist2 == 0.5)
 
 class TestWasserstein:
     def test_single(self):
@@ -145,6 +160,21 @@ class TestWasserstein:
         dgm = np.array([[0.11371516, 4.45734882]])
         dist = wasserstein(dgm, dgm)
         assert dist == 0
+    
+    def test_one_empty(self):
+        dgm1 = np.array([[1, 2]])
+        empty = np.array([])
+        dist = wasserstein(dgm1, empty)
+        assert np.allclose(dist, np.sqrt(2)/2)
+
+    def test_inf_deathtime(self):
+        dgm = np.array([[1, 2]])
+        empty = np.array([[0, np.inf]])
+        with pytest.warns(UserWarning, match="dgm1 has points with non-finite death") as w:
+            dist1 = wasserstein(empty, dgm)
+        with pytest.warns(UserWarning, match="dgm2 has points with non-finite death") as w:
+            dist2 = wasserstein(dgm, empty)
+        assert (np.allclose(dist1, np.sqrt(2)/2)) and (np.allclose(dist2, np.sqrt(2)/2))
 
 
 class TestSliced:
