@@ -3,6 +3,7 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 
+import persim
 from persim import plot_diagrams
 
 
@@ -73,15 +74,6 @@ class TestPlotting:
         ]
         f, ax = plt.subplots()
         plot_diagrams(diagrams, legend=False, show=False, plot_only=[1])
-
-    @pytest.mark.skip
-    def test_show(self):
-        diagrams = [
-            np.array([[0, 1], [1, 1], [2, 4], [3, 5]]),
-            np.array([[0.5, 3], [2, 4], [4, 5], [10, 15]])
-        ]
-        f, ax = plt.subplots()
-        plot_diagrams(diagrams, legend=False, show=True)
 
     def test_legend_true(self):
         diagrams = [
@@ -193,3 +185,32 @@ class TestPlotting:
         plot_diagrams(diagrams, legend=True, show=False)
 
         # Right now just make sure nothing breaks
+
+
+class TestMatching:
+    def test_bottleneck_matching(self):
+        dgm1 = np.array([
+            [0.1, 0.2],
+            [0.2, 0.4]
+        ])
+        dgm2 = np.array([
+            [0.1, 0.2],
+            [0.3, 0.45]
+        ])
+
+        d, (matching, D) = persim.bottleneck(dgm1, dgm2, matching=True)
+        persim.bottleneck_matching(dgm1, dgm2, matching, D)
+
+    def test_plot_labels(self):
+        dgm1 = np.array([
+            [0.1, 0.2],
+            [0.2, 0.4]
+        ])
+        dgm2 = np.array([
+            [0.1, 0.2],
+            [0.3, 0.45]
+        ])
+
+        d, (matching, D) = persim.bottleneck(dgm1, dgm2, matching=True)
+        persim.bottleneck_matching(
+            dgm1, dgm2, matching, D, labels=["X", "Y"])

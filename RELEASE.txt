@@ -1,3 +1,13 @@
+0.1.1
+    - Fix bug in Wasserstein and bottleneck distance.
+
+0.1.0
+    - Include Wasserstein distance.
+
+0.0.10
+    - Add license and README to distributed packages
+0.0.9
+    - Include modified Gromov--Hausdorff distance
 0.0.8
     - Include diagram plotting
     - revamped documentation
