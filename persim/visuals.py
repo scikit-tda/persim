@@ -175,6 +175,8 @@ def plot_diagrams(
     if show is True:
         plt.show()
 
+def plot_a_bar(p, q, c='b', linestyle='-'):
+    plt.plot([p[0], q[0]], [p[1], q[1]], c=c, linestyle=linestyle, linewidth=1)
 
 def bottleneck_matching(I1, I2, matchidx, D, labels=["dgm1", "dgm2"], ax=None):
     """ Visualize bottleneck matching between two diagrams
