@@ -91,7 +91,7 @@ class PersImage(TransformerMixin):
         if singular:
             diagrams = [diagrams]
 
-        dgs = [np.copy(diagram, np.float64) for diagram in diagrams]
+        dgs = [np.copy(diagram) for diagram in diagrams]
         landscapes = [PersImage.to_landscape(dg) for dg in dgs]
 
         if not self.specs:
