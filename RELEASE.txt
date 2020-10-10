@@ -1,3 +1,6 @@
+0.1.4
+    - Migrate to a new CI/CD pipeline
+
 0.1.3
     - Fixing documentation
     - Removed the float64 memory layout specification in the np.copy() function, that was causing an error when used with the 1.18+ versions of numpy
