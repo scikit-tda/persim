@@ -25,7 +25,8 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 Cython ripser
+        pip install Cython
+        pip install flake8 ripser
         pip install -e ".[testing]"
     - name: Lint with flake8
       run: |
