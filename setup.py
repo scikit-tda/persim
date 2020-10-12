@@ -21,8 +21,8 @@ setup(name='persim',
       description='Distances and representations of persistence diagrams',
       long_description=long_description,
       long_description_content_type="text/markdown",	
-      author='Nathaniel Saul, Chris Tralie',
-      author_email='nat@riverasaul.com, chris.tralie@gmail.com',
+      author='Nathaniel Saul, Chris Tralie, Francis Motta',
+      author_email='nat@riverasaul.com, chris.tralie@gmail.com, francis.c.motta@gmail.com',
       url='https://persim.scikit-tda.org',
       license='MIT',
       packages=['persim'],
@@ -59,5 +59,5 @@ setup(name='persim',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
       ],
-      keywords='persistent homology, persistence images, persistence diagrams, topology data analysis, algebraic topology, unsupervised learning, sliced wasserstein distance, bottleneck distance'
+      keywords='persistent homology, persistence images, persistence diagrams, topological data analysis, algebraic topology, unsupervised learning, supervised learning, machine learning, sliced wasserstein distance, bottleneck distance'
      )
