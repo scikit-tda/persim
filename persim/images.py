@@ -2,6 +2,9 @@ from __future__ import division
 from itertools import product
 import collections
 
+from joblib import Parallel, delayed
+from multiprocessing import Pool
+
 import numpy as np
 from scipy.stats import multivariate_normal as mvn
 from scipy.stats import norm
@@ -236,16 +239,16 @@ class PersistenceImager(TransformerMixin):
 
     Usage
     ------
-    
+
     First instantiate a PersistenceImager() object:
     ```
     >>> from persim import PersistenceImager
-    >>> pers_imager = PersistenceImager()
+    >>> pimgr = PersistenceImager(pixel_size=0.2, birth_range=(0,1))
     ```
     
     Printing a PersistenceImager() object will print its hyperparameters (defaults in this case):
     ```
-    >>> print(pers_imager)
+    >>> print(pimgr)
 
     PersistenceImager object:
       pixel size: 0.2
@@ -257,67 +260,63 @@ class PersistenceImager(TransformerMixin):
       weight parameters: {n: 1.0}
       kernel parameters: {sigma: [[ 1.  0.]
                                   [ 0.  1.]]}
-                                  
-    The `transform()` method can then be called on a (N,2) numpy array to generate a persistence image from the input diagram:
+    
+    PersistenceImager() attributes can be adjusted at or after instantiation. Updating attributes of a PersistenceImager() object will automatically update all other dependent attributes.
+    ```
+    >>> pimgr.pixel_size = 0.1
+    >>> pimgr.birth_range = (0, 2)
+    >>> print(pimgr)
+    
+    PersistenceImager object: 
+      pixel size: 0.1 
+      resolution: (20, 10)  <---
+      birth range: (0, 2) 
+      persistence range: (0, 1) 
+      weight: persistence 
+      kernel: bvncdf 
+      weight parameters: {n: 1.0} 
+      kernel parameters: {sigma: [[1. 0.]
+                                  [0. 1.]]}
+    ```
+    
+    The `fit()` method can be called on one or more (*,2) numpy arrays to automatically determine the miniumum birth and persistence ranges needed to capture all persistence pairs. The ranges and resolution are automatically adjusted to accomodate the specified pixel size.
+    
     ```
     >>> import numpy as np
-    >>> pers_dgm = np.array([[0.5, 0.8], [0.7, 1.2], [2.5, 4.0]])
-    >>> pers_img = pers_imager.transform(pers_dgm, skew=True)
-
-    array([[0.00430663, 0.00453225, 0.0045929 , 0.00448349, 0.00421781],
-           [0.00474815, 0.00501502, 0.00510404, 0.00500795, 0.00473973],
-           [0.005063  , 0.00537381, 0.00550102, 0.00543453, 0.00518493],
-           [0.00523385, 0.00559182, 0.00576862, 0.00575055, 0.005544  ],
-           [0.00526161, 0.00567059, 0.00590921, 0.00595932, 0.00582126]])
-    ```
+    >>> pimgr = PersistenceImager(pixel_size=0.5)
+    >>> pdgms = [np.array([[0.5, 0.8], [0.7, 2.2], [2.5, 4.0]]),
+                 np.array([[0.1, 0.2], [3.1, 3.3], [1.6, 2.9]]),
+                 np.array([[0.2, 1.5], [0.4, 0.6], [0.2, 2.6]])]
+    >>> pimgr.fit(pdgms, skew=True)
+    >>> pimgr
     
-    The option `skew=True` specifies that the diagram is currently in birth-death coordinates and must be first transformed to birth-persistence coordinates. 
-    
-    A finer resolution image is made by decreasing the `pixel_size` attribute:
-    ```
-    >>> pers_imager.pixel_size = 0.02
-
-    PersistenceImager object:
-      pixel size: 0.02      <----
-      resolution: (50, 50)  <----
-      birth range: (0, 1)
-      persistence range: (0, 1)
-      weight: linear_ramp
-      kernel: bvncdf
-      weight parameters: {}
-      kernel parameters: {sigma: [[ 1.  0.]
-                                  [ 0.  1.]]}
-    ```
-    
-    Updating attributes of a PersistenceImager() object will automatically update other dependent image attributes: 
-    ```
-    >>> pers_imager.birth_range = (0, 2)
-    >>> print(pers_imager)
-
     PersistenceImager object: 
-      pixel size: 0.02 
-      resolution: (100, 50)   <---
-      birth range: (0, 2)     <---
-      persistence range: (0, 1) 
-      weight: linear_ramp 
+      pixel size: 0.5 
+      resolution: (6, 5)                      <---
+      birth range: (0.1, 3.1)                 <---
+      persistence range: (-8.32667e-17, 2.5)  <---
+      weight: persistence 
       kernel: bvncdf 
-      weight parameters: {} 
-      kernel parameters: {sigma: [[1.  0.]
-                                  [0.  1.]]}
-    ```
-    
-    The `fit()` method can be called on an iterable of (N_j,2) numpy arrays to determine the persistence images parameters based on the collection of persistence diagrams. In particular, the birth and persistence ranges are chosen to capture all persistence pairs across all diagrams in the collection. 
+      weight parameters: {n: 1.0} 
+      kernel parameters: {sigma: [[1. 0.]
+                                  [0. 1.]]}
     
     ```
-    >>> pers_dgms = [np.array([[0.5, 0.8], [0.7, 1.2], [2.5, 4.0]]),
-                     np.array([[0.5, 0.8], [0.7, 1.2], [2.5, 4.0]]),
-                     np.array([[0.5, 0.8], [0.7, 1.2], [2.5, 4.0]])]
-    >>> pers_imager.fit(pers_dgms, skew=True)
+    
+    The `transform()` method can then be called on one or more (*,2) numpy arrays to generate persistence images from diagrams. The option `skew=True` specifies that the diagrams are currently in birth-death coordinates and must first be transformed to birth-persistence coordinates.
+    ```
+    >>> pimgs = pimgr.transform(pdgms, skew=True)
+    >>> pimgs[0]
 
-    =============  PASTE RESULTS =============
-    
+        array([[0.03999068, 0.05688393, 0.06672051, 0.06341749, 0.04820814],
+               [0.04506697, 0.06556791, 0.07809764, 0.07495246, 0.05730671],
+               [0.04454486, 0.06674611, 0.08104366, 0.07869919, 0.06058808],
+               [0.04113063, 0.0636504 , 0.07884635, 0.07747833, 0.06005714],
+               [0.03625436, 0.05757744, 0.07242608, 0.07180125, 0.05593626],
+               [0.02922239, 0.04712024, 0.05979033, 0.05956698, 0.04653357]])
     ```
     
+    The option `skew=True` specifies that the diagram is currently in birth-death coordinates and must first be transformed to birth-persistence coordinates.
     """
     
     def __init__(self, birth_range=None, pers_range=None, pixel_size=None,
@@ -341,7 +340,6 @@ class PersistenceImager(TransformerMixin):
         if kernel_params is None:
             kernel_params = {'sigma': np.array([[1.0, 0.0], [0.0, 1.0]])}
        
-            
         self.weight = weight
         self.weight_params = weight_params
         self.kernel = kernel
@@ -428,8 +426,8 @@ class PersistenceImager(TransformerMixin):
 
     def fit(self, pers_dgms, skew=True):
         """
-        Automatically choose persistence images parameters based on a collection of persistence diagrams
-        :param pers_dgms: An iterable of (N_j, 2) numpy arrays encoding persistence diagrams
+        Automatically choose persistence images parameters based on one or more persistence diagrams
+        :param pers_dgms: one or an iterable of (N,2) numpy arrays encoding a persistence diagram
         :param skew: boolean flag indicating if diagram needs to be converted to birth-persistence coordinates
                      (default: True)
         """
@@ -437,7 +435,10 @@ class PersistenceImager(TransformerMixin):
         max_birth = -np.Inf
         min_pers = np.Inf
         max_pers = -np.Inf
-
+        
+        # convert to a list of diagrams if necessary 
+        pers_dgms, singular = self._ensure_iterable(pers_dgms)
+        
         # loop over diagrams to determine the maximum extent of the pairs contained in the birth-persistence plane
         for pers_dgm in pers_dgms:
             pers_dgm = np.copy(pers_dgm)
@@ -462,40 +463,63 @@ class PersistenceImager(TransformerMixin):
         self.birth_range = (min_birth, max_birth)
         self.pers_range = (min_pers, max_pers)
 
-    def transform(self, pers_dgms, skew=True):    
+    def transform(self, pers_dgms, skew=True, n_jobs=None):
         """
         Transform a persistence diagram or a iterable containing a collection of persistence diagrams into 
         persistence images using the parameters specified in the PersistenceImager object instance
-        :param pers_dgms: iterable of (N,2) numpy array of persistence pairs encoding a persistence diagram
+        :param pers_dgms: one or an iterable of (N,2) numpy arrays encoding a persistence diagram
         :param skew: boolean flag indicating if diagram needs to be converted to birth-persistence coordinates
                      (default: True)
         :return: Python list of numpy arrays encoding the persistence images
         """
+        if n_jobs is not None:
+            parallelize = True
+            if n_jobs == -1:
+                n_jobs = None
+        else:
+            parallelize = False
+            
         # if diagram is empty, return empty image
         if len(pers_dgms) == 0:
             return np.zeros(self.resolution)
         
-        # if first entry of first entry is not iterable, then diagrams is singular and we need to make it a list of diagrams
-        try:
-            singular = not isinstance(pers_dgms[0][0], collections.Iterable)
-        except IndexError:
-            singular = False
-
-        if singular:
-            pers_dgms = [pers_dgms]
+        # convert to a list of diagrams if necessary 
+        pers_dgms, singular = self._ensure_iterable(pers_dgms)
         
         # TODO: Parallellize over collection of diagrams
-        pers_imgs = np.empty(len(pers_dgms), dtype=object)
-        img_idx = 0
-        for pers_dgm in pers_dgms:
-            pers_imgs[img_idx] = self._transform(pers_dgm, skew=skew)
-            img_idx += 1
+        if parallelize:
+            fxn = lambda pers_dgm: self._transform(pers_dgm, skew=skew)
+            pool = Pool(n_jobs)
+            pers_imgs = pool.map(fxn, pers_dgms)
+            #pers_imgs = Parallel(n_jobs=n_jobs)(delayed(self._transform)(pers_dgm, skew=skew) for pers_dgm in pers_dgms)
+            pool.close()
+        else:
+            pers_imgs = [self._transform(pers_dgm, skew=skew) for pers_dgm in pers_dgms]      
         
         if singular:
             pers_imgs = pers_imgs[0]
         
         return pers_imgs
-    
+
+    def fit_transform(self, pers_dgms, skew=True):
+        """
+        Automatically choose persistence image parameters based on a collection of persistence diagrams and transform
+        the collection of diagrams into images using the parameters specified in the PersistenceImager object instance
+        :param pers_dgms: iterable of (N,2) numpy arrays encoding persistence diagrams
+        :param skew: Boolean flag indicating if diagram needs to be converted to birth-persistence coordinates
+                     (default: True)
+        :return: Python list of numpy arrays encoding the persistence images
+        """
+        pers_dgms = np.copy(pers_dgms)
+
+        # fit imager parameters
+        self.fit(pers_dgms, skew=skew)
+
+        # transform diagrams to images
+        self.transform(pers_dgms, skew=skew)
+
+        return pers_imgs
+       
     def _transform(self, pers_dgm, skew=True):
         """
         Transform a persistence diagram to a persistence image using the parameters specified in the PersistenceImager
@@ -538,43 +562,32 @@ class PersistenceImager(TransformerMixin):
 
         # handle the general case
         if general_flag:
-            bb, pp = np.meshgrid(self._bpnts, self._ppnts)
+            bb, pp = np.meshgrid(self._bpnts, self._ppnts, indexing='ij')
             bb = bb.flatten(order='C')
             pp = pp.flatten(order='C')
             for i in range(n):
-                self.kernel_params['mu'] = pers_dgm[i, :]
-                curr_img = np.reshape(self.kernel(bb, pp, **self.kernel_params),
+                curr_img = np.reshape(self.kernel(bb, pp, mu=pers_dgm[i, :], **self.kernel_params),
                                       (self.resolution[0]+1, self.resolution[1]+1), order='C')
-                pers_img += wts[i] * (curr_img[1:, 1:] - curr_img[:-1, 1:] - curr_img[1:, :-1] + curr_img[:-1, :-1])
+                pers_img += wts[i]*(curr_img[1:, 1:] - curr_img[:-1, 1:] - curr_img[1:, :-1] + curr_img[:-1, :-1])
 
         return pers_img
 
-    def fit_transform(self, pers_dgms, skew=True):
-        """
-        Automatically choose persistence image parameters based on a collection of persistence diagrams and transform
-        the collection of diagrams into images using the parameters specified in the PersistenceImager object instance
-        :param pers_dgms: iterable of (N,2) numpy arrays encoding persistence diagrams
-        :param skew: Boolean flag indicating if diagram needs to be converted to birth-persistence coordinates
-                     (default: True)
-        :return: Python list of numpy arrays encoding the persistence images
-        """
-        pers_dgms = np.copy(pers_dgms)
+    def _ensure_iterable(self, pers_dgms):
+        # if first entry of first entry is not iterable, then diagrams is singular and we need to make it a list of diagrams
+        try:
+            singular = not isinstance(pers_dgms[0][0], collections.Iterable)
+        except IndexError:
+            singular = False
 
-        # fit imager parameters
-        self.fit(pers_dgms, skew=skew)
+        if singular:
+            pers_dgms = [pers_dgms]
+            
+        return pers_dgms, singular
 
-        # loop over each diagram and compute its image
-        num_dgms = len(pers_dgms)
-        pers_imgs = [None] * num_dgms
-        for i in range(num_dgms):
-            pers_imgs[i] = self.transform(pers_dgms[i], skew=skew)
-
-        return pers_imgs
-
-    def plot_diagram(self, pers_dgm, skew=True, out_file=None):
+    def plot_diagram(self, pers_dgm, skew=True, ax=None, out_file=None):
         """
         Plot a persistence diagram
-        :param pers_dgms: An (N,2) numpy array encoding a persistence diagram
+        :param pers_dgm: An (N,2) numpy array encoding a persistence diagram
         :param skew: boolean flag indicating if diagram needs to be converted to birth-persistence coordinates
                      (default: True)
         :param out_file: optional path to save the persistence diagram 
@@ -601,76 +614,57 @@ class PersistenceImager(TransformerMixin):
         pmin -= p_plot_buff
         pmax += p_plot_buff
 
-        fig = plt.figure()
-        ax = plt.gca()
+        ax = ax or plt.gca()
         ax.set_xlim(bmin, bmax)
         ax.set_ylim(pmin, pmax)
 
         # compute reasonable line width for pixel overlay (initially 1/50th of the width of a pixel)
-        linewidth = (1/50 * self.pixel_size) * 72 * fig.bbox_inches.width * ax.get_position().width / \
+        linewidth = (1/50 * self.pixel_size) * 72 * plt.gcf().bbox_inches.width * ax.get_position().width / \
                     np.min((bmax - bmin, pmax - pmin))
 
         # plot the persistence image grid
-        hlines = np.column_stack(np.broadcast_arrays(self._bpnts[0], self._ppnts, self._bpnts[-1], self._ppnts))
-        vlines = np.column_stack(np.broadcast_arrays(self._bpnts, self._ppnts[0], self._bpnts, self._ppnts[-1]))
-        lines = np.concatenate([hlines, vlines]).reshape(-1, 2, 2)
-        line_collection = LineCollection(lines, color='black', linewidths=linewidth)
-        ax.add_collection(line_collection)
+        if skew:
+            hlines = np.column_stack(np.broadcast_arrays(self._bpnts[0], self._ppnts, self._bpnts[-1], self._ppnts))
+            vlines = np.column_stack(np.broadcast_arrays(self._bpnts, self._ppnts[0], self._bpnts, self._ppnts[-1]))
+            lines = np.concatenate([hlines, vlines]).reshape(-1, 2, 2)
+            line_collection = LineCollection(lines, color='black', linewidths=linewidth)
+            ax.add_collection(line_collection)       
 
         # plot persistence diagram
-        plt.scatter(pers_dgm[:, 0], pers_dgm[:, 1])
+        ax.scatter(pers_dgm[:, 0], pers_dgm[:, 1])
 
         # plot diagonal if necessary
         if not skew:
-            min_diag = np.min((np.min(plt.xlim()), np.min(plt.ylim())))
-            max_diag = np.min((np.max(plt.xlim()), np.max(plt.ylim())))
-            plt.plot([min_diag, max_diag], [min_diag, max_diag])
+            min_diag = np.min((np.min(ax.get_xlim()), np.min(ax.get_ylim())))
+            max_diag = np.min((np.max(ax.get_xlim()), np.max(ax.get_ylim())))
+            ax.plot([min_diag, max_diag], [min_diag, max_diag])
 
         # fix and label axes
         ax.set_aspect('equal')
-        plt.xlabel('birth')
-        plt.ylabel(ylabel)
+        ax.set_xlabel('birth')
+        ax.set_ylabel(ylabel)
 
         # optionally save figure
-        if out_file is None:
-            plt.show()
-        else:
+        if out_file:
             plt.savefig(out_file, bbox_inches='tight')
 
-    def plot_image(self, pers_dgm, skew=True, out_file=None):
+    def plot_image(self, pers_img, ax=None, out_file=None):
         """
         Plot a persistence image
-        :param pers_dgms: An (N,2) numpy array encoding a persistence diagram
-        :param skew: boolean flag indicating if diagram needs to be converted to birth-persistence coordinates
-                     (default: True)
+        :param pers_img: (N,K) numpy array encoding a persistence image, e.g. output of PersistenceImager.transform()
         :param out_file: optional path to save the persistence diagram 
         """
-        pers_dgm = np.copy(pers_dgm)
-        pers_img = self.transform(pers_dgm, skew=skew)
-        if skew:
-            ylabel = 'persistence'
-        else:
-            ylabel = 'death'
-
-        ax = plt.gca()
+        ax = ax or plt.gca()
         ax.matshow(pers_img.T, **{'origin': 'lower'})
 
-        # plot diagonal if necessary
-        if not skew:
-            min_diag = np.min((np.min(plt.xlim()), np.min(plt.ylim())))
-            max_diag = np.min((np.max(plt.xlim()), np.max(plt.ylim())))
-            plt.plot([min_diag, max_diag], [min_diag, max_diag])
-
         # fix and label axes
-        plt.xlabel('birth')
-        plt.ylabel(ylabel)
+        ax.set_xlabel('birth')
+        ax.set_ylabel('persistence')
         ax.get_xaxis().set_ticks([])
         ax.get_yaxis().set_ticks([])
 
         # optionally save figure
-        if out_file is None:
-            plt.show()
-        else:
+        if out_file:
             plt.savefig(out_file, bbox_inches='tight')
 
 
@@ -688,16 +682,21 @@ def dict_print(dict_in):
 
 
 """
-Cumulative distribution functions of probability distribution functions used to replace persistence pairs in the
-construction of persistence images (see [PI] for details).
+Kernel functions:
+
+A valid kernel is a python function of the form kernel(x, y, mu=(birth, persistence), **kwargs) defining a 
+cumulative distribution function such that kernel(x, y) = P(X <= x, Y <=y), where x and y are numpy arrays of equal length. 
+
+The required parameter mu defines the dependance of the kernel on the location of a persistence pair and is usually 
+taken to be the mean of the probability distribution function associated to kernel CDF.
 """
 
 def bvncdf(birth, pers, mu=None, sigma=None):
     """
     Optimized bivariate normal cumulative distribution function for computing persistence images using a Gaussian kernel
-    :param birth: birth-coordinate(s) of diagram pairs
-    :param pers: persistence-coordinate(s) of diagram pairs
-    :param mu: (2,)-numpy array specifying x and y coordinates of distribution mean
+    :param birth: birth-coordinate(s) of pixel corners
+    :param pers: persistence-coordinate(s) of pixel corners
+    :param mu: (2,)-numpy array specifying x and y coordinates of distribution means (birth-persistence pairs)
     :param sigma: (2,2)-numpy array specifying distribution covariance matrix or numeric if distribution is isotropic
     :return: P(X <= birth, Y <= pers)
     """
@@ -868,7 +867,9 @@ def _gauss_legendre_quad(r):
 
 
 """
-Functions which weight the birth-persistence plane. To ensure stability, functions should vanish continuously at the
+Weight functions:
+
+A valid weight is a python function of the form weight(birth, persistence, **kwargs) defining a scalar-valued function over the birth-persistence plane, where birth and persistence are numpy arrays of equal length. To ensure stability, functions should vanish continuously at the
 line persistence = 0 (see [PI] for details).
 """
 
@@ -894,7 +895,6 @@ def linear_ramp(birth, pers, low=0.0, high=1.0, start=0.0, end=1.0):
             w[i] = (pers[i] - start) * (high - low) / (end - start) + low
 
     return w
-
 
 def persistence(birth, pers, n=1.0):
     """
