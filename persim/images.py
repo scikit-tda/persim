@@ -5,6 +5,7 @@ import collections
 from joblib import Parallel, delayed
 from multiprocessing import Pool
 
+import copy
 import numpy as np
 from scipy.stats import multivariate_normal as mvn
 from scipy.stats import norm
@@ -418,6 +419,7 @@ class PersistenceImager(TransformerMixin):
         # adjust image ranges to accommodate incommensurable ranges and pixel width
         self._birth_range = (self._birth_range[0] - db / 2, self._birth_range[1] + db / 2)
         self._pers_range = (self._pers_range[0] - dp / 2, self._pers_range[1] + dp / 2)
+        
         # construct linear spaces defining pixel locations
         self._bpnts = np.linspace(self._birth_range[0], self._birth_range[1] + self._pixel_size,
                                            self._resolution[0] + 1, endpoint=False, dtype=np.float64)
@@ -510,13 +512,13 @@ class PersistenceImager(TransformerMixin):
                      (default: True)
         :return: Python list of numpy arrays encoding the persistence images
         """
-        pers_dgms = np.copy(pers_dgms)
+        pers_dgms = copy.deepcopy(pers_dgms)
 
         # fit imager parameters
         self.fit(pers_dgms, skew=skew)
 
         # transform diagrams to images
-        self.transform(pers_dgms, skew=skew)
+        pers_imgs = self.transform(pers_dgms, skew=skew)
 
         return pers_imgs
        
@@ -690,6 +692,15 @@ cumulative distribution function such that kernel(x, y) = P(X <= x, Y <=y), wher
 The required parameter mu defines the dependance of the kernel on the location of a persistence pair and is usually 
 taken to be the mean of the probability distribution function associated to kernel CDF.
 """
+def uniform(x, y, mu=None, width=1, height=1):
+    w1 = np.maximum(x - (mu[0] - width/2), 0)
+    h1 = np.maximum(y - (mu[1] - height/2), 0)
+    
+    w = np.minimum(w1, width)
+    h = np.minimum(h1, height)
+
+    return w*h / (width*height)
+
 
 def bvncdf(birth, pers, mu=None, sigma=None):
     """
@@ -884,7 +895,13 @@ def linear_ramp(birth, pers, low=0.0, high=1.0, start=0.0, end=1.0):
     :param end: end persistence value of linear transition from low to high weight
     :return: weight at persistence pair
     """
-    n = birth.shape[0]
+    try:
+        n = len(birth)
+    except:
+        n = 1
+        birth = [birth]
+        pers = [pers]
+
     w = np.zeros((n,))
     for i in range(n):
         if pers[i] < start:
