@@ -3,7 +3,6 @@ from itertools import product
 import collections
 
 from joblib import Parallel, delayed
-from multiprocessing import Pool
 
 import copy
 import numpy as np
@@ -476,8 +475,6 @@ class PersistenceImager(TransformerMixin):
         """
         if n_jobs is not None:
             parallelize = True
-            if n_jobs == -1:
-                n_jobs = None
         else:
             parallelize = False
             
@@ -488,15 +485,10 @@ class PersistenceImager(TransformerMixin):
         # convert to a list of diagrams if necessary 
         pers_dgms, singular = self._ensure_iterable(pers_dgms)
         
-        # TODO: Parallellize over collection of diagrams
         if parallelize:
-            fxn = lambda pers_dgm: self._transform(pers_dgm, skew=skew)
-            pool = Pool(n_jobs)
-            pers_imgs = pool.map(fxn, pers_dgms)
-            #pers_imgs = Parallel(n_jobs=n_jobs)(delayed(self._transform)(pers_dgm, skew=skew) for pers_dgm in pers_dgms)
-            pool.close()
+            pers_imgs = Parallel(n_jobs=n_jobs)(delayed(_transform)(pers_dgm, skew, self.resolution, self.weight, self.weight_params, self.kernel, self.kernel_params, self._bpnts, self._ppnts) for pers_dgm in pers_dgms)
         else:
-            pers_imgs = [self._transform(pers_dgm, skew=skew) for pers_dgm in pers_dgms]      
+            pers_imgs = [_transform(pers_dgm, skew=skew, resolution=self.resolution, weight=self.weight, weight_params=self.weight_params, kernel=self.kernel, kernel_params=self.kernel_params, _bpnts=self._bpnts, _ppnts=self._ppnts) for pers_dgm in pers_dgms]
         
         if singular:
             pers_imgs = pers_imgs[0]
@@ -521,58 +513,7 @@ class PersistenceImager(TransformerMixin):
         pers_imgs = self.transform(pers_dgms, skew=skew)
 
         return pers_imgs
-       
-    def _transform(self, pers_dgm, skew=True):
-        """
-        Transform a persistence diagram to a persistence image using the parameters specified in the PersistenceImager
-        object instance
-        :param pers_dgm: (N,2) numpy array of persistence pairs encoding a persistence diagram
-        :param skew: boolean flag indicating if diagram needs to be converted to birth-persistence coordinates
-                     (default: True)
-        :return: numpy array encoding the persistence image
-        """
-        pers_dgm = np.copy(pers_dgm)
-        pers_img = np.zeros(self.resolution)
-        n = pers_dgm.shape[0]
-        general_flag = True
-
-        # if necessary convert from birth-death coordinates to birth-persistence coordinates
-        if skew:
-            pers_dgm[:, 1] = pers_dgm[:, 1] - pers_dgm[:, 0]
-
-        # compute weights at each persistence pair
-        wts = self.weight(pers_dgm[:, 0], pers_dgm[:, 1], **self.weight_params)
-
-        # handle the special case of a standard, isotropic Gaussian kernel
-        if self.kernel == bvncdf:
-            general_flag = False
-            sigma = self.kernel_params['sigma']
-
-            # sigma is specified by a single variance
-            if isinstance(sigma, (int, float)):
-                sigma = np.array([[sigma, 0.0], [0.0, sigma]], dtype=np.float64)
-
-            if (sigma[0, 0] == sigma[1, 1] and sigma[0, 1] == 0.0):
-                sigma = np.sqrt(sigma[0, 0])
-                for i in range(n):
-                    ncdf_b = _norm_cdf((self._bpnts - pers_dgm[i, 0]) / sigma)
-                    ncdf_p = _norm_cdf((self._ppnts - pers_dgm[i, 1]) / sigma)
-                    curr_img = ncdf_p[None, :] * ncdf_b[:, None]
-                    pers_img += wts[i]*(curr_img[1:, 1:] - curr_img[:-1, 1:] - curr_img[1:, :-1] + curr_img[:-1, :-1])
-            else:
-                general_flag = True
-
-        # handle the general case
-        if general_flag:
-            bb, pp = np.meshgrid(self._bpnts, self._ppnts, indexing='ij')
-            bb = bb.flatten(order='C')
-            pp = pp.flatten(order='C')
-            for i in range(n):
-                curr_img = np.reshape(self.kernel(bb, pp, mu=pers_dgm[i, :], **self.kernel_params),
-                                      (self.resolution[0]+1, self.resolution[1]+1), order='C')
-                pers_img += wts[i]*(curr_img[1:, 1:] - curr_img[:-1, 1:] - curr_img[1:, :-1] + curr_img[:-1, :-1])
-
-        return pers_img
+ 
 
     def _ensure_iterable(self, pers_dgms):
         # if first entry of first entry is not iterable, then diagrams is singular and we need to make it a list of diagrams
@@ -669,7 +610,6 @@ class PersistenceImager(TransformerMixin):
         if out_file:
             plt.savefig(out_file, bbox_inches='tight')
 
-
 def dict_print(dict_in):
     # print dictionary contents in human-readable format
     if dict_in is None:
@@ -682,7 +622,57 @@ def dict_print(dict_in):
 
     return str_out
 
+def _transform(pers_dgm, skew=True, resolution=None, weight=None, weight_params=None, kernel=None, kernel_params=None, _bpnts=None, _ppnts=None):
+        """
+        Transform a persistence diagram to a persistence image using the parameters specified in the PersistenceImager
+        object instance
+        :param pers_dgm: (N,2) numpy array of persistence pairs encoding a persistence diagram
+        :param skew: boolean flag indicating if diagram needs to be converted to birth-persistence coordinates
+                     (default: True)
+        :return: numpy array encoding the persistence image
+        """
+        pers_dgm = np.copy(pers_dgm)
+        pers_img = np.zeros(resolution)
+        n = pers_dgm.shape[0]
+        general_flag = True
 
+        # if necessary convert from birth-death coordinates to birth-persistence coordinates
+        if skew:
+            pers_dgm[:, 1] = pers_dgm[:, 1] - pers_dgm[:, 0]
+
+        # compute weights at each persistence pair
+        wts = weight(pers_dgm[:, 0], pers_dgm[:, 1], **weight_params)
+
+        # handle the special case of a standard, isotropic Gaussian kernel
+        if kernel == bvncdf:
+            general_flag = False
+            sigma = kernel_params['sigma']
+
+            # sigma is specified by a single variance
+            if isinstance(sigma, (int, float)):
+                sigma = np.array([[sigma, 0.0], [0.0, sigma]], dtype=np.float64)
+
+            if (sigma[0, 0] == sigma[1, 1] and sigma[0, 1] == 0.0):
+                sigma = np.sqrt(sigma[0, 0])
+                for i in range(n):
+                    ncdf_b = _norm_cdf((_bpnts - pers_dgm[i, 0]) / sigma)
+                    ncdf_p = _norm_cdf((_ppnts - pers_dgm[i, 1]) / sigma)
+                    curr_img = ncdf_p[None, :] * ncdf_b[:, None]
+                    pers_img += wts[i]*(curr_img[1:, 1:] - curr_img[:-1, 1:] - curr_img[1:, :-1] + curr_img[:-1, :-1])
+            else:
+                general_flag = True
+
+        # handle the general case
+        if general_flag:
+            bb, pp = np.meshgrid(_bpnts, _ppnts, indexing='ij')
+            bb = bb.flatten(order='C')
+            pp = pp.flatten(order='C')
+            for i in range(n):
+                curr_img = np.reshape(kernel(bb, pp, mu=pers_dgm[i, :], **kernel_params),
+                                      (resolution[0]+1, resolution[1]+1), order='C')
+                pers_img += wts[i]*(curr_img[1:, 1:] - curr_img[:-1, 1:] - curr_img[1:, :-1] + curr_img[:-1, :-1])
+
+        return pers_img
 """
 Kernel functions:
 

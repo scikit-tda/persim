@@ -1,7 +1,6 @@
 import pytest
 
 import numpy as np
-from persim import PersImage
 from persim import PersistenceImager
 from persim.images import persistence, linear_ramp, uniform, bvncdf, _norm_cdf, _sbvn_cdf, _bvn_cdf
 
@@ -13,27 +12,27 @@ def test_empty_diagram():
     dgm = np.zeros((0, 2))
     persimgr = PersistenceImager(pixel_size=0.1)
     res = persimgr.transform(dgm)
-    assert np.all(res == np.zeros((10, 10)))
+    np.testing.assert_array_equal(res, np.zeros((10, 10)))
 
 def test_empty_diagram_list():
     dgms1 = [np.array([[2, 3]]), 
             np.zeros((0, 2))]
     persimgr1 = PersistenceImager(pixel_size=0.1)
     res1 = persimgr1.transform(dgms1)
-    assert np.all(res1[1] == np.zeros((10, 10)))
+    np.testing.assert_array_equal(res1[1],np.zeros((10, 10)))
 
     dgms2 = [np.zeros((0, 2)), 
             np.array([[2, 3]])]
     persimgr2 = PersistenceImager(pixel_size=0.1)
     res2 = persimgr2.transform(dgms2)
-    assert np.all(res2[0] == np.zeros((10, 10)))
+    np.testing.assert_array_equal(res2[0], np.zeros((10, 10)))
 
     dgms3 = [np.zeros((0, 2)), 
             np.zeros((0, 2))]
     persimgr3 = PersistenceImager(pixel_size=0.1)
     res3 = persimgr3.transform(dgms3)
-    assert np.all(res3[0] == np.zeros((10, 10)))
-    assert np.all(res3[1] == np.zeros((10, 10)))
+    np.testing.assert_array_equal(res3[0], np.zeros((10, 10)))
+    np.testing.assert_array_equal(res3[1], np.zeros((10, 10)))
 
 def test_birth_range_setter():
     persimgr = PersistenceImager(birth_range=(0,1), pers_range=(0,2), pixel_size=1)
@@ -158,12 +157,12 @@ class TestWeightFunctions:
         persimgr = PersistenceImager(weight=linear_ramp, weight_params={'low':0.0, 'high':1.0, 'start':0.0, 'end':1.0})
         wf = persimgr.weight
         wf_params = persimgr.weight_params
-        assert wf(1, 0, **wf_params) == 0
+        np.testing.assert_equal(wf(1, 0, **wf_params), 0)
         
         persimgr = PersistenceImager(weight=persistence, weight_params={'n': 2})
         wf = persimgr.weight
         wf_params = persimgr.weight_params
-        assert wf(1, 0, **wf_params) == 0
+        np.testing.assert_equal(wf(1, 0, **wf_params), 0)
 
     def test_linear_ramp(self):
         persimgr = PersistenceImager(weight=linear_ramp, weight_params={'low':0.0, 'high':5.0, 'start':0.0, 'end':1.0})
@@ -171,31 +170,31 @@ class TestWeightFunctions:
         wf = persimgr.weight
         wf_params = persimgr.weight_params
 
-        assert wf(1, 0, **wf_params) == 0
-        assert wf(1, 1/5, **wf_params) == 1
-        assert wf(1, 1, **wf_params) == 5
-        assert wf(1, 2, **wf_params) == 5
+        np.testing.assert_equal(wf(1, 0, **wf_params), 0)
+        np.testing.assert_equal(wf(1, 1/5, **wf_params), 1)
+        np.testing.assert_equal(wf(1, 1, **wf_params), 5)
+        np.testing.assert_equal(wf(1, 2, **wf_params), 5)
         
         persimgr.weight_params = {'low':0.0, 'high':5.0, 'start':0.0, 'end':5.0}
         wf_params = persimgr.weight_params
         
-        assert wf(1, 0, **wf_params) == 0
-        assert wf(1, 1/5, **wf_params) == 1/5
-        assert wf(1, 1, **wf_params) == 1
-        assert wf(1, 5, **wf_params) == 5
+        np.testing.assert_equal(wf(1, 0, **wf_params), 0)
+        np.testing.assert_equal(wf(1, 1/5, **wf_params), 1/5)
+        np.testing.assert_equal(wf(1, 1, **wf_params), 1)
+        np.testing.assert_equal(wf(1, 5, **wf_params), 5)
         
         persimgr.weight_params = {'low':0.0, 'high':5.0, 'start':1.0, 'end':5.0}
         wf_params = persimgr.weight_params
         
-        assert wf(1, 0, **wf_params) == 0
-        assert wf(1, 1, **wf_params) == 0
-        assert wf(1, 5, **wf_params) == 5
+        np.testing.assert_equal(wf(1, 0, **wf_params), 0)
+        np.testing.assert_equal(wf(1, 1, **wf_params), 0)
+        np.testing.assert_equal(wf(1, 5, **wf_params), 5)
         
         persimgr.weight_params = {'low':1.0, 'high':5.0, 'start':1.0, 'end':5.0}
         wf_params = persimgr.weight_params  
-        assert wf(1, 0, **wf_params) == 1
-        assert wf(1, 1, **wf_params) == 1
-        assert wf(1, 2, **wf_params) == 2
+        np.testing.assert_equal(wf(1, 0, **wf_params), 1)
+        np.testing.assert_equal(wf(1, 1, **wf_params), 1)
+        np.testing.assert_equal(wf(1, 2, **wf_params), 2)
 
     def test_persistence(self):
         persimgr = PersistenceImager(weight=persistence, weight_params={'n':1.0})
@@ -204,12 +203,12 @@ class TestWeightFunctions:
         wf_params = persimgr.weight_params
         
         x = np.random.rand()
-        assert wf(1, x, **wf_params) == x
+        np.testing.assert_equal(wf(1, x, **wf_params), x)
         
         persimgr.weight_params = {'n':1.5}
         wf_params = persimgr.weight_params
         
-        assert wf(1, x, **wf_params) == x ** 1.5
+        np.testing.assert_equal(wf(1, x, **wf_params), x ** 1.5)
  
 class TestKernelFunctions:
     def test_bvncdf(self):
@@ -228,7 +227,7 @@ class TestKernelFunctions:
         np.testing.assert_almost_equal(kernel(np.array([1]), np.array([0]), **kernel_params), 0.11987503, 8)
         
         kernel_params = {'mu_x':1.0, 'mu_y':1.0, 'sigma_xx':1.0, 'sigma_yy':2.0, 'sigma_xy':1.0}
-        assert kernel(np.array([1]), np.array([1]), **kernel_params) == .375
+        np.testing.assert_equal(kernel(np.array([1]), np.array([1]), **kernel_params), .375)
         
     def test_norm_cdf(self):
         np.testing.assert_equal(_norm_cdf(0), .5)
@@ -238,9 +237,9 @@ class TestKernelFunctions:
         kernel = uniform
         kernel_params={'width': 3, 'height': 1}
 
-        assert kernel(np.array([-1]), np.array([-1]), mu=(0,0), **kernel_params) == 0
-        assert kernel(np.array([3]), np.array([1]), mu=(0,0), **kernel_params) == 1
-        assert kernel(np.array([5]), np.array([5]), mu=(0,0), **kernel_params) == 1
+        np.testing.assert_equal(kernel(np.array([-1]), np.array([-1]), mu=(0,0), **kernel_params), 0)
+        np.testing.assert_equal(kernel(np.array([3]), np.array([1]), mu=(0,0), **kernel_params), 1)
+        np.testing.assert_equal(kernel(np.array([5]), np.array([5]), mu=(0,0), **kernel_params), 1)
 
 class TestTransformOutput:
     def test_lists_of_lists(self):
