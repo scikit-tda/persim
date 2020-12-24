@@ -5,5 +5,6 @@ from .wasserstein import *
 from .heat import *
 from .gromov_hausdorff import *
 from .visuals import *
+from .landscape import *
 
 from ._version import __version__
