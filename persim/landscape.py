@@ -13,6 +13,7 @@
 ###############################################################
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 def to_landscape(diagram):
     """
@@ -96,6 +97,38 @@ def hat(t, b, d):
     else:
         return 0
 
+def plot_landscape(landscape):
+    """
+    Plot all landscapes for a given (set of) diagrams
 
+    Inputs:
+    -------
+        landscape (list): Output of one iteration of persim.to_landscape()
+
+    Outputs:
+    --------
+        Plots for each landscape in the list
+
+    Returns:
+    --------
+        None
+    """
+
+    # TODO: Integrate more complex plotting args and kwargs for more precise control
+    
+    for i in range(len(landscape)):
+        pts, ls = landscape[i]
+
+        plt.figure()
+
+        for j in range(len(ls)):
+
+            plt.plot(pts, ls[j], label = f'$\lambda_{{{j}}}$')
+
+        plt.title(f'$H_{{{i}}}$ Landscape')
+        plt.legend()
+        plt.show()
+
+    return None
 
 

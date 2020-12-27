@@ -25,12 +25,6 @@ persim.plot_diagrams(dgms)
 
 landscapes = persim.to_landscape(dgms)
 
-for i in range(len(landscapes)):
-    plt.figure()
-    pts, ls = landscapes[i]
-    for j in range(len(ls)):
-        plt.plot(pts, ls[j])
-    plt.legend()
-    plt.title(f'Homology Degree {i}')
-    plt.show()
+persim.plot_landscape(landscapes)
+
 
