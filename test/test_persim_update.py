@@ -2,7 +2,8 @@ import pytest
 
 import numpy as np
 from persim import PersistenceImager
-from persim.images import persistence, linear_ramp, uniform, bvncdf, _norm_cdf, _sbvn_cdf, _bvn_cdf
+from persim.images_weights import *
+from persim.images_kernels import *
 
 # ----------------------------------------
 # New PersistenceImager Tests
@@ -211,12 +212,12 @@ class TestWeightFunctions:
         np.testing.assert_equal(wf(1, x, **wf_params), x ** 1.5)
  
 class TestKernelFunctions:
-    def test_bvncdf(self):
-        kernel = bvncdf
+    def test_gaussian(self):
+        kernel = gaussian
         kernel_params = {'mu':[1, 1], 'sigma':np.array([[1,0],[0,1]])}
         np.testing.assert_almost_equal(kernel(np.array([1]), np.array([1]), **kernel_params), 1/4, 8)
         
-        kernel = _bvn_cdf
+        kernel = bvn_cdf
         kernel_params = {'mu_x':1.0, 'mu_y':1.0, 'sigma_xx':1.0, 'sigma_yy':1.0, 'sigma_xy':0.0}
         np.testing.assert_almost_equal(kernel(np.array([1]), np.array([1]), **kernel_params), 1/4, 8)
 
@@ -230,8 +231,8 @@ class TestKernelFunctions:
         np.testing.assert_equal(kernel(np.array([1]), np.array([1]), **kernel_params), .375)
         
     def test_norm_cdf(self):
-        np.testing.assert_equal(_norm_cdf(0), .5)
-        np.testing.assert_almost_equal(_norm_cdf(1), 0.8413447460685429, 8)
+        np.testing.assert_equal(norm_cdf(0), .5)
+        np.testing.assert_almost_equal(norm_cdf(1), 0.8413447460685429, 8)
     
     def test_uniform(self):
         kernel = uniform
@@ -241,6 +242,12 @@ class TestKernelFunctions:
         np.testing.assert_equal(kernel(np.array([3]), np.array([1]), mu=(0,0), **kernel_params), 1)
         np.testing.assert_equal(kernel(np.array([5]), np.array([5]), mu=(0,0), **kernel_params), 1)
 
+    def test_sigma(self):
+        kernel = gaussian
+        kernel_params1 = {'sigma':np.array([[1,0],[0,1]])}
+        kernel_params2 = {'sigma': [[1,0],[0,1]]}
+        np.testing.assert_equal(kernel(np.array([1]), np.array([1]), **kernel_params1), kernel(np.array([1]), np.array([1]), **kernel_params2))
+    
 class TestTransformOutput:
     def test_lists_of_lists(self):
         persimgr = PersistenceImager(birth_range=(0,3), pers_range=(0,3), pixel_size=1)
