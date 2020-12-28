@@ -2,8 +2,8 @@ import pytest
 
 import numpy as np
 from persim import PersistenceImager
-from persim.images_weights import *
-from persim.images_kernels import *
+from persim import images_kernels
+from persim import images_weights
 
 # ----------------------------------------
 # New PersistenceImager Tests
@@ -155,18 +155,18 @@ def test_mixed_pairs():
     
 class TestWeightFunctions:
     def test_zero_on_birthaxis(self):
-        persimgr = PersistenceImager(weight=linear_ramp, weight_params={'low':0.0, 'high':1.0, 'start':0.0, 'end':1.0})
+        persimgr = PersistenceImager(weight=images_weights.linear_ramp, weight_params={'low':0.0, 'high':1.0, 'start':0.0, 'end':1.0})
         wf = persimgr.weight
         wf_params = persimgr.weight_params
         np.testing.assert_equal(wf(1, 0, **wf_params), 0)
         
-        persimgr = PersistenceImager(weight=persistence, weight_params={'n': 2})
+        persimgr = PersistenceImager(weight=images_weights.persistence, weight_params={'n': 2})
         wf = persimgr.weight
         wf_params = persimgr.weight_params
         np.testing.assert_equal(wf(1, 0, **wf_params), 0)
 
     def test_linear_ramp(self):
-        persimgr = PersistenceImager(weight=linear_ramp, weight_params={'low':0.0, 'high':5.0, 'start':0.0, 'end':1.0})
+        persimgr = PersistenceImager(weight=images_weights.linear_ramp, weight_params={'low':0.0, 'high':5.0, 'start':0.0, 'end':1.0})
 
         wf = persimgr.weight
         wf_params = persimgr.weight_params
@@ -198,7 +198,7 @@ class TestWeightFunctions:
         np.testing.assert_equal(wf(1, 2, **wf_params), 2)
 
     def test_persistence(self):
-        persimgr = PersistenceImager(weight=persistence, weight_params={'n':1.0})
+        persimgr = PersistenceImager(weight=images_weights.persistence, weight_params={'n':1.0})
 
         wf = persimgr.weight
         wf_params = persimgr.weight_params
@@ -213,11 +213,11 @@ class TestWeightFunctions:
  
 class TestKernelFunctions:
     def test_gaussian(self):
-        kernel = gaussian
+        kernel = images_kernels.gaussian
         kernel_params = {'mu':[1, 1], 'sigma':np.array([[1,0],[0,1]])}
         np.testing.assert_almost_equal(kernel(np.array([1]), np.array([1]), **kernel_params), 1/4, 8)
         
-        kernel = bvn_cdf
+        kernel = images_kernels.bvn_cdf
         kernel_params = {'mu_x':1.0, 'mu_y':1.0, 'sigma_xx':1.0, 'sigma_yy':1.0, 'sigma_xy':0.0}
         np.testing.assert_almost_equal(kernel(np.array([1]), np.array([1]), **kernel_params), 1/4, 8)
 
@@ -231,11 +231,11 @@ class TestKernelFunctions:
         np.testing.assert_equal(kernel(np.array([1]), np.array([1]), **kernel_params), .375)
         
     def test_norm_cdf(self):
-        np.testing.assert_equal(norm_cdf(0), .5)
-        np.testing.assert_almost_equal(norm_cdf(1), 0.8413447460685429, 8)
+        np.testing.assert_equal(images_kernels.norm_cdf(0), .5)
+        np.testing.assert_almost_equal(images_kernels.norm_cdf(1), 0.8413447460685429, 8)
     
     def test_uniform(self):
-        kernel = uniform
+        kernel = images_kernels.uniform
         kernel_params={'width': 3, 'height': 1}
 
         np.testing.assert_equal(kernel(np.array([-1]), np.array([-1]), mu=(0,0), **kernel_params), 0)
@@ -243,7 +243,7 @@ class TestKernelFunctions:
         np.testing.assert_equal(kernel(np.array([5]), np.array([5]), mu=(0,0), **kernel_params), 1)
 
     def test_sigma(self):
-        kernel = gaussian
+        kernel = images_kernels.gaussian
         kernel_params1 = {'sigma':np.array([[1,0],[0,1]])}
         kernel_params2 = {'sigma': [[1,0],[0,1]]}
         np.testing.assert_equal(kernel(np.array([1]), np.array([1]), **kernel_params1), kernel(np.array([1]), np.array([1]), **kernel_params2))

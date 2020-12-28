@@ -12,8 +12,8 @@ from scipy.stats import norm
 import scipy.spatial as spatial
 import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
-from persim.images_weights import *
-from persim.images_kernels import *
+from persim import images_kernels
+from persim import images_weights
 
 from sklearn.base import TransformerMixin, BaseEstimator
 
@@ -309,9 +309,9 @@ class PersistenceImager(TransformerMixin):
         if pixel_size is None:
             pixel_size = np.min([pers_range[1] - pers_range[0], birth_range[1] - birth_range[0]]) * 0.2
         if weight is None:
-            weight = persistence
+            weight = images_weights.persistence
         if kernel is None:
-            kernel = gaussian
+            kernel = images_kernels.gaussian
         if weight_params is None:
             weight_params = {'n': 1.0}
         if kernel_params is None:
@@ -604,7 +604,7 @@ def _transform(pers_dgm, skew=True, resolution=None, weight=None, weight_params=
         wts = weight(pers_dgm[:, 0], pers_dgm[:, 1], **weight_params)
 
         # handle the special case of a standard, isotropic Gaussian kernel
-        if kernel == gaussian:
+        if kernel == images_kernels.gaussian:
             general_flag = False
             sigma = kernel_params['sigma']
 
@@ -615,8 +615,8 @@ def _transform(pers_dgm, skew=True, resolution=None, weight=None, weight_params=
             if (sigma[0][0] == sigma[1][1] and sigma[0][1] == 0.0):
                 sigma = np.sqrt(sigma[0][0])
                 for i in range(n):
-                    ncdf_b = norm_cdf((_bpnts - pers_dgm[i, 0]) / sigma)
-                    ncdf_p = norm_cdf((_ppnts - pers_dgm[i, 1]) / sigma)
+                    ncdf_b = images_kernels.norm_cdf((_bpnts - pers_dgm[i, 0]) / sigma)
+                    ncdf_p = images_kernels.norm_cdf((_ppnts - pers_dgm[i, 1]) / sigma)
                     curr_img = ncdf_p[None, :] * ncdf_b[:, None]
                     pers_img += wts[i]*(curr_img[1:, 1:] - curr_img[:-1, 1:] - curr_img[1:, :-1] + curr_img[:-1, :-1])
             else:
