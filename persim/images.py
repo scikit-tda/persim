@@ -2,41 +2,37 @@ from __future__ import division
 from itertools import product
 import collections
 
-from joblib import Parallel, delayed
-
 import copy
-
 import numpy as np
-from scipy.stats import multivariate_normal as mvn
 from scipy.stats import norm
 import scipy.spatial as spatial
 import matplotlib.pyplot as plt
-from matplotlib.collections import LineCollection
 from persim import images_kernels
 from persim import images_weights
-
-from sklearn.base import TransformerMixin, BaseEstimator
+from joblib import Parallel, delayed
+from deprecated.sphinx import deprecated
+from sklearn.base import TransformerMixin
+from matplotlib.collections import LineCollection
+from scipy.stats import multivariate_normal as mvn
 
 __all__ = ["PersImage", "PersistenceImager"]
 
-"""
-Implements class used to convert persistence diagrams into a finite-dimensional representation known as a persistence images, 
-as introduced in Adams et al, 2017 (http://www.jmlr.org/papers/volume18/16-337/16-337.pdf) [PI].
-"""
-
+@deprecated(
+    reason="""Replaced with the class :class:`persim.PersistenceImager`.""",
+    version="0.1.4",
+)
 class PersImage(TransformerMixin):
     """ Initialize a persistence image generator.
-
-    Parameters
-    -----------
-
+    
+Parameters
+----------
+    
     pixels : pair of ints like (int, int)
         Tuple representing number of pixels in return image along x and y axis.
     spread : float
-        Standard deviation of gaussian kernel
+        Standard deviation of gaussian kernel.
     specs : dict
-        Parameters for shape of image with respect to diagram domain. This is used if you would like images to have a particular range. Shaped like 
-        ::
+        Parameters for shape of image with respect to diagram domain. This is used if you would like images to have a particular range. Shaped like::
         
             {
                 "maxBD": float,
@@ -50,12 +46,6 @@ class PersImage(TransformerMixin):
         TODO: Implement this feature.
         Determine which type of weighting function used, or pass in custom weighting function.
         Currently only implements linear weighting.
-
-
-    Usage
-    ------
-
-
     """
 
     def __init__(
@@ -225,81 +215,87 @@ class PersImage(TransformerMixin):
 
 
 class PersistenceImager(TransformerMixin):
-    """ Initialize a persistence image generator used to convert persistence diagrams into persistence images
+    """Transformer which converts persistence diagrams into persistence images.
 
     Parameters
-    -----------
+    ----------
+    birth_range : pair of floats
+        Range of persistence pair birth values covered by the persistence image (default: (0.0, 1.0)).
+    pers_range : pair of floats
+        Range of persistence pair persistence (death-birth) values covered by the persistence image (default: (0.0, 1.0)).
+    pixel_size : float
+        Dimensions of each square pixel (default: 0.2).
+    weight : callable
+        Function which weights the birth-persistence plane (default: persim.images_weights.persistence).
+    weight_params : dict
+        Arguments needed to specify the weight function (default: {'n': 1.0}).
+    kernel : callable
+        Cumulative distribution function defining the kernel (default: persim.images_kernels.gaussian).
+    kernel_params : dict
+        Arguments needed to specify the kernel function (default: {'sigma': [[1.0, 0.0], [0.0, 1.0]]}).
 
-    birth_range : tuple specifying lower and upper birth values of the persistence image
-    pers_range : tuple specifying lower and upper persistence values of the persistence image
-    pixel_size : size of each square pixel
-    weight : function to weight the birth-persistence plane
-    weight_params : arguments needed to specify the weight function
-    kernel : cumulative distribution function of kernel
-    kernel_params : arguments needed to specify the kernel (cumulative distribution) function
+
+    Example
+    -------
+    First instantiate a PersistenceImager() object::
+
+        > from persim import PersistenceImager
+        > pimgr = PersistenceImager(pixel_size=0.2, birth_range=(0,1))
 
 
-    Usage
-    ------
-
-    First instantiate a PersistenceImager() object:
-    ```
-    >>> from persim import PersistenceImager
-    >>> pimgr = PersistenceImager(pixel_size=0.2, birth_range=(0,1))
-    ```
+    Printing a PersistenceImager() object will print its hyperparameters::
     
-    Printing a PersistenceImager() object will print its hyperparameters:
-    ```
-    >>> print(pimgr)
-
-        PersistenceImager(birth_range=(0.0, 1.0), pers_range=(0.0, 1.0), pixel_size=0.2, weight=persistence, weight_params={'n': 1.0}, kernel=gaussian, kernel_params={'sigma': [[1.0, 0.0], [0.0, 1.0]]})
-    ```
-    
-    PersistenceImager() attributes can be adjusted at or after instantiation. Updating attributes of a PersistenceImager() object will automatically update all other dependent attributes.
-    ```
-    >>> pimgr.pixel_size = 0.1
-    >>> pimgr.birth_range = (0, 2)
-    >>> print(pimgr)
-    >>> print(pimgr.resolution)
+        > print(pimgr)
         
+        PersistenceImager(birth_range=(0.0, 1.0), pers_range=(0.0, 1.0), pixel_size=0.2, weight=persistence, weight_params={'n': 1.0}, kernel=gaussian, kernel_params={'sigma': [[1.0, 0.0], [0.0, 1.0]]})
+
+
+    PersistenceImager() attributes can be adjusted at or after instantiation. Updating attributes of a PersistenceImager() object will automatically update all other dependent attributes::
+    
+        > pimgr.pixel_size = 0.1
+        > pimgr.birth_range = (0, 2)
+        > print(pimgr)
+        > print(pimgr.resolution)
+    
         PersistenceImager(birth_range=(0.0, 2.0), pers_range=(0.0, 1.0), pixel_size=0.1, weight=persistence, weight_params={'n': 1.0}, kernel=gaussian, kernel_params={'sigma': [[1.0, 0.0], [0.0, 1.0]]})
         (20, 10)
-    ```
+
+
+    The `fit()` method can be called on one or more (-,2) numpy.ndarrays to automatically determine the miniumum birth and persistence ranges needed to capture all persistence pairs. The ranges and resolution are automatically adjusted to accomodate the specified pixel size. The option `skew=True` specifies that the diagram is currently in birth-death coordinates and must first be transformed to birth-persistence coordinates::
     
-    The `fit()` method can be called on one or more (*,2) numpy arrays to automatically determine the miniumum birth and persistence ranges needed to capture all persistence pairs. The ranges and resolution are automatically adjusted to accomodate the specified pixel size. The option `skew=True` specifies that the diagram is currently in birth-death coordinates and must first be transformed to birth-persistence coordinates.
+        > import numpy as np
+        > pimgr = PersistenceImager(pixel_size=0.5)
+        > pdgms = [np.array([[0.5, 0.8], [0.7, 2.2], [2.5, 4.0]]),
+                   np.array([[0.1, 0.2], [3.1, 3.3], [1.6, 2.9]]),
+                   np.array([[0.2, 1.5], [0.4, 0.6], [0.2, 2.6]])]
+        > pimgr.fit(pdgms, skew=True)
+        > print(pimgr)
+        > print(pimgr.resolution)
     
-    ```
-    >>> import numpy as np
-    >>> pimgr = PersistenceImager(pixel_size=0.5)
-    >>> pdgms = [np.array([[0.5, 0.8], [0.7, 2.2], [2.5, 4.0]]),
-                 np.array([[0.1, 0.2], [3.1, 3.3], [1.6, 2.9]]),
-                 np.array([[0.2, 1.5], [0.4, 0.6], [0.2, 2.6]])]
-    >>> pimgr.fit(pdgms, skew=True)
-    >>> print(pimgr)
-    >>> print(pimgr.resolution)
-        
         PersistenceImager(birth_range=(0.1, 3.1), pers_range=(-8.326672684688674e-17, 2.5), pixel_size=0.5, weight=persistence, weight_params={'n': 1.0}, kernel=gaussian, kernel_params={'sigma': [[1.0, 0.0], [0.0, 1.0]]})
         (6, 5)
-    ```
-    
-    The `transform()` method can then be called on one or more (*,2) numpy arrays to generate persistence images from diagrams. The option `skew=True` specifies that the diagrams are currently in birth-death coordinates and must first be transformed to birth-persistence coordinates.
-    ```
-    >>> pimgs = pimgr.transform(pdgms, skew=True)
-    >>> pimgs[0]
 
+
+    The `transform()` method can then be called on one or more (-,2) numpy.ndarrays to generate persistence images from diagrams. The option `skew=True` specifies that the diagrams are currently in birth-death coordinates and must first be transformed to birth-persistence coordinates::
+
+        > pimgs = pimgr.transform(pdgms, skew=True)
+        > pimgs[0]
+    
         array([[0.03999068, 0.05688393, 0.06672051, 0.06341749, 0.04820814],
                [0.04506697, 0.06556791, 0.07809764, 0.07495246, 0.05730671],
                [0.04454486, 0.06674611, 0.08104366, 0.07869919, 0.06058808],
                [0.04113063, 0.0636504 , 0.07884635, 0.07747833, 0.06005714],
                [0.03625436, 0.05757744, 0.07242608, 0.07180125, 0.05593626],
-               [0.02922239, 0.04712024, 0.05979033, 0.05956698, 0.04653357]])
-    ```
+               [0.02922239, 0.04712024, 0.05979033, 0.05956698, 0.04653357]]) 
+
+
+    Notes
+    -----
+    [1] Adams et. al., "Persistence Images: A Stable Vector Representation of Persistent Homology," Journal of Machine Learning Research, vol. 18, pp. 1-35, 2017. http://www.jmlr.org/papers/volume18/16-337/16-337.pdf
     """
     
-    def __init__(self, birth_range=None, pers_range=None, pixel_size=None,
-                 weight=None, weight_params=None, kernel=None, kernel_params=None):
-        """
-        Class for transforming persistence diagrams into persistence images
+    def __init__(self, birth_range=None, pers_range=None, pixel_size=None, weight=None, weight_params=None, kernel=None, kernel_params=None):
+        """ PersistenceImager constructor method
         """
         # set defaults
         if birth_range is None:
@@ -398,11 +394,14 @@ class PersistenceImager(TransformerMixin):
                                            self._resolution[1] + 1, endpoint=False, dtype=np.float64)
 
     def fit(self, pers_dgms, skew=True):
-        """
-        Automatically choose persistence images parameters based on one or more persistence diagrams
-        :param pers_dgms: one or an iterable of (N,2) numpy arrays encoding a persistence diagram
-        :param skew: boolean flag indicating if diagram needs to be converted to birth-persistence coordinates
-                     (default: True)
+        """ Choose persistence image range parameters which minimally enclose all persistence pairs across one or more persistence diagrams.
+        
+        Parameters
+        ----------
+        pers_dgms : one or an iterable of (-,2) numpy.ndarrays
+            Collection of one or more persistence diagrams.
+        skew : boolean 
+            Flag indicating if diagram(s) need to first be converted to birth-persistence coordinates (default: True).
         """
         min_birth = np.Inf
         max_birth = -np.Inf
@@ -437,13 +436,22 @@ class PersistenceImager(TransformerMixin):
         self.pers_range = (min_pers, max_pers)
 
     def transform(self, pers_dgms, skew=True, n_jobs=None):
-        """
-        Transform a persistence diagram or a iterable containing a collection of persistence diagrams into 
-        persistence images using the parameters specified in the PersistenceImager object instance
-        :param pers_dgms: one or an iterable of (N,2) numpy arrays encoding a persistence diagram
-        :param skew: boolean flag indicating if diagram needs to be converted to birth-persistence coordinates
-                     (default: True)
-        :return: Python list of numpy arrays encoding the persistence images
+        """ Transform a persistence diagram or an iterable containing a collection of persistence diagrams into 
+        persistence images.
+        
+        Parameters
+        ----------
+        pers_dgms : one or an iterable of (-,2) numpy.ndarrays
+            Collection of one or more persistence diagrams.
+        skew : boolean 
+            Flag indicating if diagram(s) need to first be converted to birth-persistence coordinates (default: True).
+        n_jobs : int
+            Number of cores to use to transform a collection of persistence diagrams into persistence images (default: None, uses a single core).
+
+        Returns
+        -------
+        list
+            Collection of numpy.ndarrays encoding the persistence images in the same order as pers_dgms.
         """
         if n_jobs is not None:
             parallelize = True
@@ -468,13 +476,20 @@ class PersistenceImager(TransformerMixin):
         return pers_imgs
 
     def fit_transform(self, pers_dgms, skew=True):
-        """
-        Automatically choose persistence image parameters based on a collection of persistence diagrams and transform
-        the collection of diagrams into images using the parameters specified in the PersistenceImager object instance
-        :param pers_dgms: iterable of (N,2) numpy arrays encoding persistence diagrams
-        :param skew: Boolean flag indicating if diagram needs to be converted to birth-persistence coordinates
-                     (default: True)
-        :return: Python list of numpy arrays encoding the persistence images
+        """ Choose persistence image range parameters which minimally enclose all persistence pairs across one or more persistence diagrams and transform the persistence diagrams into persistence images.
+        
+        Parameters
+        ----------
+        pers_dgms : one or an iterable of (-,2) numpy.ndarray
+            Collection of one or more persistence diagrams.
+        skew : boolean 
+            Flag indicating if diagram(s) need to first be converted to birth-persistence coordinates (default: True).
+        
+
+        Returns
+        -------
+        list
+            Collection of numpy.ndarrays encoding the persistence images in the same order as pers_dgms.
         """
         pers_dgms = copy.deepcopy(pers_dgms)
 
@@ -499,12 +514,23 @@ class PersistenceImager(TransformerMixin):
         return pers_dgms, singular
 
     def plot_diagram(self, pers_dgm, skew=True, ax=None, out_file=None):
-        """
-        Plot a persistence diagram
-        :param pers_dgm: An (N,2) numpy array encoding a persistence diagram
-        :param skew: boolean flag indicating if diagram needs to be converted to birth-persistence coordinates
-                     (default: True)
-        :param out_file: optional path to save the persistence diagram 
+        """ Plot a persistence diagram.
+        
+        Parameters
+        ----------
+        pers_dgm : (-,2) numpy.ndarray
+            A persistence diagram.
+        skew : boolean 
+            Flag indicating if diagram needs to first be converted to birth-persistence coordinates (default: True).
+        ax : matplotlib.Axes
+            Instance of a matplotlib.Axes object in which to plot (default: None, generates a new figure)
+        out_file : str
+            Path and file name including extension to save the figure (default: None, figure not saved).
+
+        Returns
+        -------
+        matplotlib.Axes
+            The matplotlib.Axes which contains the persistence diagram
         """
         pers_dgm = np.copy(pers_dgm)
 
@@ -561,12 +587,26 @@ class PersistenceImager(TransformerMixin):
         # optionally save figure
         if out_file:
             plt.savefig(out_file, bbox_inches='tight')
+        
+        return ax
+
 
     def plot_image(self, pers_img, ax=None, out_file=None):
-        """
-        Plot a persistence image
-        :param pers_img: (N,K) numpy array encoding a persistence image, e.g. output of PersistenceImager.transform()
-        :param out_file: optional path to save the persistence diagram 
+        """ Plot a persistence image.
+        
+        Parameters
+        ----------
+        pers_img : (M,N) numpy.ndarray
+            A persistence image, as output by PersistenceImager().transform()
+        ax : matplotlib.Axes
+            Instance of a matplotlib.Axes object in which to plot (default: None, generates a new figure)
+        out_file : str
+            Path and file name including extension to save the figure (default: None, figure not saved).
+
+        Returns
+        -------
+        matplotlib.Axes
+            The matplotlib.Axes which contains the persistence image
         """
         ax = ax or plt.gca()
         ax.matshow(pers_img.T, **{'origin': 'lower'})
@@ -580,16 +620,38 @@ class PersistenceImager(TransformerMixin):
         # optionally save figure
         if out_file:
             plt.savefig(out_file, bbox_inches='tight')
-            
+        
+        return ax
+
 
 def _transform(pers_dgm, skew=True, resolution=None, weight=None, weight_params=None, kernel=None, kernel_params=None, _bpnts=None, _ppnts=None):
-        """
-        Transform a persistence diagram to a persistence image using the parameters specified in the PersistenceImager
-        object instance
-        :param pers_dgm: (N,2) numpy array of persistence pairs encoding a persistence diagram
-        :param skew: boolean flag indicating if diagram needs to be converted to birth-persistence coordinates
-                     (default: True)
-        :return: numpy array encoding the persistence image
+        """ Transform a persistence diagram into a persistence image.
+        
+        Parameters
+        ----------
+        pers_dgm : (-,2) numpy.ndarray
+            A persistence diagrams.
+        skew : boolean 
+            Flag indicating if diagram(s) need to first be converted to birth-persistence coordinates (default: True).
+        resolution : pair of ints
+            The number of pixels along the birth and persistence axes in the persistence image.
+        weight : callable
+            Function which weights the birth-persistence plane.
+        weight_params : dict
+            Arguments needed to specify the weight function.
+        kernel : callable
+            Cumulative distribution function defining the kernel.
+        kernel_params : dict
+            Arguments needed to specify the kernel function.
+        _bpnts : (N,) numpy.ndarray
+            The birth coordinates of the persistence image pixel locations.
+        _ppnts : (M,) numpy.ndarray
+            The persistence coordinates of the persistence image pixel locations.
+            
+        Returns
+        -------
+        numpy.ndarray
+            (M,N) numpy.ndarray encoding the persistence image corresponding to pers_dgm.
         """
         pers_dgm = np.copy(pers_dgm)
         pers_img = np.zeros(resolution)

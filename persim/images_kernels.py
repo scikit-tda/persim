@@ -23,13 +23,23 @@ def uniform(x, y, mu=None, width=1, height=1):
 
 
 def gaussian(birth, pers, mu=None, sigma=None):
-    """
-    Optimized bivariate normal cumulative distribution function for computing persistence images using a Gaussian kernel
-    :param birth: birth-coordinate(s) of pixel corners
-    :param pers: persistence-coordinate(s) of pixel corners
-    :param mu: (2,)-numpy array specifying x and y coordinates of distribution means (birth-persistence pairs)
-    :param sigma: (2,2)-numpy array specifying distribution covariance matrix or numeric if distribution is isotropic
-    :return: P(X <= birth, Y <= pers)
+    """ Optimized bivariate normal cumulative distribution function for computing persistence images using a Gaussian kernel.
+    
+    Parameters
+    ----------
+    birth : (M,) numpy.ndarray
+        Birth coordinate(s) of pixel corners.
+    pers : (N,) numpy.ndarray
+        Persistence coordinates of pixel corners.
+    mu : (2,) numpy.ndarray
+        Coordinates of the distribution mean (birth-persistence pairs).
+    sigma : float or (2,2) numpy.ndarray 
+        Distribution's covariance matrix or the equal variances if the distribution is standard isotropic.
+    
+    Returns
+    -------
+    float
+        Value of joint CDF at (birth, pers), i.e.,  P(X <= birth, Y <= pers).
     """
     if mu is None:
         mu = np.array([0.0, 0.0], dtype=np.float64)
@@ -45,24 +55,43 @@ def gaussian(birth, pers, mu=None, sigma=None):
 
 
 def norm_cdf(x):
-    """
-    Univariate normal cumulative distribution function with mean 0.0 and standard deviation 1.0
-    :param x: value at which to evaluate the cdf (upper limit)
-    :return: P(X <= x), for X ~ N[0,1]
+    """ Univariate normal cumulative distribution function (CDF) with mean 0.0 and standard deviation 1.0.
+    
+    Parameters
+    ----------
+    x : float
+        Value at which to evaluate the CDF (upper limit).
+    
+    Returns
+    -------
+    float
+        Value of CDF at x, i.e., P(X <= x), for X ~ N[0,1].
     """
     return erfc(-x / np.sqrt(2.0)) / 2.0
 
 
 def sbvn_cdf(x, y, mu_x=0.0, mu_y=0.0, sigma_x=1.0, sigma_y=1.0):
-    """
-    Standard bivariate normal cumulative distribution function with specified mean and variances
-    :param x: x-coordinate(s) at which to evaluate the cdf (upper limit)
-    :param y: y-coordinate(s) at which to evaluate the cdf (upper limit)
-    :param mu_x: x-coordinate of mean of bivariate normal
-    :param mu_y: y-coordinate of mean of bivariate normal
-    :param sigma_x: variance in x
-    :param sigma_y: variance in y
-    :return: P(X <= x, Y <= y)
+    """ Standard bivariate normal cumulative distribution function with specified mean and variances.
+    
+    Parameters
+    ----------
+    x : float or numpy.ndarray of floats
+        x-coordinate(s) at which to evaluate the CDF (upper limit).
+    y : float or numpy.ndarray of floats 
+        y-coordinate(s) at which to evaluate the CDF (upper limit).
+    mu_x : float
+        x-coordinate of the mean.
+    mu_y : float
+        y-coordinate of the mean.
+    sigma_x : float
+        Variance in x.
+    sigma_y : float
+        Variance in y.
+    
+    Returns
+    -------
+    float
+        Value of joint CDF at (x, y), i.e.,  P(X <= birth, Y <= pers).
     """
     x = (x - mu_x) / np.sqrt(sigma_x)
     y = (y - mu_y) / np.sqrt(sigma_y)
@@ -70,19 +99,33 @@ def sbvn_cdf(x, y, mu_x=0.0, mu_y=0.0, sigma_x=1.0, sigma_y=1.0):
 
 
 def bvn_cdf(x, y, mu_x=0.0, mu_y=0.0, sigma_xx=1.0, sigma_yy=1.0, sigma_xy=0.0):
-    """
-    Bivariate normal cumulative distribution function with specified mean and covariance matrix based on the Matlab
-    implementations by Thomas H. Jørgensen (http://www.tjeconomics.com/code/) and Alan Genz
-    (http://www.math.wsu.edu/math/faculty/genz/software/matlab/bvnl.m) using the approach described by Drezner
-    and Wesolowsky (https://doi.org/10.1080/00949659008811236)
-    :param x: x-coordinate(s) at which to evaluate the cdf (upper limit)
-    :param y: y-coordinate(s) at which to evaluate the cdf (upper limit)
-    :param mu_x: x-coordinate of mean of bivariate normal
-    :param mu_y: y-coordinate of mean of bivariate normal
-    :param sigma_xx: variance in x
-    :param sigma_yy: variance in y
-    :param sigma_xy: covariance of x and y
-    :return: P(X <= x, Y <= y)
+    """ Bivariate normal cumulative distribution function with specified mean and covariance matrix.
+    
+    Parameters
+    ----------
+    x : float or numpy.ndarray of floats
+        x-coordinate(s) at which to evaluate the CDF (upper limit).
+    y : float or numpy.ndarray of floats 
+        y-coordinate(s) at which to evaluate the CDF (upper limit).
+    mu_x : float
+        x-coordinate of the mean.
+    mu_y : float
+        y-coordinate of the mean.
+    sigma_x : float
+        Variance in x.
+    sigma_y : float
+        Variance in y.
+    sigma_xy : float
+        Covariance of x and y.
+        
+    Returns
+    -------
+    float
+        Value of joint CDF at (x, y), i.e.,  P(X <= birth, Y <= pers).
+        
+    Notes
+    -----
+    Based on the Matlab implementations by Thomas H. Jørgensen (http://www.tjeconomics.com/code/) and Alan Genz (http://www.math.wsu.edu/math/faculty/genz/software/matlab/bvnl.m) using the approach described by Drezner and Wesolowsky (https://doi.org/10.1080/00949659008811236).
     """
     dh = -(x - mu_x) / np.sqrt(sigma_xx)
     dk = -(y - mu_y) / np.sqrt(sigma_yy)
@@ -168,10 +211,17 @@ def bvn_cdf(x, y, mu_x=0.0, mu_y=0.0, sigma_xx=1.0, sigma_yy=1.0, sigma_xy=0.0):
 
 
 def gauss_legendre_quad(r):
-    """
-    Return weights and abscissae for the Legendre-Gauss quadrature integral approximation
-    :param r: correlation
-    :return:
+    """ Return weights and abscissae for the Legendre-Gauss quadrature integral approximation.
+    
+    Parameters
+    ----------
+    r : float
+        Correlation
+    
+    Returns
+    -------
+    tuple
+        Number of points in the Gaussian quadrature rule, quadrature weights, and quadrature points.
     """
     if np.abs(r) < 0.3:
         lg = 3

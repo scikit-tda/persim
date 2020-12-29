@@ -23,7 +23,8 @@ Persistence Images
     :toctree: stubs
     :nosignatures:
 
-    persim.PersImage
+    persim.PersistenceImager
+	persim.PersImage
 
 
 

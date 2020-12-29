@@ -33,7 +33,7 @@ To contribute please fork the project make your changes and submit a pull reques
     :hidden:
     :caption: User Guide
 
-    notebooks/Persistence Images
+    notebooks/Persistence images
     notebooks/distances
     reference/index
 
