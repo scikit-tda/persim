@@ -152,7 +152,25 @@ def test_mixed_pairs():
     
     np.testing.assert_array_equal(res, res2)
     np.testing.assert_array_equal(res, res3)
-    
+
+def test_parameter_exceptions():
+    def construct_imager(param_dict):
+        pimgr = PersistenceImager(**param_dict)
+
+    np.testing.assert_raises(ValueError, construct_imager, {'birth_range': 0})
+    np.testing.assert_raises(ValueError, construct_imager, {'birth_range': ('str', 0)})
+    np.testing.assert_raises(ValueError, construct_imager, {'birth_range': (0, 0, 0)})
+    np.testing.assert_raises(ValueError, construct_imager, {'pers_range': 0})
+    np.testing.assert_raises(ValueError, construct_imager, {'pers_range': ('str', 0)})
+    np.testing.assert_raises(ValueError, construct_imager, {'pers_range': (0, 0, 0)})
+    np.testing.assert_raises(ValueError, construct_imager, {'pixel_size': 'str'})
+    np.testing.assert_raises(ValueError, construct_imager, {'weight': 0})
+    np.testing.assert_raises(ValueError, construct_imager, {'weight': 'invalid_weight'})
+    np.testing.assert_raises(ValueError, construct_imager, {'kernel': 0})
+    np.testing.assert_raises(ValueError, construct_imager, {'kernel': 'invalid_kernel'})
+    np.testing.assert_raises(ValueError, construct_imager, {'weight_params': 0})
+    np.testing.assert_raises(ValueError, construct_imager, {'kernel_params': 0})
+
 class TestWeightFunctions:
     def test_zero_on_birthaxis(self):
         persimgr = PersistenceImager(weight=images_weights.linear_ramp, weight_params={'low':0.0, 'high':1.0, 'start':0.0, 'end':1.0})

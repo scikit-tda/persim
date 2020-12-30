@@ -225,12 +225,12 @@ class PersistenceImager(TransformerMixin):
         Range of persistence pair persistence (death-birth) values covered by the persistence image (default: (0.0, 1.0)).
     pixel_size : float
         Dimensions of each square pixel (default: 0.2).
-    weight : callable
-        Function which weights the birth-persistence plane (default: persim.images_weights.persistence).
+    weight : callable or str in ['persistence', 'linear_ramp']
+        Function which weights the birth-persistence plane (default: 'persistence').
     weight_params : dict
         Arguments needed to specify the weight function (default: {'n': 1.0}).
-    kernel : callable
-        Cumulative distribution function defining the kernel (default: persim.images_kernels.gaussian).
+    kernel : callable or str in ['gaussian', 'uniform']
+        Cumulative distribution function defining the kernel (default: 'gaussian').
     kernel_params : dict
         Arguments needed to specify the kernel function (default: {'sigma': [[1.0, 0.0], [0.0, 1.0]]}).
 
@@ -296,14 +296,14 @@ class PersistenceImager(TransformerMixin):
     
     def __init__(self, birth_range=None, pers_range=None, pixel_size=None, weight=None, weight_params=None, kernel=None, kernel_params=None):
         """ PersistenceImager constructor method
-        """
+        """       
         # set defaults
         if birth_range is None:
             birth_range = (0.0, 1.0)
         if pers_range is None:
             pers_range = (0.0, 1.0)
         if pixel_size is None:
-            pixel_size = np.min([pers_range[1] - pers_range[0], birth_range[1] - birth_range[0]]) * 0.2
+            pixel_size = 0.2
         if weight is None:
             weight = images_weights.persistence
         if kernel is None:
@@ -312,10 +312,12 @@ class PersistenceImager(TransformerMixin):
             weight_params = {'n': 1.0}
         if kernel_params is None:
             kernel_params = {'sigma': [[1.0, 0.0], [0.0, 1.0]]}
-       
-        self.weight = weight
+        
+        # validate parameters
+        self._validate_parameters(birth_range=birth_range, pers_range=pers_range, pixel_size=pixel_size, weight=weight, weight_params=weight_params, kernel=kernel, kernel_params=kernel_params)
+        
+        self.weight, self.kernel = self._ensure_callable(weight=weight, kernel=kernel)
         self.weight_params = weight_params
-        self.kernel = kernel
         self.kernel_params = kernel_params
         self._pixel_size = pixel_size
         self._birth_range = birth_range
@@ -324,7 +326,7 @@ class PersistenceImager(TransformerMixin):
         self._height = pers_range[1] - pers_range[0]
         self._resolution = (int(self._width / self._pixel_size), int(self._height / self._pixel_size))
         self._create_mesh()
-
+        
     @property
     def width(self):
         return self._width
@@ -370,14 +372,75 @@ class PersistenceImager(TransformerMixin):
         self._height = int(np.ceil((self.pers_range[1] - self.pers_range[0]) / self.pixel_size)) * self._pixel_size
         self._resolution = (int(self.width / self.pixel_size), int(self.height / self.pixel_size))
         self._create_mesh()
-    
+        
     def __repr__(self):
         import pprint as pp
-        
         params = tuple([self.birth_range, self.pers_range, self.pixel_size, self.weight.__name__, pp.pformat(self.weight_params), self.kernel.__name__, pp.pformat(self.kernel_params)])
         repr_str = 'PersistenceImager(birth_range=%s, pers_range=%s, pixel_size=%s, weight=%s, weight_params=%s, kernel=%s, kernel_params=%s)' % params
         return repr_str
-
+    
+    def _ensure_callable(self, weight=None, kernel=None):
+        valid_weights_dict = {'persistence': images_weights.persistence, 'linear_ramp': images_weights.linear_ramp}
+        valid_kernels_dict = {'gaussian': images_kernels.gaussian, 'uniform': images_kernels.uniform}
+        
+        if isinstance(weight, str):
+            weight = valid_weights_dict[weight]
+            
+        if isinstance(kernel, str):
+            kernel = valid_kernels_dict[kernel]
+            
+        return weight, kernel
+    
+    def _validate_parameters(self, birth_range=None, pers_range=None, pixel_size=None, weight=None, weight_params=None, kernel=None, kernel_params=None):
+        valid_weights = ['persistence', 'linear_ramp']
+        valid_kernels = ['gaussian', 'uniform']
+        
+        # validate birth_range
+        if isinstance(birth_range, tuple):
+            if len(birth_range) != 2:
+                raise ValueError("birth_range must be a pair: (min. birth, max. birth)")
+            elif (not isinstance(birth_range[0], (int, float))) or (not isinstance(birth_range[1], (int, float))):
+                raise ValueError("birth_range must be a pair of numbers: (min. birth, max. birth)")
+        else:
+            raise ValueError("birth_range must be a tuple")
+        
+        # validate pers_range
+        if isinstance(pers_range, tuple):
+            if len(pers_range) != 2:
+                raise ValueError("pers_range must be a pair: (min. persistence, max. persistence)")
+            elif (not isinstance(pers_range[0], (int, float))) or (not isinstance(pers_range[1], (int, float))):
+                raise ValueError("pers_range must be a pair of numbers: (min. persistence, max. persistence)")
+        else:
+            raise ValueError("pers_range must be a tuple")
+            
+        # validate pixel_size
+        if not isinstance(pixel_size, (int, float)):
+            raise ValueError("pixel_size must be an int or float")            
+        
+        # validate weight
+        if not callable(weight):
+            if isinstance(weight, str):
+                if weight not in ['persistence', 'linear_ramp']:
+                    raise ValueError("weight must be callable or a str in %s" %valid_weights)
+            else:
+                raise ValueError("weight must be callable or a str")
+        
+        # validate weight_params
+        if not isinstance(weight_params, dict):
+            raise ValueError("weight_params must be a dict")
+       
+        # validate kernel
+        if not callable(kernel):
+            if isinstance(kernel, str):
+                if kernel not in valid_kernels:
+                    raise ValueError("kernel must be callable or a str in %s" %valid_kernels)
+            else:
+                raise ValueError("kernel must be callable or a str")
+        
+        # validate kernel_params
+        if not isinstance(kernel_params, dict):
+            raise ValueError("kernel_params must be a dict")
+            
     def _create_mesh(self):
         # padding around specified image ranges as a result of incommensurable ranges and pixel width
         db = self._width - (self._birth_range[1] - self._birth_range[0])
