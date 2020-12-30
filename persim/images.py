@@ -19,7 +19,7 @@ __all__ = ["PersImage", "PersistenceImager"]
 
 @deprecated(
     reason="""Replaced with the class :class:`persim.PersistenceImager`.""",
-    version="0.1.4",
+    version="0.1.5",
 )
 class PersImage(TransformerMixin):
     """ Initialize a persistence image generator.
