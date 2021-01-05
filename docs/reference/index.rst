@@ -24,7 +24,7 @@ Persistence Images
     :nosignatures:
 
     persim.PersistenceImager
-	persim.PersImage
+    persim.PersImage
 
 
 
