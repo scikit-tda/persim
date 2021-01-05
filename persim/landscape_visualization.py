@@ -7,9 +7,9 @@ import itertools
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
-from PersistenceLandscape import PersistenceLandscape
-from PersistenceLandscapeExact import PersistenceLandscapeExact
-from PersistenceLandscapeGrid import PersistenceLandscapeGrid
+from .PersLandscape import PersLandscape
+from .PersLandscapeExact import PersLandscapeExact
+from .PersLandscapeGrid import PersLandscapeGrid
 from operator import itemgetter
 from matplotlib import cm
 
@@ -17,7 +17,7 @@ from matplotlib import cm
 
 mpl.rcParams['text.usetex'] = True
 
-def plot_landscape(landscape: PersistenceLandscape,
+def plot_landscape(landscape: PersLandscape,
                    num_steps:int = 3000,
                    colormap = "default",
                    title = None,
@@ -26,15 +26,15 @@ def plot_landscape(landscape: PersistenceLandscape,
     """
     plot landscape functions. 
     """
-    if isinstance(landscape, PersistenceLandscapeGrid):
+    if isinstance(landscape, PersLandscapeGrid):
         return plot_landscape_grid(landscape = landscape, num_steps = num_steps, 
                                    colormap = colormap, title = title, labels = labels)
-    if isinstance(landscape, PersistenceLandscapeExact):
+    if isinstance(landscape, PersLandscapeExact):
         return plot_landscape_exact(landscape = landscape, num_steps = num_steps, 
                                     colormap = colormap, title = title, labels = labels)
     
 
-def plot_landscape_exact(landscape: PersistenceLandscapeExact,
+def plot_landscape_exact(landscape: PersLandscapeExact,
                    num_steps: int = 3000,
                    colormap = "default",
                    alpha = 0.8,
@@ -123,7 +123,7 @@ def plot_landscape_exact(landscape: PersistenceLandscapeExact,
     ax.view_init(10,90)
     plt.show()
 
-def plot_landscape_grid(landscape: PersistenceLandscapeGrid,
+def plot_landscape_grid(landscape: PersLandscapeGrid,
                    num_steps: int = 3000,
                    colormap = "default",
                    labels = None,

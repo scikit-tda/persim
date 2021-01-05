@@ -4,12 +4,12 @@ Define Grid Persistence Landscape class.
 from __future__ import annotations
 import numpy as np
 import itertools
-from .auxiliary import pairs_snap, union_vals, ndsnap_regular
+from .landscape_auxiliary import pairs_snap, union_vals, ndsnap_regular
 from operator import itemgetter, attrgetter
-from .PersistenceLandscape import PersistenceLandscape
+from .PersLandscape import PersLandscape
 
 
-class PersistenceLandscapeGrid(PersistenceLandscape):
+class PersLandscapeGrid(PersLandscape):
     """
     Persistence Landscape Grid class.
 
@@ -17,7 +17,7 @@ class PersistenceLandscapeGrid(PersistenceLandscape):
     given by sampling the landscape functions on a grid. This version is only an 
     approximation to the true landscape, but given a fine enough grid, this should
     suffice for most applications. If an exact
-    calculation with no approximation is desired, consider `PersistenceLandscapeExact`.
+    calculation with no approximation is desired, consider `PersLandscapeExact`.
     
     The default parameters for start and stop favor dgms over values. That
     is, if both dgms and values are passed but start and stop are not, the
@@ -188,7 +188,7 @@ class PersistenceLandscapeGrid(PersistenceLandscape):
             result.append( pairs )
         return np.array(result)                
     
-    def __add__(self, other: PersistenceLandscapeGrid) -> PersistenceLandscapeGrid:
+    def __add__(self, other: PersLandscapeGrid) -> PersLandscapeGrid:
         super().__add__(other)
         if self.start != other.start:
             raise ValueError("Start values of grids do not coincide")
@@ -197,13 +197,13 @@ class PersistenceLandscapeGrid(PersistenceLandscape):
         if self.num_dims != other.num_dims:
             raise ValueError("Number of steps of grids do not coincide")
         self_pad, other_pad = union_vals(self.values, other.values)
-        return PersistenceLandscapeGrid(start=self.start, stop=self.stop, 
+        return PersLandscapeGrid(start=self.start, stop=self.stop, 
                                         num_dims=self.num_dims,
                                         hom_deg=self.hom_deg, 
                                         values=self_pad+other_pad)
     
-    def __neg__(self) -> PersistenceLandscapeGrid:
-        return PersistenceLandscapeGrid(
+    def __neg__(self) -> PersLandscapeGrid:
+        return PersLandscapeGrid(
             start=self.start, 
             stop=self.stop, 
             num_dims=self.num_dims,
@@ -214,19 +214,19 @@ class PersistenceLandscapeGrid(PersistenceLandscape):
     def __sub__(self, other):
         return self + -other
     
-    def __mul__(self, other: float) -> PersistenceLandscapeGrid:
+    def __mul__(self, other: float) -> PersLandscapeGrid:
         super().__mul__(other)
-        return PersistenceLandscapeGrid(
+        return PersLandscapeGrid(
             start=self.start, 
             stop=self.stop, 
             num_dims=self.num_dims,
             hom_deg=self.hom_deg,
             values = np.array([other*depth_array for depth_array in self.values]))
     
-    def __rmul__(self,other: float) -> PersistenceLandscapeGrid:
+    def __rmul__(self,other: float) -> PersLandscapeGrid:
         return self.__mul__(other)
     
-    def __truediv__(self, other: float) -> PersistenceLandscapeGrid:
+    def __truediv__(self, other: float) -> PersLandscapeGrid:
         super().__truediv__(other)
         return (1.0/other)*self
     
@@ -260,7 +260,7 @@ class PersistenceLandscapeGrid(PersistenceLandscape):
 
 def snap_PL(l: list, start: float = None, stop: float = None, num_dims : int =  None) -> list:
         """
-        Given a list `l` of PersistenceLandscapeGrid types, convert them to a list
+        Given a list `l` of PersLandscapeGrid types, convert them to a list
         where each entry has the same start, stop, and num_dims. This puts each
         entry of `l` on the same grid, so they can be added, averaged, etc.
         
@@ -281,41 +281,41 @@ def snap_PL(l: list, start: float = None, stop: float = None, num_dims : int =  
                 snapped_landscape.append(np.array(np.interp(grid, np.linspace(pl.start, pl.stop,
                                                                      pl.num_dims), funct)))
             # store snapped persistence landscape   
-            k.append( PersistenceLandscapeGrid(start=start, stop=stop, num_dims=num_dims,
+            k.append( PersLandscapeGrid(start=start, stop=stop, num_dims=num_dims,
                                      values=np.array(snapped_landscape), 
                                      hom_deg = pl.hom_deg))
         return k
     
 def lc_grid(landscapes: list, coeffs: list, start: float = None, stop: float = None,
-             num_dims: int = None) -> PersistenceLandscapeGrid:
-    """ Compute the linear combination of a list of PersistenceLandscapeGrid objects.
+             num_dims: int = None) -> PersLandscapeGrid:
+    """ Compute the linear combination of a list of PersLandscapeGrid objects.
     
     
     
         Parameters
         -------
         landscapes: list
-            a list of PersistenceLandscapeGrid objects
+            a list of PersLandscapeGrid objects
             
         coeffs: list 
             a list of the coefficients defining the linear combination
         
         start: float
-            starting value for the common grid for PersistenceLandscapeGrid objects 
+            starting value for the common grid for PersLandscapeGrid objects 
         in `landscapes`
         
         stop: float
-            last value in the common grid for PersistenceLandscapeGrid objects 
+            last value in the common grid for PersLandscapeGrid objects 
         in `landscapes`
         
         num_dims: int
-            number of steps on the common grid for PersistenceLandscapeGrid objects 
+            number of steps on the common grid for PersLandscapeGrid objects 
         in `landscapes`
             
         Returns
         -------
-        PersistenceLandscapeGrid:
-            The specified linear combination of PersistenceLandscapeGrid objects 
+        PersLandscapeGrid:
+            The specified linear combination of PersLandscapeGrid objects 
         in `landscapes`
         
     """
@@ -323,29 +323,29 @@ def lc_grid(landscapes: list, coeffs: list, start: float = None, stop: float = N
     return np.sum(np.array(coeffs)*np.array(l))
 
 def average_grid(landscapes: list, start: float = None, stop: float = None, 
-               num_dims: int = None)-> PersistenceLandscapeGrid:
-    """ Compute the average of a list of PersistenceLandscapeGrid objects.
+               num_dims: int = None)-> PersLandscapeGrid:
+    """ Compute the average of a list of PersLandscapeGrid objects.
          Parameters
         -------
         landscapes: list
-            a list of PersistenceLandscapeGrid objects
+            a list of PersLandscapeGrid objects
         
         start: float
-            starting value for the common grid for PersistenceLandscapeGrid objects 
+            starting value for the common grid for PersLandscapeGrid objects 
         in `landscapes`
         
         stop: float
-            last value in the common grid for PersistenceLandscapeGrid objects 
+            last value in the common grid for PersLandscapeGrid objects 
         in `landscapes`
         
         num_dims: int
-            number of steps on the common grid for PersistenceLandscapeGrid objects 
+            number of steps on the common grid for PersLandscapeGrid objects 
         in `landscapes`
             
         Returns
         -------
-        PersistenceLandscapeGrid:
-            The specified average of PersistenceLandscapeGrid objects in `landscapes`
+        PersLandscapeGrid:
+            The specified average of PersLandscapeGrid objects in `landscapes`
     """
     return lc_grid(landscapes=landscapes, coeffs = [1.0/len(landscapes) for _ in landscapes],
                    start=start,stop=stop,num_dims=num_dims)

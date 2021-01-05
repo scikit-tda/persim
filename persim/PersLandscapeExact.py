@@ -5,12 +5,12 @@ from __future__ import annotations
 import itertools
 import numpy as np
 from operator import itemgetter
-from .auxiliary import union_crit_pairs
-from .PersistenceLandscape import PersistenceLandscape
-from .PersistenceLandscapeGrid import PersistenceLandscapeGrid
+from .landscape_auxiliary import union_crit_pairs
+from .PersLandscape import PersLandscape
+from .PersLandscapeGrid import PersLandscapeGrid
 
 
-class PersistenceLandscapeExact(PersistenceLandscape):
+class PersLandscapeExact(PersLandscape):
     """Persistence Landscape Exact class.
 
     This class implements an exact version of Persistence Landscapes. The landscape
@@ -18,7 +18,7 @@ class PersistenceLandscapeExact(PersistenceLandscape):
     linear interpolation of these critical pairs. All
     computations done with these classes are exact. For much faster but
     approximate methods that should suffice for most applications, consider
-    `PersistenceLandscapeGrid`.
+    `PersLandscapeGrid`.
 
     Parameters
     ----------
@@ -76,7 +76,7 @@ class PersistenceLandscapeExact(PersistenceLandscape):
 
     def __neg__(self):
         self.compute_landscape()
-        return PersistenceLandscapeExact(hom_deg=self.hom_deg,
+        return PersLandscapeExact(hom_deg=self.hom_deg,
                                     critical_pairs=[ [[a,-b] for a, b in depth_list]
                                                     for depth_list in self.critical_pairs])
         """
@@ -95,7 +95,7 @@ class PersistenceLandscapeExact(PersistenceLandscape):
         # This requires a list implementation as written.
         if self.hom_deg != other.hom_deg:
             raise ValueError("homological degrees must match")
-        return PersistenceLandscapeExact(
+        return PersLandscapeExact(
             critical_pairs=union_crit_pairs(self, other),
             hom_deg=self.hom_deg
             )
@@ -104,7 +104,7 @@ class PersistenceLandscapeExact(PersistenceLandscape):
         
         Parameters
         -------
-        other: PersistenceLandscapeExact
+        other: PersLandscapeExact
             
         Returns
         -------
@@ -122,7 +122,7 @@ class PersistenceLandscapeExact(PersistenceLandscape):
         
         Parameters
         -------
-        other: PersistenceLandscape
+        other: PersLandscape
             
         Returns
         -------
@@ -135,7 +135,7 @@ class PersistenceLandscapeExact(PersistenceLandscape):
 
     def __mul__(self, other: float):      
         self.compute_landscape()
-        return PersistenceLandscapeExact(
+        return PersLandscapeExact(
             hom_deg=self.hom_deg,
             critical_pairs=[[(a, other*b) for a, b in depth_list] 
                             for depth_list in self.critical_pairs])
@@ -425,8 +425,8 @@ class PersistenceLandscapeExact(PersistenceLandscape):
 # End PLE class definition
 ###############################
 
-def vectorize(l: PersistenceLandscapeExact, start: float = None, stop: float = None, num_dims: int = 500) -> PersistenceLandscapeGrid:
-    """ Converts a `PersistenceLandscapeExact` type to a `PersistenceLandscapeGrid` type.
+def vectorize(l: PersLandscapeExact, start: float = None, stop: float = None, num_dims: int = 500) -> PersLandscapeGrid:
+    """ Converts a `PersLandscapeExact` type to a `PersLandscapeGrid` type.
 
     
     Parameters
@@ -455,5 +455,5 @@ def vectorize(l: PersistenceLandscapeExact, start: float = None, stop: float = N
     for depth in l.critical_pairs:
         xs, ys = zip(*depth)
         result.append(np.interp(grid, xs, ys))
-    return PersistenceLandscapeGrid(start = start, stop = stop, num_dims = num_dims,
+    return PersLandscapeGrid(start = start, stop = stop, num_dims = num_dims,
                                     hom_deg = l.hom_deg, values = np.array(result))

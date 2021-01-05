@@ -5,13 +5,13 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 
-class PersistenceLandscape(ABC):
+class PersLandscape(ABC):
     """
     The base Persistence Landscape class
 
     This is the base persistence landscape class and should not be
-    called directly. The subclasses `PersistenceLandscapeGrid` or
-    `PersistenceLandscapeExact` should instead be called.
+    called directly. The subclasses `PersLandscapeGrid` or
+    `PersLandscapeExact` should instead be called.
 
     Parameters
     ----------

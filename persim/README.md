@@ -1,3 +1,6 @@
+# SCIKIT-TDA PERSISTENCE LANDSCAPES
+
+For further documentation and examples, see the [pyscapes](https://github.com/gabbyangeloro/Pyscapes) repository.
 ## pyscapes: Persistence landscapes in python
 
 This packages implements persistence landscapes in a user-friendly
