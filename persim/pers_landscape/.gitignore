@@ -1,0 +1,9 @@
+Ignore/
+.vscode/
+*.DS_STORE
+*.ini
+*.aux
+*.pylint*
+*.ini
+*.bak
+*.pyc
