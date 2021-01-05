@@ -1,6 +1,3 @@
-0.1.5
-	- Deprecated PersImage class with implementation of PersistenceImager
-
 0.1.4
     - Migrate to a new CI/CD pipeline
 
