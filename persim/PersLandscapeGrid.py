@@ -191,7 +191,7 @@ class PersLandscapeGrid(PersLandscape):
             result.append(pairs)
         return np.array(result)
 
-    def __add__(self, other: PersLandscapeGrid) -> PersLandscapeGrid:
+    def __add__(self, other):
         super().__add__(other)
         if self.start != other.start:
             raise ValueError("Start values of grids do not coincide")
@@ -205,7 +205,7 @@ class PersLandscapeGrid(PersLandscape):
                                  hom_deg=self.hom_deg,
                                  values=self_pad + other_pad)
 
-    def __neg__(self) -> PersLandscapeGrid:
+    def __neg__(self):
         return PersLandscapeGrid(
             start=self.start,
             stop=self.stop,
@@ -217,7 +217,7 @@ class PersLandscapeGrid(PersLandscape):
     def __sub__(self, other):
         return self + -other
 
-    def __mul__(self, other: float) -> PersLandscapeGrid:
+    def __mul__(self, other: float):
         super().__mul__(other)
         return PersLandscapeGrid(
             start=self.start,
@@ -226,10 +226,10 @@ class PersLandscapeGrid(PersLandscape):
             hom_deg=self.hom_deg,
             values=np.array([other * depth_array for depth_array in self.values]))
 
-    def __rmul__(self, other: float) -> PersLandscapeGrid:
+    def __rmul__(self, other: float):
         return self.__mul__(other)
 
-    def __truediv__(self, other: float) -> PersLandscapeGrid:
+    def __truediv__(self, other: float):
         super().__truediv__(other)
         return (1.0 / other) * self
 
