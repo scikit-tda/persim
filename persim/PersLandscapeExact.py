@@ -28,7 +28,7 @@ class PersLandscapeExact(PersLandscape):
         the output format from ripser.py: ripser(data_user)['dgms']. Only
         one of diagrams or critical pairs should be specified.
 
-    hom_deg : int
+    homological_degree : int
         Represents the homology degree of the persistence diagram.
 
     critical_pairs : list, optional
@@ -55,12 +55,12 @@ class PersLandscapeExact(PersLandscape):
     """
 
     def __init__(
-            self, dgms: list = [], hom_deg: int = 0,
+            self, dgms: list = [], homological_degree: int = 0,
             critical_pairs: list = [], compute: bool = False) -> None:
-        super().__init__(dgms=dgms, hom_deg=hom_deg)
+        super().__init__(dgms=dgms, homological_degree=homological_degree)
         self.critical_pairs = critical_pairs
         if dgms:
-            self.dgms = dgms[self.hom_deg]
+            self.dgms = dgms[self.homological_degree]
         else:  # critical pairs are passed. Is this the best check for this?
             self.dgms = dgms
         self.max_depth = len(self.critical_pairs)
@@ -70,12 +70,12 @@ class PersLandscapeExact(PersLandscape):
     def __repr__(self):
         return (
             "The persistence landscape of diagrams in homological "
-            f"degree {self.hom_deg}"
+            f"degree {self.homological_degree}"
         )
 
     def __neg__(self):
         self.compute_landscape()
-        return PersLandscapeExact(hom_deg=self.hom_deg,
+        return PersLandscapeExact(homological_degree=self.homological_degree,
                                   critical_pairs=[[[a, -b] for a, b in depth_list]
                                                   for depth_list in self.critical_pairs])
         """
@@ -92,11 +92,11 @@ class PersLandscapeExact(PersLandscape):
 
     def __add__(self, other):
         # This requires a list implementation as written.
-        if self.hom_deg != other.hom_deg:
+        if self.homological_degree != other.homological_degree:
             raise ValueError("homological degrees must match")
         return PersLandscapeExact(
             critical_pairs=union_crit_pairs(self, other),
-            hom_deg=self.hom_deg
+            homological_degree=self.homological_degree
         )
         """
         Computes the sum of two persistence landscape objects
@@ -136,7 +136,7 @@ class PersLandscapeExact(PersLandscape):
     def __mul__(self, other: float):
         self.compute_landscape()
         return PersLandscapeExact(
-            hom_deg=self.hom_deg,
+            homological_degree=self.homological_degree,
             critical_pairs=[[(a, other * b) for a, b in depth_list]
                             for depth_list in self.critical_pairs])
         """
@@ -457,4 +457,4 @@ def vectorize(l: PersLandscapeExact, start: float = None,
         xs, ys = zip(*depth)
         result.append(np.interp(grid, xs, ys))
     return PersLandscapeGrid(start=start, stop=stop, num_dims=num_dims,
-                             hom_deg=l.hom_deg, values=np.array(result))
+                             homological_degree=l.homological_degree, values=np.array(result))

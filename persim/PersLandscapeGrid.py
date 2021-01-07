@@ -37,7 +37,7 @@ class PersLandscapeGrid(PersLandscape):
     dgms : list[list]
         A list lists of birth-death pairs for each homological degree.
 
-    hom_deg : int
+    homological_degree : int
         represents the homology degree of the persistence diagram.
 
     vales
@@ -54,12 +54,12 @@ class PersLandscapeGrid(PersLandscape):
 
     def __init__(
             self, start: float = None, stop: float = None, num_dims: int = 500,
-            dgms: list = [], hom_deg: int = 0,
+            dgms: list = [], homological_degree: int = 0,
             values=np.array([]), compute: bool = False) -> None:
 
-        super().__init__(dgms=dgms, hom_deg=hom_deg)
+        super().__init__(dgms=dgms, homological_degree=homological_degree)
         if dgms:  # diagrams are passed
-            self.dgms = dgms[self.hom_deg]
+            self.dgms = dgms[self.homological_degree]
             # remove infity values
             # ~: indexes everything but values satisfying the condition
             # axis = 1: checks the condition for each row
@@ -90,7 +90,7 @@ class PersLandscapeGrid(PersLandscape):
     def __repr__(self) -> str:
 
         return ('The persistence landscapes of diagrams in homological '
-                f'degree {self.hom_deg} on grid from {self.start} to {self.stop}'
+                f'degree {self.homological_degree} on grid from {self.start} to {self.stop}'
                 f' with step size {self.num_dims}')
 
     def compute_landscape(self, verbose: bool = False) -> list:
@@ -202,7 +202,7 @@ class PersLandscapeGrid(PersLandscape):
         self_pad, other_pad = union_vals(self.values, other.values)
         return PersLandscapeGrid(start=self.start, stop=self.stop,
                                  num_dims=self.num_dims,
-                                 hom_deg=self.hom_deg,
+                                 homological_degree=self.homological_degree,
                                  values=self_pad + other_pad)
 
     def __neg__(self):
@@ -210,7 +210,7 @@ class PersLandscapeGrid(PersLandscape):
             start=self.start,
             stop=self.stop,
             num_dims=self.num_dims,
-            hom_deg=self.hom_deg,
+            homological_degree=self.homological_degree,
             values=np.array([-1 * depth_array for depth_array in self.values]))
         pass
 
@@ -223,7 +223,7 @@ class PersLandscapeGrid(PersLandscape):
             start=self.start,
             stop=self.stop,
             num_dims=self.num_dims,
-            hom_deg=self.hom_deg,
+            homological_degree=self.homological_degree,
             values=np.array([other * depth_array for depth_array in self.values]))
 
     def __rmul__(self, other: float):
@@ -288,7 +288,7 @@ def snap_PL(l: list, start: float = None, stop: float = None,
         # store snapped persistence landscape
         k.append(PersLandscapeGrid(start=start, stop=stop, num_dims=num_dims,
                                    values=np.array(snapped_landscape),
-                                   hom_deg=pl.hom_deg))
+                                   homological_degree=pl.homological_degree))
     return k
 
 
