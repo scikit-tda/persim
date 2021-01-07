@@ -18,6 +18,7 @@ from matplotlib import cm
 # mpl.rcParams['text.usetex'] = True
 
 def plot_landscape_simple(landscape: PersLandscape,
+                   alpha = 1,
                    padding = 0.1, 
                    num_steps = 1000,
                    title = None,
@@ -26,10 +27,11 @@ def plot_landscape_simple(landscape: PersLandscape,
     plot landscape functions. 
     """
     if isinstance(landscape, PersLandscapeExact):
-        return plot_landscape_exact_simple(landscape=landscape, title=title)
+        return plot_landscape_exact_simple(landscape=landscape, alpha=alpha, title=title)
 
     if isinstance(landscape, PersLandscapeGrid):
-        return plot_landscape_grid_simple(landscape=landscape, padding=padding, num_steps=num_steps, title=title)
+        return plot_landscape_grid_simple(landscape=landscape, alpha=alpha, padding=padding, num_steps=num_steps, title=title)
+
 
 def plot_landscape_exact_simple(landscape: PersLandscapeExact,
                    alpha = 1,
@@ -74,7 +76,6 @@ def plot_landscape_grid_simple(landscape: PersLandscapeGrid,
                    alpha = 1,
                    padding = 0.1,
                    num_steps = 1000,
-                   smooth = True,
                    title = None):
     """
     A simple plot of the persistence landscape. This is a faster plotting utility than the standard plotting, but is recommended for smaller landscapes for ease of visualization.
@@ -83,6 +84,12 @@ def plot_landscape_grid_simple(landscape: PersLandscapeGrid,
     ----------
     alpha, default 1
         transparency of shading
+
+    padding: float, default 0.1
+        amount of empty grid shown to left and right of landscape functions
+        
+    num_steps: int, default 1000
+        number of sampled points that are plotted
         
     """
     fig = plt.figure()
