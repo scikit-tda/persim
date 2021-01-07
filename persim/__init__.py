@@ -9,7 +9,9 @@ from .visuals import *
 # from .landscape import *
 from .PersLandscapeExact import *
 from .PersLandscapeGrid import *
+
 from .landscape_visualization import *
+from .landscape_visualization_simple import *
 
 
 from ._version import __version__
