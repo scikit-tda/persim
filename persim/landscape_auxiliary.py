@@ -4,7 +4,6 @@ Auxilary functions for working with persistence diagrams.
 Most of these functions should not be called directly.
 """
 
-from __future__ import annotations
 import itertools
 from operator import itemgetter, attrgetter
 import numpy as np
