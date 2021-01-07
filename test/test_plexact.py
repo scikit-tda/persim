@@ -19,14 +19,14 @@ class TestPersLandscapeExact(unittest.TestCase):
         """
         # example from Peter & Pavel's paper
         P = PersLandscapeExact(
-            diagrams=[np.array([[1.0, 5.0], [2.0, 8.0], [3.0, 4.0], [5.0, 9.0],
+            dgms=[np.array([[1.0, 5.0], [2.0, 8.0], [3.0, 4.0], [5.0, 9.0],
                                 [6.0, 7.0]])],
             homological_degree=0)
         P.compute_landscape()
         
         # duplicate bars
         Q = PersLandscapeExact(
-            diagrams=[np.array([[1, 5],[1, 5],[3, 6]])],
+            dgms=[np.array([[1, 5],[1, 5],[3, 6]])],
             homological_degree=0)
         Q.compute_landscape()
         
@@ -46,7 +46,7 @@ class TestPersLandscapeExact(unittest.TestCase):
         Test homological degree
         """
         P = PersLandscapeExact(
-            diagrams=[np.array([[1.0, 5.0], [2.0, 8.0], [3.0, 4.0], [5.0, 9.0],
+            dgms=[np.array([[1.0, 5.0], [2.0, 8.0], [3.0, 4.0], [5.0, 9.0],
                                 [6.0, 7.0]])],
             homological_degree=0)
         self.assertEqual(P.homological_degree,0)
@@ -78,7 +78,7 @@ class PersLandscapeExactBad(unittest.TestCase):
     # TODO
     """
     # def test_pl_hom_degree(self):
-    #    diagrams = []
+    #    dgms = []
     #    hom_deg = -1
     #    self.assertRaises 
     # def test_p_norm(self):

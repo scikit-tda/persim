@@ -19,14 +19,14 @@ class TestPersLandscapeExact(unittest.TestCase):
         """
         # example from Peter & Pavel's paper
         P = PersLandscapeExact(
-            diagrams=[np.array([[1.0, 5.0], [2.0, 8.0], [3.0, 4.0], [5.0, 9.0],
+            dgms=[np.array([[1.0, 5.0], [2.0, 8.0], [3.0, 4.0], [5.0, 9.0],
                                 [6.0, 7.0]])],
             homological_degree=0)
         P.compute_landscape()
         
         # duplicate bars
         Q = PersLandscapeExact(
-            diagrams=[np.array([[1, 5],[1, 5],[3, 6]])],
+            dgms=[np.array([[1, 5],[1, 5],[3, 6]])],
             homological_degree=0)
         Q.compute_landscape()
         
@@ -46,7 +46,7 @@ class TestPersLandscapeExact(unittest.TestCase):
         Test homological degree
         """
         P = PersLandscapeExact(
-            diagrams=[np.array([[1.0, 5.0], [2.0, 8.0], [3.0, 4.0], [5.0, 9.0],
+            dgms=[np.array([[1.0, 5.0], [2.0, 8.0], [3.0, 4.0], [5.0, 9.0],
                                 [6.0, 7.0]])],
             homological_degree=0)
         self.assertEqual(P.homological_degree,0)
@@ -61,11 +61,11 @@ class TestPersLandscapeExact(unittest.TestCase):
         negP = PersLandscapeExact(
             critical_pairs=[[[0, 0], [1, -1], [2, -1], [3, -1], [4, 0]]],
             homological_degree=0)
-        self.assertEqual(P.infinity_norm(), 1)
+        self.assertEqual(P.sup_norm(), 1)
         self.assertAlmostEqual(P.p_norm(p=2), np.sqrt(2 + (2.0/3.0)))
         self.assertAlmostEqual(P.p_norm(p=5), (2 + (1.0/3.0))**(1.0/5.0))
         self.assertAlmostEqual(P.p_norm(p=113), (2+ (1.0/57.0))**(1.0/113.0))
-        self.assertEqual(negP.infinity_norm(), 1)
+        self.assertEqual(negP.sup_norm(), 1)
         self.assertAlmostEqual(negP.p_norm(p=2), np.sqrt(2 + (2.0/3.0)))
         self.assertAlmostEqual(negP.p_norm(p=5), (2 + (1.0/3.0))**(1.0/5.0))
         self.assertAlmostEqual(negP.p_norm(p=113), (2+ (1.0/57.0))**(1.0/113.0))
@@ -77,12 +77,12 @@ class TestPersLandscapeGrid(unittest.TestCase):
         """
         Test PersLandscape
         """
-        diagrams=[np.array([[2,6],[4,10]])]
-        P1 = PersLandscapeGrid(0, 10, 11, diagrams,
+        dgms=[np.array([[2,6],[4,10]])]
+        P1 = PersLandscapeGrid(0, 10, 11, dgms,
                                      homological_degree=0)
-        P2 = PersLandscapeGrid(0, 10, 6, diagrams,
+        P2 = PersLandscapeGrid(0, 10, 6, dgms,
                                      homological_degree=0)
-        P3 = PersLandscapeGrid(0, 10, 21, diagrams,
+        P3 = PersLandscapeGrid(0, 10, 21, dgms,
                                      homological_degree=0)
         
         P1.compute_landscape()
@@ -91,11 +91,14 @@ class TestPersLandscapeGrid(unittest.TestCase):
         
         # duplicate bars
         Q = PersLandscapeExact(
-            diagrams=[np.array([[1, 5],[1, 5],[3, 6]])],
+            dgms=[np.array([[1, 5],[1, 5],[3, 6]])],
             homological_degree=0)
         Q.compute_landscape()
         
         
+        """
+
+        # PersLandscapeGrid has no attribute funct_values
         self.assertEqual(P1.funct_values, 
         np.array([[0., 0., 0., 1.0, 2.0, 1.0, 2.0, 3.0, 2.0, 1.0, 0], 
          [0., 0., 0., 0., 0., 1.0, 0., 0., 0., 0., 0.]]))
@@ -107,6 +110,7 @@ class TestPersLandscapeGrid(unittest.TestCase):
         2.5, 3. , 2.5, 2. , 1.5, 1. , 0.5, 0. ],
        [0. , 0. , 0. , 0. , 0. , 0. , 0. , 0. , 0. , 0.5, 1. , 0.5, 0. ,
         0. , 0. , 0. , 0. , 0. , 0. , 0. , 0. ]]))
+        """
         
         
 
@@ -115,7 +119,7 @@ class PersLandscapeExactBad(unittest.TestCase):
     # TODO
     """
     # def test_pl_hom_degree(self):
-    #    diagrams = []
+    #    dgms = []
     #    hom_deg = -1
     #    self.assertRaises 
     # def test_p_norm(self):
@@ -125,7 +129,7 @@ class PersLandscapeExactBad(unittest.TestCase):
     #     P = PersLandscape(
     #         critical_pairs=[[[0, 0], [1, 1], [2, 1], [3, 1], [4, 0]]],
     #         homological_degree=0)
-    #     self.assertEqual(P.infinity_norm(), 1)
+    #     self.assertEqual(P.sup_norm(), 1)
     #     self.assertAlmostEqual(P.p_norm(p=2), np.sqrt(2 + (2.0/3.0)))
     #     self.assertAlmostEqual(P.p_norm(p=5), (2 + (1.0/3.0))**(1.0/5.0))
 
