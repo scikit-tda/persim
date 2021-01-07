@@ -1,7 +1,6 @@
 """ 
 Define Grid Persistence Landscape class.
 """
-from __future__ import annotations
 import numpy as np
 import itertools
 from .landscape_auxiliary import pairs_snap, union_vals, ndsnap_regular

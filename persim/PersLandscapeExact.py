@@ -1,7 +1,6 @@
 """
 Define Persistence Landscape Exact class.
 """
-from __future__ import annotations
 import itertools
 import numpy as np
 from operator import itemgetter
