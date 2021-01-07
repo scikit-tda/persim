@@ -1,31 +1,31 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Unit test for PersistenceLandscapeExact
+Unit test for PersLandscapeExact
 """
 
 import unittest 
 import numpy as np
 
-from PersistenceLandscapeExact import PersistenceLandscapeExact
-from PersistenceLandscapeGrid import PersistenceLandscapeGrid
+from persim import PersLandscapeExact
+from persim import PersLandscapeGrid
 
-class TestPersistenceLandscapeExact(unittest.TestCase):
+class TestPersLandscapeExact(unittest.TestCase):
     
     
     def test_pl_critical_pairs(self):
         """
-        Test PersistenceLandscape
+        Test PersLandscape
         """
         # example from Peter & Pavel's paper
-        P = PersistenceLandscapeExact(
+        P = PersLandscapeExact(
             diagrams=[np.array([[1.0, 5.0], [2.0, 8.0], [3.0, 4.0], [5.0, 9.0],
                                 [6.0, 7.0]])],
             homological_degree=0)
         P.compute_landscape()
         
         # duplicate bars
-        Q = PersistenceLandscapeExact(
+        Q = PersLandscapeExact(
             diagrams=[np.array([[1, 5],[1, 5],[3, 6]])],
             homological_degree=0)
         Q.compute_landscape()
@@ -45,7 +45,7 @@ class TestPersistenceLandscapeExact(unittest.TestCase):
         """
         Test homological degree
         """
-        P = PersistenceLandscapeExact(
+        P = PersLandscapeExact(
             diagrams=[np.array([[1.0, 5.0], [2.0, 8.0], [3.0, 4.0], [5.0, 9.0],
                                 [6.0, 7.0]])],
             homological_degree=0)
@@ -55,10 +55,10 @@ class TestPersistenceLandscapeExact(unittest.TestCase):
         """
         Test p-norms
         """
-        P = PersistenceLandscapeExact(
+        P = PersLandscapeExact(
             critical_pairs=[[[0, 0], [1, 1], [2, 1], [3, 1], [4, 0]]],
             homological_degree=0)
-        negP = PersistenceLandscapeExact(
+        negP = PersLandscapeExact(
             critical_pairs=[[[0, 0], [1, -1], [2, -1], [3, -1], [4, 0]]],
             homological_degree=0)
         self.assertEqual(P.infinity_norm(), 1)
@@ -70,19 +70,19 @@ class TestPersistenceLandscapeExact(unittest.TestCase):
         self.assertAlmostEqual(negP.p_norm(p=5), (2 + (1.0/3.0))**(1.0/5.0))
         self.assertAlmostEqual(negP.p_norm(p=113), (2+ (1.0/57.0))**(1.0/113.0))
 
-class TestPersistenceLandscapeGrid(unittest.TestCase):
+class TestPersLandscapeGrid(unittest.TestCase):
     
     
     def test_pl_critical_pairs(self):
         """
-        Test PersistenceLandscape
+        Test PersLandscape
         """
         diagrams=[np.array([[2,6],[4,10]])]
-        P1 = PersistenceLandscapeGrid(0, 10, 11, diagrams,
+        P1 = PersLandscapeGrid(0, 10, 11, diagrams,
                                      homological_degree=0)
-        P2 = PersistenceLandscapeGrid(0, 10, 6, diagrams,
+        P2 = PersLandscapeGrid(0, 10, 6, diagrams,
                                      homological_degree=0)
-        P3 = PersistenceLandscapeGrid(0, 10, 21, diagrams,
+        P3 = PersLandscapeGrid(0, 10, 21, diagrams,
                                      homological_degree=0)
         
         P1.compute_landscape()
@@ -90,7 +90,7 @@ class TestPersistenceLandscapeGrid(unittest.TestCase):
         P3.compute_landscape()
         
         # duplicate bars
-        Q = PersistenceLandscapeExact(
+        Q = PersLandscapeExact(
             diagrams=[np.array([[1, 5],[1, 5],[3, 6]])],
             homological_degree=0)
         Q.compute_landscape()
@@ -110,7 +110,7 @@ class TestPersistenceLandscapeGrid(unittest.TestCase):
         
         
 
-class PersistenceLandscapeExactBad(unittest.TestCase):
+class PersLandscapeExactBad(unittest.TestCase):
     """ Test bad/error test cases here.
     # TODO
     """
@@ -122,7 +122,7 @@ class PersistenceLandscapeExactBad(unittest.TestCase):
     #     """
     #     Test p-norms
     #     """
-    #     P = PersistenceLandscape(
+    #     P = PersLandscape(
     #         critical_pairs=[[[0, 0], [1, 1], [2, 1], [3, 1], [4, 0]]],
     #         homological_degree=0)
     #     self.assertEqual(P.infinity_norm(), 1)

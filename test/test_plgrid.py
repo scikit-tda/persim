@@ -8,22 +8,22 @@ Created on Fri Nov  6 11:26:54 2020
 import unittest 
 import numpy as np
 
-from PersistenceLandscapeGrid import PersistenceLandscapeGrid
+from persim import PersLandscapeGrid
 
 
-class TestPersistenceLandscapeGrid(unittest.TestCase):
+class TestPersLandscapeGrid(unittest.TestCase):
     
     
     def test_pl_funct_values(self):
         """
-        Test PersistenceLandscape
+        Test PersLandscape
         """
         diagrams=[np.array([[2,6],[4,10]])]
-        P1 = PersistenceLandscapeGrid(0, 10, 11, diagrams,
+        P1 = PersLandscapeGrid(0, 10, 11, diagrams,
                                      homological_degree=0)
-        P2 = PersistenceLandscapeGrid(0, 10, 6, diagrams,
+        P2 = PersLandscapeGrid(0, 10, 6, diagrams,
                                      homological_degree=0)
-        P3 = PersistenceLandscapeGrid(0, 10, 21, diagrams,
+        P3 = PersLandscapeGrid(0, 10, 21, diagrams,
                                      homological_degree=0)
         
         P1.compute_landscape()
