@@ -122,12 +122,12 @@ def gromov_hausdorff(
 
     Parameters
     -----------
-    AG: np.array (|V(G)|×|V(G)|)
-        (Sparse) adjacency matrix of graph G, or an iterable of
+    AG: (N,N) np.array
+        (Sparse) adjacency matrix of graph G with N vertices, or an iterable of
         adjacency matrices if AH=None.
-    AH: np.array (|V(H)|×|V(H)|)
-        (Sparse) adjacency matrix of graph H, or None.
-    mapping_sample_size_order: np.array (2)
+    AH: (M,M) np.array
+        (Sparse) adjacency matrix of graph H with M vertices, or None.
+    mapping_sample_size_order: (2,) np.array 
         Parameter that regulates the number of mappings to sample when
         tightening upper bound of the mGH distance.
 
@@ -184,12 +184,12 @@ def make_distance_matrix_from_adjacency_matrix(AG):
 
     Parameters
     -----------
-    AG: np.array (|V(G)|×|V(G)|)
-        (Sparse) adjacency matrix of simple unweighted graph G.
+    AG: (N,N) np.array
+        (Sparse) adjacency matrix of simple unweighted graph G with N vertices.
 
     Returns
     --------
-    DG: np.array (|V(G)|×|V(G)|)
+    DG: (N,N)  np.array
         (Dense) distance matrix of the compact metric space
         representation of G based on its shortest path lengths.
     """
