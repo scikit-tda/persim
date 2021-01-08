@@ -21,6 +21,7 @@ Persistence Images
 
 .. autosummary::
     :toctree: stubs
+    :recursive:
     :nosignatures:
 
     persim.PersistenceImager

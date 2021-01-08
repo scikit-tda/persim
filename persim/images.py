@@ -329,18 +329,50 @@ class PersistenceImager(TransformerMixin):
         
     @property
     def width(self):
+        """
+        Persistence image width.
+        
+        Returns
+        -------
+        width : float
+            The width of the region of the birth-persistence plane covered by the persistence image in birth units.
+        """
         return self._width
 
     @property
     def height(self):
+        """
+        Persistence image height.
+        
+        Returns
+        -------
+        height : float
+            The height of the region of the birth-persistence plane covered by the persistence image in persistence units.
+        """
         return self._height
 
     @property
     def resolution(self):
+        """
+        Persistence image resolution.
+        
+        Returns
+        -------
+        resolution : pair of ints (width, height)
+            The number of pixels along each dimension of the persistence image, determined by the birth and persistence ranges and the pixel size.
+        """
         return self._resolution
 
     @property
     def pixel_size(self):
+        """
+        Persistence image square pixel dimensions.
+        
+        Returns
+        -------
+        pixel_size : float
+            The width (and height) in birth/persistence units of each square pixel in the persistence image. 
+        """
         return self._pixel_size
 
     @pixel_size.setter
@@ -353,6 +385,14 @@ class PersistenceImager(TransformerMixin):
 
     @property
     def birth_range(self):
+        """
+        Range of birth values covered by the persistence image.
+        
+        Returns
+        -------
+        birth_range : pair of floats (min. birth, max. birth)
+            The minimum and maximum birth values covered by the persistence image.
+        """
         return self._birth_range
 
     @birth_range.setter
@@ -364,6 +404,14 @@ class PersistenceImager(TransformerMixin):
 
     @property
     def pers_range(self):
+        """
+        Range of persistence values covered by the persistence image.
+        
+        Returns
+        -------
+        pers_range : pair of floats (min. persistence, max. persistence)
+            The minimum and maximum persistence values covered by the persistence image.
+        """
         return self._pers_range
 
     @pers_range.setter
