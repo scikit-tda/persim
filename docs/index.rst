@@ -33,7 +33,7 @@ To contribute please fork the project make your changes and submit a pull reques
     :hidden:
     :caption: User Guide
 
-    notebooks/Persistence Images
+    notebooks/Persistence images
     notebooks/distances
     reference/index
 
@@ -44,7 +44,8 @@ To contribute please fork the project make your changes and submit a pull reques
     :caption: Tutorials
 
     notebooks/Classification with persistence images
-
+    notebooks/Persistence barcode measure
+    
 
 .. |Downloads| image:: https://pypip.in/download/persim/badge.svg
     :target: https://pypi.python.org/pypi/persim/
