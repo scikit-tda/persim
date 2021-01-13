@@ -12,6 +12,7 @@
 Persim is a Python package for many tools used in analyzing Persistence Diagrams.  It currently houses implementations of 
 
 - Persistence Images
+- Persistence Landscapes
 - Bottleneck distance
 - Modified Gromov&ndash;Hausdorff distance
 - Sliced Wasserstein Kernel
