@@ -6,9 +6,9 @@
 
 from __future__ import annotations
 import numpy as np
-from auxiliary import union_vals, ndsnap_regular
 from operator import itemgetter, attrgetter
 from .pers_landscape import PersLandscape
+from .pers_landscape_aux import union_vals, ndsnap_regular
 
 __all__ = ["PersLandscapeApprox", "snap_PL", "lc_approx", "average_approx"]
 
@@ -120,17 +120,8 @@ class PersLandscapeApprox(PersLandscape):
         # grid = np.array([[x,y] for x in grid_values for y in grid_values])
         bd_pairs = self.dgms
 
-        # create list of triangle top for each birth death pair
-        birth: "np.ndarray" = bd_pairs[:, 0]
-        death: "np.ndarray" = bd_pairs[:, 1]
-        triangle_top_ycoord = (death - birth) / 2
-        triangle_top = np.array(list(zip((birth + death) / 2, (death - birth) / 2)))
-
-        # snap birth-death pairs and triangle tops to grid
-        # bd_pairs_grid = pairs_snap(bd_pairs, grid)
+        # snap birth-death pairs to grid
         bd_pairs_grid = ndsnap_regular(bd_pairs, *(grid_values, grid_values))
-        # triangle_top_grid = pairs_snap(triangle_top, grid)
-        triangle_top_grid = ndsnap_regular(triangle_top, *(grid_values, grid_values))
 
         # make grid dictionary
         index = list(range(self.num_steps))
@@ -144,18 +135,21 @@ class PersLandscapeApprox(PersLandscape):
             [b, d] = bd
             ind_in_Wb = dict_grid[b]  # index in W
             ind_in_Wd = dict_grid[d]  # index in W
+            mid_pt = (
+                ind_in_Wb + (ind_in_Wd - ind_in_Wb) // 2
+            )  # index half way between, rounded down
 
             # step through by x value
             j = 0
             # j in (b, b+d/2]
-            for _ in np.arange(triangle_top_grid[ind_in_bd_pairs, 0], b, -step):
+            for _ in range(ind_in_Wb, mid_pt):
                 j += 1
                 # j*step: adding points from a line with slope 1
                 W[ind_in_Wb + j].append(j * step)
 
             j = 0
             # j in (b+d/2, d)
-            for _ in np.arange(triangle_top_grid[ind_in_bd_pairs, 0] + step, d, step):
+            for _ in range(mid_pt + 1, ind_in_Wd):
                 j += 1
                 W[ind_in_Wd - j].append(j * step)
 
