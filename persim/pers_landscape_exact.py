@@ -9,7 +9,7 @@ from __future__ import annotations
 import itertools
 import numpy as np
 from operator import itemgetter
-from auxiliary import union_crit_pairs
+from .pers_landscape_aux import union_crit_pairs
 from .pers_landscape import PersLandscape
 from .pers_landscape_approx import PersLandscapeApprox
 

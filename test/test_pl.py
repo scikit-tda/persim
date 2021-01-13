@@ -82,29 +82,35 @@ class TestPersLandscapeApprox:
         Test PersistenceLandscape
         """
         diagrams = [np.array([[2, 6], [4, 10]])]
-        P1 = PersLandscapeApprox(0, 10, 11, diagrams, homological_degree=0)
-        P2 = PersLandscapeApprox(0, 10, 6, diagrams, homological_degree=0)
-        P3 = PersLandscapeApprox(0, 10, 21, diagrams, homological_degree=0)
+        P1 = PersLandscapeApprox(
+            start=0, stop=10, num_steps=11, dgms=diagrams, hom_deg=0
+        )
+        P2 = PersLandscapeApprox(
+            start=0, stop=10, num_steps=6, dgms=diagrams, hom_deg=0
+        )
+        P3 = PersLandscapeApprox(
+            start=0, stop=10, num_steps=21, dgms=diagrams, hom_deg=0
+        )
 
         P1.compute_landscape()
         P2.compute_landscape()
         P3.compute_landscape()
 
-        self.assertEqual(
-            P1.funct_values,
-            np.array(
+        assert (
+            P1.values
+            == np.array(
                 [
                     [0.0, 0.0, 0.0, 1.0, 2.0, 1.0, 2.0, 3.0, 2.0, 1.0, 0.0],
                     [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
                 ]
-            ),
+            )
         ).all()
 
-        self.assertEqual(P2.funct_values, np.array([[0.0, 0.0, 2.0, 2.0, 2.0, 0.0]]))
+        assert (P2.values == np.array([[0.0, 0.0, 2.0, 2.0, 2.0, 0.0]])).all()
 
-        self.assertEqual(
-            P3.funct_values,
-            np.array(
+        assert (
+            P3.values
+            == np.array(
                 [
                     [
                         0.0,
@@ -153,5 +159,5 @@ class TestPersLandscapeApprox:
                         0.0,
                     ],
                 ]
-            ),
-        )
+            )
+        ).all()

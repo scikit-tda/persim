@@ -10,29 +10,32 @@ import numpy as np
 
 __all__ = ["death_vector", "linear_combination"]
 
+
 def death_vector(dgms: list, hom_deg: int = 0):
-    """ Returns the death vector in degree 0 for the persistence diagram
-    
-    For Vietoris-Rips or Cech complexes, or any similar filtration, all bars in 
-    homological degree 0 start at filtration value 0. Therefore, the discerning 
+    """Returns the death vector in degree 0 for the persistence diagram
+
+    For Vietoris-Rips or Cech complexes, or any similar filtration, all bars in
+    homological degree 0 start at filtration value 0. Therefore, the discerning
     information is the death values. The death vector is the vector of death times,
     sorted from largest to smallest.
-    
+
     Parameters
     ----------
     dgms : list of persistence diagrams
-        
+
     hom_deg : int specifying the homological degree
-    
+
     """
     if hom_deg != 0:
-        raise NotImplementedError("The death vector is not defined for "
-                                  "homological degrees greater than zero.")
-    return sorted(dgms[hom_deg][:,1], reverse=True)
-    
+        raise NotImplementedError(
+            "The death vector is not defined for "
+            "homological degrees greater than zero."
+        )
+    return sorted(dgms[hom_deg][:, 1], reverse=True)
+
 
 def linear_combination(landscapes: list, coeffs: list):
-    """ Compute a linear combination of landscapes
+    """Compute a linear combination of landscapes
     Parameters
     ----------
     landscapes : list of PersistenceLandscape objects
@@ -43,31 +46,33 @@ def linear_combination(landscapes: list, coeffs: list):
     -------
     None.
     """
-    result = coeffs[0]*landscapes[0]
+    result = coeffs[0] * landscapes[0]
     for c, L in enumerate(landscapes):
-        result += coeffs[c]*L
+        result += coeffs[c] * L
     return result
 
-def union_vals(A,B):
-    """ Helper function for summing grid landscapes.
-    
+
+def union_vals(A, B):
+    """Helper function for summing grid landscapes.
+
     Extends one list to the length of the other by padding with zero lists.
     """
     diff = A.shape[0] - B.shape[0]
     if diff < 0:
         # B has more entries, so pad A
-        A = np.pad(A, pad_width=((0,np.abs(diff)), (0,0)))
+        A = np.pad(A, pad_width=((0, np.abs(diff)), (0, 0)))
         return A, B
     elif diff > 0:
         # A has more entries, so pad B
-        B = np.pad(B, pad_width=((0,diff),(0,0)))
+        B = np.pad(B, pad_width=((0, diff), (0, 0)))
         return A, B
     else:
-        return A, B    
+        return A, B
+
 
 def union_crit_pairs(A, B):
-    """ Helper function for summing landscapes.
-    
+    """Helper function for summing landscapes.
+
     Computes the union of two sets of critical pairs.
     """
     result_pairs = []
@@ -95,11 +100,11 @@ def union_crit_pairs(A, B):
 
 
 def pos_to_slope_interp(l: list) -> list:
-    """ Convert positions of critical pairs to (x-value, slope) pairs. 
-    
+    """Convert positions of critical pairs to (x-value, slope) pairs.
+
     Intended
     for internal use. Inverse function of `slope_to_pos_interp`.
-    
+
     Result
     ------
     list
@@ -108,32 +113,33 @@ def pos_to_slope_interp(l: list) -> list:
 
     output = []
     # for sequential pairs in landscape function
-    for [[x0,y0], [x1,y1]] in zip(l,l[1:]):
-        slope = (y1 - y0)/(x1 - x0)
-        output.append([x0,slope])
-    output.append([l[-1][0],0])
+    for [[x0, y0], [x1, y1]] in zip(l, l[1:]):
+        slope = (y1 - y0) / (x1 - x0)
+        output.append([x0, slope])
+    output.append([l[-1][0], 0])
     return output
 
 
 def slope_to_pos_interp(l: list) -> list:
-    """ Convert positions of (x-value, slope) pairs to critical pairs. 
-    
+    """Convert positions of (x-value, slope) pairs to critical pairs.
+
     Intended
     for internal use. Inverse function of `pos_to_slope_interp`.
-    
+
     Result
     ------
     list
         [(xi, yi)]_i for i in len(function in landscape)
     """
-    output = [[l[0][0],0]]
+    output = [[l[0][0], 0]]
     # for sequential pairs in [(xi,mi)]_i
     for [[x0, m], [x1, _]] in zip(l, l[1:]):
         # uncover y0 and y1 from slope formula
         y0 = output[-1][1]
-        y1 = y0 + (x1 - x0)*m
+        y1 = y0 + (x1 - x0) * m
         output.append([x1, y1])
     return output
+
 
 def sum_slopes(a: list, b: list) -> list:
     """
@@ -141,11 +147,11 @@ def sum_slopes(a: list, b: list) -> list:
     of pairs (xi,mi), where each xi is the x-value of critical pair and
     mi is the slope. The input should be of the form of the output of the
     `pos_to_slope_interp' function.
-    
+
     Result
     ------
     list
-        
+
     """
     result = []
     am, bm = 0, 0  # initialize slopes
@@ -172,16 +178,12 @@ def sum_slopes(a: list, b: list) -> list:
     return result
 
 
-def ndsnap_regular(points, *grid_axes):   
-    """ Snap points to the 2d grid determined by grid_axes
-    """      
+def ndsnap_regular(points, *grid_axes):
+    """Snap points to the 2d grid determined by grid_axes"""
     # https://stackoverflow.com/q/8457645/717525
-    snapped = []                                         
-    for i, ax in enumerate(grid_axes):                         
+    snapped = []
+    for i, ax in enumerate(grid_axes):
         diff = ax[:, np.newaxis] - points[:, i]
-        best = np.argmin(np.abs(diff), axis=0)                                                                                                  
-        snapped.append(ax[best])                                                                                           
+        best = np.argmin(np.abs(diff), axis=0)
+        snapped.append(ax[best])
     return np.array(snapped).T
-
-
-
