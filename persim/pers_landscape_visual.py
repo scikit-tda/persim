@@ -305,7 +305,7 @@ def plot_landscape_approx_simple(landscape: PersLandscapeApprox,
                    padding = 0.1,
                    num_steps = 1000,
                    title = None):
-     """
+    """
     A simple plot of the persistence landscape. This is a faster plotting utility than the standard plotting, but is recommended for smaller landscapes for ease of visualization.
     
     Parameters
@@ -338,7 +338,7 @@ def plot_landscape_approx_simple(landscape: PersLandscapeApprox,
 
         plt.plot(domain, l, label=f"$\lambda_{{{depth}}}$", alpha=alpha)
 
-    
+
     plt.legend()
     if title: plt.title(title)
     plt.show()   

@@ -10,7 +10,7 @@ import itertools
 import numpy as np
 from operator import itemgetter
 from .pers_landscape_aux import union_crit_pairs
-from .pers_landscape import PersLandscape
+from .pers_landscape.PersLandscape import PersLandscape
 from .pers_landscape_approx import PersLandscapeApprox
 
 __all__ = ["PersLandscapeExact", "vectorize"]
