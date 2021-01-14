@@ -7,9 +7,9 @@ import itertools
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
-from pers_landscape import PersLandscape
-from pers_landscape_exact import PersLandscapeExact
-from pers_landscape_approx import PersLandscapeApprox
+from .pers_landscape import PersLandscape
+from .pers_landscape_exact import PersLandscapeExact
+from .pers_landscape_approx import PersLandscapeApprox
 from operator import itemgetter
 from matplotlib import cm
 

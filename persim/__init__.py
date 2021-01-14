@@ -10,5 +10,6 @@ from .pers_landscape_approx import *
 from .pers_landscape_transf import *
 from .pers_landscape_aux import *
 from .pers_landscape_visual import *
+from .pers_landscape_visual_simple import *
 
 from ._version import __version__

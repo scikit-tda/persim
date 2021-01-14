@@ -10,9 +10,9 @@ import matplotlib as mpl
 from matplotlib import cm
 import matplotlib.pyplot as plt
 import numpy as np
-from pers_landscape import PersLandscape
-from pers_landscape_exact import PersLandscapeExact
-from pers_landscape_approx import PersLandscapeApprox
+from .pers_landscape import PersLandscape
+from .pers_landscape_exact import PersLandscapeExact
+from .pers_landscape_approx import PersLandscapeApprox
 
 # TODO: Use styles instead of colormaps directly? Or both?
 
