@@ -1,6 +1,6 @@
 """
     Persistence Landscape Exact class
-    
+
     authors: Gabrielle Angeloro, Michael Catanzaro
 """
 
@@ -262,12 +262,8 @@ class PersLandscapeExact(PersLandscape):
         # change inner nparrays into lists
         for i in range(len(A)):
             A[i] = list(A[i])
-        # store infitiy values
-        infty_bar = False
         if A[-1][1] == np.inf:
             A.pop(-1)
-            infty_bar = True
-            # TODO: Do we need this infty_bar variable?
 
         landscape_idx = 0
         L = []

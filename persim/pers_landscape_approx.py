@@ -1,6 +1,6 @@
 """
     Persistence Landscape Approximate class
-    
+
     authors: Gabrielle Angeloro, Michael Catanzaro
 """
 
@@ -18,10 +18,10 @@ class PersLandscapeApprox(PersLandscape):
     Persistence Landscape Approximate class.
 
     This class implements an approximate version of Persistence Landscape,
-    given by sampling the landscape functions on a grid. This version is only an
-    approximation to the true landscape, but given a fine enough grid, this should
-    suffice for most applications. If an exact
-    calculation with no approximation is desired, consider `PersLandscapeExact`.
+    given by sampling the landscape functions on a grid. This version is only
+    an approximation to the true landscape, but given a fine enough grid, this
+    should suffice for most applications. If an exact calculation with no
+    approximation is desired, consider `PersLandscapeExact`.
 
     The default parameters for start and stop favor dgms over values. That
     is, if both dgms and values are passed but start and stop are not, the
@@ -88,7 +88,6 @@ class PersLandscapeApprox(PersLandscape):
                 raise ValueError("start parameter must be passed if values are passed.")
             if stop is None:
                 raise ValueError("stop parameter must be passed if values are passed.")
-                # stop = np.amax(values)
         self.start = start
         self.stop = stop
         self.values = values
@@ -181,8 +180,8 @@ class PersLandscapeApprox(PersLandscape):
         self.compute_landscape()
         grid_values = list(np.linspace(self.start, self.stop, self.num_steps))
         result = []
-        for l in self.values:
-            pairs = list(zip(grid_values, l))
+        for vals in self.values:
+            pairs = list(zip(grid_values, vals))
             result.append(pairs)
         return np.array(result)
 
@@ -264,7 +263,7 @@ class PersLandscapeApprox(PersLandscape):
 
 
 def snap_PL(
-    l: list, start: float = None, stop: float = None, num_steps: int = None
+    pls: list, start: float = None, stop: float = None, num_steps: int = None
 ) -> list:
     """Snap a list of PersLandscapeApprox tpes to a common grid
 
@@ -278,14 +277,14 @@ def snap_PL(
     possible from the input list `l`.
     """
     if start is None:
-        start = min(l, key=attrgetter("start")).start
+        start = min(pls, key=attrgetter("start")).start
     if stop is None:
-        stop = max(l, key=attrgetter("stop")).stop
+        stop = max(pls, key=attrgetter("stop")).stop
     if num_steps is None:
-        num_steps = max(l, key=attrgetter("num_steps")).num_steps
+        num_steps = max(pls, key=attrgetter("num_steps")).num_steps
     grid = np.linspace(start, stop, num_steps)
     k = []
-    for pl in l:
+    for pl in pls:
         snapped_landscape = []
         for funct in pl:
             # snap each function and store
@@ -346,8 +345,8 @@ def lc_approx(
     in `landscapes`
 
     """
-    l = snap_PL(landscapes, start=start, stop=stop, num_steps=num_steps)
-    return np.sum(np.array(coeffs) * np.array(l))
+    pl = snap_PL(landscapes, start=start, stop=stop, num_steps=num_steps)
+    return np.sum(np.array(coeffs) * np.array(pl))
 
 
 def average_approx(

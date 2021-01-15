@@ -1,6 +1,6 @@
 """
     Auxilary functions for working with persistence diagrams.
-    
+
     authors: Gabrielle Angeloro, Michael Catanzaro
 """
 
@@ -81,10 +81,10 @@ def union_crit_pairs(A, B):
     # zip functions in landscapes A and B and pad with None
     for a, b in list(itertools.zip_longest(A.critical_pairs, B.critical_pairs)):
         # B had more functions
-        if a == None:
+        if a is None:
             result_pairs.append(b)
         # A had more functions
-        elif b == None:
+        elif b is None:
             result_pairs.append(a)
         # A, B > pos_to_slope_interp > sum_slopes > slope_to_pos_interp
         else:
@@ -102,8 +102,7 @@ def union_crit_pairs(A, B):
 def pos_to_slope_interp(l: list) -> list:
     """Convert positions of critical pairs to (x-value, slope) pairs.
 
-    Intended
-    for internal use. Inverse function of `slope_to_pos_interp`.
+    Intended for internal use. Inverse function of `slope_to_pos_interp`.
 
     Result
     ------
