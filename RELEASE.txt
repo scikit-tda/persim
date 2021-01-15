@@ -1,3 +1,7 @@
+0.2.0
+    - New full featured implementation of Persistence Images.
+    - Legacy PersImage now deprecated.
+
 0.1.4
     - Migrate to a new CI/CD pipeline
 
