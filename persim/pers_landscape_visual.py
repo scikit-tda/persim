@@ -297,7 +297,7 @@ def plot_landscape_approx_simple(landscape: PersLandscapeApprox,
 
         plt.plot(domain, l, label=f"$\lambda_{{{depth}}}$", alpha=alpha)
 
-
+    
     plt.legend()
     if title: plt.title(title)
     plt.show()
