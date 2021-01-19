@@ -4,7 +4,6 @@
     authors: Gabrielle Angeloro, Michael Catanzaro
 """
 
-from __future__ import annotations
 import numpy as np
 from operator import itemgetter, attrgetter
 from .pers_landscape import PersLandscape
@@ -181,7 +180,7 @@ class PersLandscapeApprox(PersLandscape):
             result.append(pairs)
         return np.array(result)
 
-    def __add__(self, other: PersLandscapeApprox) -> PersLandscapeApprox:
+    def __add__(self, other):
         super().__add__(other)
         if self.start != other.start:
             raise ValueError("Start values of grids do not coincide")
@@ -198,7 +197,7 @@ class PersLandscapeApprox(PersLandscape):
             values=self_pad + other_pad,
         )
 
-    def __neg__(self) -> PersLandscapeApprox:
+    def __neg__(self):
         return PersLandscapeApprox(
             start=self.start,
             stop=self.stop,
@@ -211,7 +210,7 @@ class PersLandscapeApprox(PersLandscape):
     def __sub__(self, other):
         return self + -other
 
-    def __mul__(self, other: float) -> PersLandscapeApprox:
+    def __mul__(self, other: float):
         super().__mul__(other)
         return PersLandscapeApprox(
             start=self.start,
@@ -221,10 +220,10 @@ class PersLandscapeApprox(PersLandscape):
             values=np.array([other * depth_array for depth_array in self.values]),
         )
 
-    def __rmul__(self, other: float) -> PersLandscapeApprox:
+    def __rmul__(self, other: float):
         return self.__mul__(other)
 
-    def __truediv__(self, other: float) -> PersLandscapeApprox:
+    def __truediv__(self, other: float):
         super().__truediv__(other)
         return (1.0 / other) * self
 
