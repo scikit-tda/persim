@@ -227,7 +227,7 @@ def plot_landscape_approx(
         image = np.interp(
             domain,
             np.linspace(
-                start=landscape.start, stop=landscape.stop, num=landscape.num_dims
+                start=landscape.start, stop=landscape.stop, num=landscape.num_steps
             ),
             l,
         )

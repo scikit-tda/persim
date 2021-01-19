@@ -65,7 +65,7 @@ class PersLandscapeApprox(PersLandscape):
         dgms: list = [],
         hom_deg: int = 0,
         values=np.array([]),
-        compute: bool = False,
+        compute: bool = True,
     ) -> None:
 
         super().__init__(dgms=dgms, hom_deg=hom_deg)
