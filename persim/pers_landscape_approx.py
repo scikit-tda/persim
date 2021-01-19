@@ -72,10 +72,6 @@ class PersLandscapeApprox(PersLandscape):
         if dgms:  # diagrams are passed
             self.dgms = dgms[self.hom_deg]
             # remove infity values
-            # ~: indexes everything but values satisfying the condition
-            # axis = 1: checks the condition for each row
-            # np.any: if any element in the row satisfies the condition
-            # it gets indexed
             self.dgms = self.dgms[~np.any(self.dgms == np.inf, axis=1)]
             # calculate start and stop
             if start is None:
