@@ -81,20 +81,28 @@ class TestPersLandscapeApprox:
         """
         Test PersistenceLandscape
         """
-        diagrams = [np.array([[2, 6], [4, 10]])]
+        diagrams1 = [np.array([[2, 6], [4, 10]])]
         P1 = PersLandscapeApprox(
-            start=0, stop=10, num_steps=11, dgms=diagrams, hom_deg=0
+            start=0, stop=10, num_steps=11, dgms=diagrams1, hom_deg=0
         )
         P2 = PersLandscapeApprox(
-            start=0, stop=10, num_steps=6, dgms=diagrams, hom_deg=0
+            start=0, stop=10, num_steps=6, dgms=diagrams1, hom_deg=0
         )
         P3 = PersLandscapeApprox(
-            start=0, stop=10, num_steps=21, dgms=diagrams, hom_deg=0
+            start=0, stop=10, num_steps=21, dgms=diagrams1, hom_deg=0
         )
-
+        
+        #duplicate bars
+        diagrams2 = [np.array([[2, 6], [2, 6], [4, 10]])]
+        Q1 = PersLandscapeApprox(
+            start=0, stop=10, num_steps=11, dgms=diagrams1, hom_deg=0
+        )
+        
         P1.compute_landscape()
         P2.compute_landscape()
         P3.compute_landscape()
+        
+        Q1.compute_landscape()
 
         assert (
             P1.values
@@ -161,3 +169,20 @@ class TestPersLandscapeApprox:
                 ]
             )
         ).all()
+        
+        
+        assert (
+            Q1.values
+            == np.array(
+                [
+                    [0.0, 0.0, 0.0, 1.0, 2.0, 1.0, 2.0, 3.0, 2.0, 1.0, 0.0],
+                    [0.0, 0.0, 0.0, 1.0, 2.0, 1.0, 2.0, 3.0, 2.0, 1.0, 0.0],
+                    [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                ]
+            )
+        ).all()
+        
+        
+        
+        
+        
