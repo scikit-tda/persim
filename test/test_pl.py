@@ -97,7 +97,18 @@ class TestPersLandscapeApprox:
         Q1 = PersLandscapeApprox(
             start=0, stop=10, num_steps=11, dgms=diagrams2, hom_deg=0
         )
-
+        
+        #edge case: bars start same value
+        diagrams3 = [np.array([[3, 5], [3, 7]])]
+        Q2 = PersLandscapeApprox(
+            start=0, stop=10, num_steps=11, dgms=diagrams2, hom_deg=0
+        )
+        
+        #edge case: bars end same value
+        diagrams4 = [np.array([[2,6], [4,6]])]
+        Q3 = PersLandscapeApprox(
+            start=0, stop=10, num_steps=11, dgms=diagrams2, hom_deg=0
+        )
         assert (
             P1.values
             == np.array(
@@ -170,6 +181,26 @@ class TestPersLandscapeApprox:
             == np.array(
                 [
                     [0.0, 0.0, 0.0, 1.0, 2.0, 1.0, 2.0, 3.0, 2.0, 1.0, 0.0],
+                    [0.0, 0.0, 0.0, 1.0, 2.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                    [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                ]
+            )
+        ).all()
+        
+        assert (
+            Q2.values
+            == np.array(
+                [
+                    [0.0, 0.0, 0.0, 0.0, 1.0, 2.0, 1.0, 0.0, 0.0, 0.0, 0.0],
+                    [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                ]
+            )
+        ).all()
+        
+        assert (
+            Q3.values
+            == np.array(
+                [
                     [0.0, 0.0, 0.0, 1.0, 2.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
                     [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
                 ]
