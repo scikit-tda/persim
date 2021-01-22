@@ -1,8 +1,6 @@
 """
     Implementation of scikit-learn transformers for persistence
     landscapes.
-
-    authors: Gabrielle Angeloro, Michael Catanzaro
 """
 from operator import itemgetter
 from sklearn.base import BaseEstimator, TransformerMixin

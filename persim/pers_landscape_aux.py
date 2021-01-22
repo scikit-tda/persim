@@ -1,7 +1,5 @@
 """
     Auxilary functions for working with persistence diagrams.
-
-    authors: Gabrielle Angeloro, Michael Catanzaro
 """
 
 import itertools

@@ -1,7 +1,5 @@
 """
     Persistence Landscape Exact class
-
-    authors: Gabrielle Angeloro, Michael Catanzaro
 """
 
 import itertools

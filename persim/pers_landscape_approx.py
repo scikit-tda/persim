@@ -1,7 +1,5 @@
 """
     Persistence Landscape Approximate class
-
-    authors: Gabrielle Angeloro, Michael Catanzaro
 """
 
 import numpy as np
