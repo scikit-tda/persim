@@ -76,6 +76,7 @@ def plot_landscape_exact(
     padding: float=0.1,
     depth_padding: float=0.7,
     title=None,
+    ax=None,
 ):
     """
     A plot of the exact persistence landscape.
@@ -185,6 +186,7 @@ def plot_landscape_approx(
     padding: float = 0.1,
     depth_padding: float = 0.7,
     title=None,
+    ax=None,
 ):
     """
     A plot of the approximate persistence landscape.
