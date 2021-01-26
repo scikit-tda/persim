@@ -23,6 +23,7 @@ def plot_landscape(
     colormap="default",
     title=None,
     labels=None,
+    ax=None,
 ):
     """
     Plot landscape functions
@@ -34,6 +35,7 @@ def plot_landscape(
             colormap=colormap,
             title=title,
             labels=labels,
+            ax=ax,
         )
     if isinstance(landscape, PersLandscapeExact):
         return plot_landscape_exact(
@@ -42,32 +44,25 @@ def plot_landscape(
             colormap=colormap,
             title=title,
             labels=labels,
+            ax=ax,
         )
 
 
-def plot_landscape_simple(
-    landscape: PersLandscape,
-    alpha=1,
-    padding=0.1,
-    num_steps=1000,
-    title=None,
-):
+def plot_landscape_simple(landscape: PersLandscape,
+                   alpha=1,
+                   padding=0.1,
+                   num_steps=1000,
+                   title=None,
+                   ax=None,
+                   ):
     """
     plot landscape functions.
     """
     if isinstance(landscape, PersLandscapeExact):
-        return plot_landscape_exact_simple(
-            landscape=landscape, alpha=alpha, title=title
-        )
+        return plot_landscape_exact_simple(landscape=landscape, alpha=alpha, title=title, ax=ax)
 
     if isinstance(landscape, PersLandscapeApprox):
-        return plot_landscape_approx_simple(
-            landscape=landscape,
-            alpha=alpha,
-            padding=padding,
-            num_steps=num_steps,
-            title=title,
-        )
+        return plot_landscape_approx_simple(landscape=landscape, alpha=alpha, padding=padding, num_steps=num_steps, title=title, ax=ax)
 
 
 def plot_landscape_exact(
@@ -79,6 +74,7 @@ def plot_landscape_exact(
     padding: float = 0.1,
     depth_padding: float = 0.7,
     title=None,
+    ax=None,
 ):
     """
     A plot of the exact persistence landscape.
@@ -150,8 +146,10 @@ def plot_landscape_exact(
     ax.view_init(10, 90)
     plt.show()
 
-
-def plot_landscape_exact_simple(landscape: PersLandscapeExact, alpha=1, title=None):
+def plot_landscape_exact_simple(landscape: PersLandscapeExact,
+                   alpha = 1,
+                   title = None,
+                   ax=None):
     """
     A simple plot of the persistence landscape. This is a faster plotting utility than the standard plotting, but is recommended for smaller landscapes for ease of visualization.
 
@@ -162,7 +160,7 @@ def plot_landscape_exact_simple(landscape: PersLandscapeExact, alpha=1, title=No
         transparency of shading
 
     """
-    fig = plt.figure()
+    ax = ax or plt.gca()
     landscape.compute_landscape()
     crit_pairs = list(itertools.chain.from_iterable(landscape.critical_pairs))
     min_crit_pt = min(crit_pairs, key=itemgetter(0))[0]  # smallest birth time
@@ -172,11 +170,9 @@ def plot_landscape_exact_simple(landscape: PersLandscapeExact, alpha=1, title=No
     # for each landscape function
     for depth, l in enumerate(landscape):
         ls = np.array(l)
-        plt.plot(ls[:, 0], ls[:, 1], label=f"$\lambda_{{{depth}}}$", alpha=alpha)
-    plt.legend()
-    if title:
-        plt.title(title)
-    plt.show()
+        ax.plot(ls[:,0], ls[:,1], label=f'$\lambda_{{{depth}}}$', alpha=alpha)
+    ax.legend()
+    if title: ax.set_title(title)
 
 
 def plot_landscape_approx(
@@ -188,6 +184,7 @@ def plot_landscape_approx(
     padding: float = 0.1,
     depth_padding: float = 0.7,
     title=None,
+    ax=None,
 ):
     """
     A plot of the approximate persistence landscape.
@@ -266,9 +263,12 @@ def plot_landscape_approx(
     plt.show()
 
 
-def plot_landscape_approx_simple(
-    landscape: PersLandscapeApprox, alpha=1, padding=0.1, num_steps=1000, title=None
-):
+def plot_landscape_approx_simple(landscape: PersLandscapeApprox,
+                   alpha=1,
+                   padding=0.1,
+                   num_steps=1000,
+                   title=None,
+                   ax=None):
     """
     A simple plot of the persistence landscape. This is a faster plotting utility than the standard plotting, but is recommended for smaller landscapes for ease of visualization.
 
@@ -284,7 +284,7 @@ def plot_landscape_approx_simple(
         number of sampled points that are plotted
 
     """
-    fig = plt.figure()
+    ax = ax or plt.gca()
 
     landscape.compute_landscape()
 
@@ -302,9 +302,8 @@ def plot_landscape_approx_simple(
             landscape.start - padding * 0.1, landscape.stop + padding * 0.1, num=len(l)
         )
 
-        plt.plot(domain, l, label=f"$\lambda_{{{depth}}}$", alpha=alpha)
+        ax.plot(domain, l, label=f"$\lambda_{{{depth}}}$", alpha=alpha)
 
-    plt.legend()
-    if title:
-        plt.title(title)
-    plt.show()
+    
+    ax.legend()
+    if title: ax.set_title(title)
