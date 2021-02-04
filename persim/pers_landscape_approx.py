@@ -18,11 +18,13 @@ class PersLandscapeApprox(PersLandscape):
     given by sampling the landscape functions on a grid. This version is only
     an approximation to the true landscape, but given a fine enough grid, this
     should suffice for most applications. If an exact calculation with no
-    approximation is desired, consider `PersLandscapeExact`.
+    approximation is desired, consider `PersLandscapeExact`. Computations with this
+    class are much faster compared to `PersLandscapeExact` in general.
 
-    The default parameters for start and stop favor dgms over values. That
-    is, if both dgms and values are passed but start and stop are not, the
-    start and stop values will be determined by dgms.
+    The optional parameters `start`, `stop`, `num_steps` determine the approximating
+    grid that the values are sampled on. If both `dgms` and `values` are passed but `start`
+    and `stop` are not, `start` and `stop` will be determined by `dgms`.
+
 
     Parameters
     ----------
@@ -36,21 +38,84 @@ class PersLandscapeApprox(PersLandscape):
         The number of dimensions of the approximation, equivalently the
         number of steps in the grid.
 
-    dgms : list[list]
-        A list lists of birth-death pairs for each homological degree.
+    dgms : list of (-,2) numpy.ndarrays, optional
+        Nested list of numpy arrays, e.g., [array( array([:]), array([:]) ),..., array([:])].
+        Each entry in the list corresponds to a single homological degree.
+        Each array represents the birth-death pairs in that homological degree. This is
+        precisely the output format from ripser.py: ripser(data_user)['dgms'].
 
     hom_deg : int
-        represents the homology degree of the persistence diagram.
+        Represents the homology degree of the persistence diagram.
 
-    vales
+    values : numpy.ndarray, optional
+        The approximated values of the landscapes, indexed by depth.
 
-    Methods
-    -------
-
+    compute : bool, optional
+        Flag determining whether landscape functions are computed upon instantiation.
 
     Examples
     --------
+    Define a persistence diagram and instantiate the landscape::
 
+        >>> from persim import PersLandscapeApprox
+        >>> import numpy as np
+        >>> pd = [ np.array([[0,3],[1,4]]), np.array([[1,4]]) ]
+        >>> pla = PersLandscapeApprox(dgms=pd, hom_deg=0); pla
+
+        Approximate persistence landscape in homological degree 0 on grid from 0 to 4 with 500 steps
+
+    The `start` and `stop` parameters will be determined to be as tight as possible from `dgms` if they are not passed. They can be passed directly if desired::
+
+        >>> wide_pl = PersLandscapeApprox(dgms=pd, hom_deg=0, start=-1, stop=3.1415, num_steps=1000); wide_pl
+
+        Approximate persistence landscape in homological degree 0 on grid from -1 to 3.1415 with 1000 steps
+
+    The approximating values are stored in the `values` attribute::
+
+        >>> wide_pl.values
+
+        array([[0.        , 0.        , 0.        , ..., 0.00829129, 0.00414565,
+        0.        ],
+       [0.        , 0.        , 0.        , ..., 0.        , 0.        ,
+        0.        ]])
+
+    Arithmetic methods are implemented for approximate landscapes, so they can be summed, subtracted, and admit scalar multiplication.
+
+    .. note:: Landscapes must have the same grid parameters (`start`, `stop`, and `num_steps`) before any arithmetic is involved. See the `snap_PL` function for a method that will snap a list of landscapes onto a common grid.
+
+        >>> pla - wide_pl
+
+        ValueError: Start values of grids do not coincide
+
+        >>> from persim import snap_PL
+        >>> [snapped_pla, snapped_wide_pl] = snap_PL([pla,wide_pl])
+        >>> print(snapped_pla, snapped_wide_pl)
+
+        Approximate persistence landscape in homological degree 0 on grid from -1 to 4 with 1000 steps Approximate persistence landscape in homological degree 0 on grid from -1 to 4 with 1000 steps
+
+        >>> sum_pl = snapped_pla + snapped_wide_pl; sum_pl.values
+
+        array([[0.        , 0.        , 0.        , ..., 0.01001001, 0.00500501,
+        0.        ],
+       [0.        , 0.        , 0.        , ..., 0.        , 0.        ,
+        0.        ]])
+
+    Approximate landscapes are sliced by depth and slicing returns the approximated values in those depths::
+
+        >>> sum_pl[0]
+
+        array([0.00000000e+00, 0.00000000e+00, 0.00000000e+00, ...,
+               1.50150150e-02, 1.00100100e-02, 5.00500501e-03, 0.00000000e+00])
+
+    Norms are implemented for all `p` including the supremum norm::
+
+        >>> sum_pl.p_norm(p=5)
+
+        12.44665414332285
+
+        >>> sum_pl.sup_norm()
+
+        2.9958943943943943
 
     """
 
@@ -90,12 +155,20 @@ class PersLandscapeApprox(PersLandscape):
 
     def __repr__(self) -> str:
         return (
-            "The persistence landscape in homological "
+            "Approximate persistence landscape in homological "
             f"degree {self.hom_deg} on grid from {self.start} to {self.stop}"
             f" with {self.num_steps} steps"
         )
 
     def compute_landscape(self, verbose: bool = False) -> list:
+        """Computes the approximate landscape values
+
+        Parameters
+        ----------
+        verbose : bool, optional
+            If true, progress messages are printed during computation.
+
+        """
 
         verboseprint = print if verbose else lambda *a, **k: None
 
@@ -169,7 +242,7 @@ class PersLandscapeApprox(PersLandscape):
         return
 
     def values_to_pairs(self):
-        """Converts function values to ordered pairs and returns them."""
+        """Converts function values to ordered pairs and returns them"""
         self.compute_landscape()
         grid_values = list(np.linspace(self.start, self.stop, self.num_steps))
         result = []
@@ -179,6 +252,13 @@ class PersLandscapeApprox(PersLandscape):
         return np.array(result)
 
     def __add__(self, other):
+        """Computes the sum of two approximate persistence landscapes
+        
+        Parameters
+        ----------
+        other : PersLandscapeApprox
+            The other summand.
+        """
         super().__add__(other)
         if self.start != other.start:
             raise ValueError("Start values of grids do not coincide")
@@ -196,6 +276,7 @@ class PersLandscapeApprox(PersLandscape):
         )
 
     def __neg__(self):
+        """Negates an approximate persistence landscape"""
         return PersLandscapeApprox(
             start=self.start,
             stop=self.stop,
@@ -206,9 +287,23 @@ class PersLandscapeApprox(PersLandscape):
         pass
 
     def __sub__(self, other):
+        """Computes the difference of two approximate persistence landscapes
+        
+        Parameters
+        ----------
+        other : PersLandscapeApprox
+            The landscape to be subtracted.
+        """
         return self + -other
 
     def __mul__(self, other: float):
+        """Multiplies an approximate persistence landscape by a real scalar
+        
+        Parameters
+        ----------
+        other : float
+            The real scalar to be multiplied.
+        """
         super().__mul__(other)
         return PersLandscapeApprox(
             start=self.start,
@@ -219,9 +314,23 @@ class PersLandscapeApprox(PersLandscape):
         )
 
     def __rmul__(self, other: float):
+        """Multiplies an approximate persistence landscape by a real scalar
+        
+        Parameters
+        ----------
+        other : float
+            The real scalar factor.
+        """
         return self.__mul__(other)
 
     def __truediv__(self, other: float):
+        """Divides an approximate persistence landscape by a non-zero real scalar
+        
+        Parameters
+        ----------
+        other : float
+            The non-zero real scalar divisor.
+        """
         super().__truediv__(other)
         return (1.0 / other) * self
 
@@ -244,9 +353,21 @@ class PersLandscapeApprox(PersLandscape):
         return self.values[key]
 
     def p_norm(self, p: int = 2) -> float:
+        """
+        Returns the L_{`p`} norm of an approximate persistence landscape
+
+        Parameters
+        ----------
+        p: float, default 2
+            value p of the L_{`p`} norm
+        """
         return np.sum([np.linalg.norm(depth, p) for depth in self.values])
 
     def sup_norm(self) -> float:
+        """
+        Returns the supremum norm of an approximate persistence landscape
+
+        """
         return np.max(np.abs(self.values))
 
 

@@ -48,21 +48,26 @@ def plot_landscape(
         )
 
 
-def plot_landscape_simple(landscape: PersLandscape,
-                   alpha=1,
-                   padding=0.1,
-                   num_steps=1000,
-                   title=None,
-                   ax=None,
-                   ):
+def plot_landscape_simple(
+    landscape: PersLandscape, alpha=1, padding=0.1, num_steps=1000, title=None, ax=None,
+):
     """
     plot landscape functions.
     """
     if isinstance(landscape, PersLandscapeExact):
-        return plot_landscape_exact_simple(landscape=landscape, alpha=alpha, title=title, ax=ax)
+        return plot_landscape_exact_simple(
+            landscape=landscape, alpha=alpha, title=title, ax=ax
+        )
 
     if isinstance(landscape, PersLandscapeApprox):
-        return plot_landscape_approx_simple(landscape=landscape, alpha=alpha, padding=padding, num_steps=num_steps, title=title, ax=ax)
+        return plot_landscape_approx_simple(
+            landscape=landscape,
+            alpha=alpha,
+            padding=padding,
+            num_steps=num_steps,
+            title=title,
+            ax=ax,
+        )
 
 
 def plot_landscape_exact(
@@ -146,10 +151,10 @@ def plot_landscape_exact(
     ax.view_init(10, 90)
     plt.show()
 
-def plot_landscape_exact_simple(landscape: PersLandscapeExact,
-                   alpha = 1,
-                   title = None,
-                   ax=None):
+
+def plot_landscape_exact_simple(
+    landscape: PersLandscapeExact, alpha=1, title=None, ax=None
+):
     """
     A simple plot of the persistence landscape. This is a faster plotting utility than the standard plotting, but is recommended for smaller landscapes for ease of visualization.
 
@@ -170,9 +175,10 @@ def plot_landscape_exact_simple(landscape: PersLandscapeExact,
     # for each landscape function
     for depth, l in enumerate(landscape):
         ls = np.array(l)
-        ax.plot(ls[:,0], ls[:,1], label=f'$\lambda_{{{depth}}}$', alpha=alpha)
+        ax.plot(ls[:, 0], ls[:, 1], label=f"$\lambda_{{{depth}}}$", alpha=alpha)
     ax.legend()
-    if title: ax.set_title(title)
+    if title:
+        ax.set_title(title)
 
 
 def plot_landscape_approx(
@@ -263,12 +269,14 @@ def plot_landscape_approx(
     plt.show()
 
 
-def plot_landscape_approx_simple(landscape: PersLandscapeApprox,
-                   alpha=1,
-                   padding=0.1,
-                   num_steps=1000,
-                   title=None,
-                   ax=None):
+def plot_landscape_approx_simple(
+    landscape: PersLandscapeApprox,
+    alpha=1,
+    padding=0.1,
+    num_steps=1000,
+    title=None,
+    ax=None,
+):
     """
     A simple plot of the persistence landscape. This is a faster plotting utility than the standard plotting, but is recommended for smaller landscapes for ease of visualization.
 
@@ -304,6 +312,6 @@ def plot_landscape_approx_simple(landscape: PersLandscapeApprox,
 
         ax.plot(domain, l, label=f"$\lambda_{{{depth}}}$", alpha=alpha)
 
-    
     ax.legend()
-    if title: ax.set_title(title)
+    if title:
+        ax.set_title(title)
