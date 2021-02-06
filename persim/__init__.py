@@ -5,10 +5,12 @@ from .wasserstein import *
 from .heat import *
 from .gromov_hausdorff import *
 from .visuals import *
-from .pers_landscape_exact import *
-from .pers_landscape_approx import *
-from .pers_landscape_transformer import *
-from .pers_landscape_aux import *
-from .pers_landscape_visual import *
+from .landscapes import (
+    PersLandscapeExact, 
+    PersLandscapeApprox, 
+    PersistenceLandscaper,  
+    plot_landscape, 
+    plot_landscape_simple
+)
 
 from ._version import __version__

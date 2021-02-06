@@ -5,8 +5,8 @@
 from operator import itemgetter
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-from .pers_landscape_exact import PersLandscapeExact
-from .pers_landscape_approx import PersLandscapeApprox
+from .exact import PersLandscapeExact
+from .approximate import PersLandscapeApprox
 
 
 __all__ = ["PersistenceLandscaper"]

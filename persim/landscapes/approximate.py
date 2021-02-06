@@ -4,8 +4,8 @@
 
 import numpy as np
 from operator import itemgetter, attrgetter
-from .pers_landscape import PersLandscape
-from .pers_landscape_aux import union_vals, ndsnap_regular
+from .base import PersLandscape
+from .auxiliary import union_vals, ndsnap_regular
 
 __all__ = ["PersLandscapeApprox", "snap_PL", "lc_approx", "average_approx"]
 
