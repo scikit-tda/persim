@@ -8,6 +8,7 @@ import matplotlib as mpl
 from matplotlib import cm
 import matplotlib.pyplot as plt
 import numpy as np
+
 from .base import PersLandscape
 from .exact import PersLandscapeExact
 from .approximate import PersLandscapeApprox
@@ -49,7 +50,12 @@ def plot_landscape(
 
 
 def plot_landscape_simple(
-    landscape: PersLandscape, alpha=1, padding=0.1, num_steps=1000, title=None, ax=None,
+    landscape: PersLandscape,
+    alpha=1,
+    padding=0.1,
+    num_steps=1000,
+    title=None,
+    ax=None,
 ):
     """
     plot landscape functions.

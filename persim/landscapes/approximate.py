@@ -3,11 +3,11 @@
 """
 
 import numpy as np
-from operator import itemgetter, attrgetter
+from operator import itemgetter
 from .base import PersLandscape
 from .auxiliary import union_vals, ndsnap_regular
 
-__all__ = ["PersLandscapeApprox", "snap_PL", "lc_approx", "average_approx"]
+__all__ = ["PersLandscapeApprox"]
 
 
 class PersLandscapeApprox(PersLandscape):
@@ -253,7 +253,7 @@ class PersLandscapeApprox(PersLandscape):
 
     def __add__(self, other):
         """Computes the sum of two approximate persistence landscapes
-        
+
         Parameters
         ----------
         other : PersLandscapeApprox
@@ -288,7 +288,7 @@ class PersLandscapeApprox(PersLandscape):
 
     def __sub__(self, other):
         """Computes the difference of two approximate persistence landscapes
-        
+
         Parameters
         ----------
         other : PersLandscapeApprox
@@ -298,7 +298,7 @@ class PersLandscapeApprox(PersLandscape):
 
     def __mul__(self, other: float):
         """Multiplies an approximate persistence landscape by a real scalar
-        
+
         Parameters
         ----------
         other : float
@@ -315,7 +315,7 @@ class PersLandscapeApprox(PersLandscape):
 
     def __rmul__(self, other: float):
         """Multiplies an approximate persistence landscape by a real scalar
-        
+
         Parameters
         ----------
         other : float
@@ -325,7 +325,7 @@ class PersLandscapeApprox(PersLandscape):
 
     def __truediv__(self, other: float):
         """Divides an approximate persistence landscape by a non-zero real scalar
-        
+
         Parameters
         ----------
         other : float
@@ -369,131 +369,3 @@ class PersLandscapeApprox(PersLandscape):
 
         """
         return np.max(np.abs(self.values))
-
-
-############################################
-# End PersLandscapeApprox class definition #
-############################################
-
-
-def snap_PL(
-    pls: list, start: float = None, stop: float = None, num_steps: int = None
-) -> list:
-    """Snap a list of PersLandscapeApprox tpes to a common grid
-
-    Given a list `l` of PersLandscapeApprox types, convert them to a list
-    where each entry has the same start, stop, and num_steps. This puts each
-    entry of `l` on the same grid, so they can be added, averaged, etc.
-    This assumes they're all of the same homological degree.
-
-    If the user
-    does not specify the grid parameters, they are computed as tightly as
-    possible from the input list `l`.
-    """
-    if start is None:
-        start = min(pls, key=attrgetter("start")).start
-    if stop is None:
-        stop = max(pls, key=attrgetter("stop")).stop
-    if num_steps is None:
-        num_steps = max(pls, key=attrgetter("num_steps")).num_steps
-    grid = np.linspace(start, stop, num_steps)
-    k = []
-    for pl in pls:
-        snapped_landscape = []
-        for funct in pl:
-            # snap each function and store
-            snapped_landscape.append(
-                np.array(
-                    np.interp(grid, np.linspace(pl.start, pl.stop, pl.num_steps), funct)
-                )
-            )
-        # store snapped persistence landscape
-        k.append(
-            PersLandscapeApprox(
-                start=start,
-                stop=stop,
-                num_steps=num_steps,
-                values=np.array(snapped_landscape),
-                hom_deg=pl.hom_deg,
-            )
-        )
-    return k
-
-
-def lc_approx(
-    landscapes: list,
-    coeffs: list,
-    start: float = None,
-    stop: float = None,
-    num_steps: int = None,
-) -> PersLandscapeApprox:
-    """Compute the linear combination of a list of PersLandscapeApprox objects.
-
-    This uses vectorized arithmetic from numpy, so it should be faster and
-    more memory efficient than a naive for-loop.
-
-    Parameters
-    -------
-    landscapes: list
-        a list of PersLandscapeApprox objects
-
-    coeffs: list
-        a list of the coefficients defining the linear combination
-
-    start: float
-        starting value for the common grid for PersLandscapeApprox objects
-    in `landscapes`
-
-    stop: float
-        last value in the common grid for PersLandscapeApprox objects
-    in `landscapes`
-
-    num_steps: int
-        number of steps on the common grid for PersLandscapeApprox objects
-    in `landscapes`
-
-    Returns
-    -------
-    PersLandscapeApprox:
-        The specified linear combination of PersLandscapeApprox objects
-    in `landscapes`
-
-    """
-    pl = snap_PL(landscapes, start=start, stop=stop, num_steps=num_steps)
-    return np.sum(np.array(coeffs) * np.array(pl))
-
-
-def average_approx(
-    landscapes: list, start: float = None, stop: float = None, num_steps: int = None
-) -> PersLandscapeApprox:
-    """Compute the average of a list of PersLandscapeApprox objects.
-
-    Parameters
-    -------
-    landscapes: list
-        a list of PersLandscapeApprox objects
-
-    start: float, optional
-        starting value for the common grid for PersLandscapeApprox objects
-        in `landscapes`
-
-    stop: float, optional
-        last value in the common grid for PersLandscapeApprox objects
-        in `landscapes`
-
-    num_steps: int
-        number of steps on the common grid for PersLandscapeApprox objects
-        in `landscapes`
-
-    Returns
-    -------
-    PersLandscapeApprox:
-        The specified average of PersLandscapeApprox objects in `landscapes`
-    """
-    return lc_approx(
-        landscapes=landscapes,
-        coeffs=[1.0 / len(landscapes) for _ in landscapes],
-        start=start,
-        stop=stop,
-        num_steps=num_steps,
-    )
