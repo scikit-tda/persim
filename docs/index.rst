@@ -1,8 +1,9 @@
 |PyPI version| |Downloads| |Build Status| |Codecov| |License: MIT|
 
-Persim is a Python package for many tools used in analyzing Persistence Diagrams.  It currently houses implementations of 
+Persim is a Python package for many tools used in analyzing Persistence Diagrams.  It currently includes implementations of most of the popular methods of working with persistence diagrams, including
 
 - Persistence Images
+- Persistence Landscapes
 - Bottleneck distance
 - Modified Gromov--Hausdorff distance
 - Sliced Wasserstein Kernel
@@ -26,11 +27,11 @@ We welcome contributions of all shapes and sizes. There are lots of opportunitie
 
 To contribute please fork the project make your changes and submit a pull request. We will do our best to work through any issues with you and get your code merged into the main branch.
 
-
+Documentation
+--------------
 
 .. toctree::
     :maxdepth: 1
-    :hidden:
     :caption: User Guide
 
     notebooks/Persistence images
@@ -40,11 +41,12 @@ To contribute please fork the project make your changes and submit a pull reques
 
 .. toctree::
     :maxdepth: 1
-    :hidden:
     :caption: Tutorials
 
     notebooks/Classification with persistence images
     notebooks/Persistence barcode measure
+    notebooks/Differentiation with Persistence Landscapes
+    notebooks/Persistence Landscapes and Machine Learning
     
 
 .. |Downloads| image:: https://pypip.in/download/persim/badge.svg

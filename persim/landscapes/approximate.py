@@ -94,10 +94,9 @@ class PersLandscapeApprox(PersLandscape):
         Approximate persistence landscape in homological degree 0 on grid from -1 to 4 with 1000 steps Approximate persistence landscape in homological degree 0 on grid from -1 to 4 with 1000 steps
 
         >>> sum_pl = snapped_pla + snapped_wide_pl; sum_pl.values
-
         array([[0.        , 0.        , 0.        , ..., 0.01001001, 0.00500501,
         0.        ],
-       [0.        , 0.        , 0.        , ..., 0.        , 0.        ,
+        [0.        , 0.        , 0.        , ..., 0.        , 0.        ,
         0.        ]])
 
     Approximate landscapes are sliced by depth and slicing returns the approximated values in those depths::
