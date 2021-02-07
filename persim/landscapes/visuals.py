@@ -1,7 +1,5 @@
 """
     Visualization methods for plotting persistence landscapes.
-
-    authors: Gabrielle Angeloro, Michael Catanzaro, Calder Sheagren
 """
 
 import itertools
@@ -10,18 +8,19 @@ import matplotlib as mpl
 from matplotlib import cm
 import matplotlib.pyplot as plt
 import numpy as np
-from .pers_landscape import PersLandscape
-from .pers_landscape_exact import PersLandscapeExact
-from .pers_landscape_approx import PersLandscapeApprox
+
+from .base import PersLandscape
+from .exact import PersLandscapeExact
+from .approximate import PersLandscapeApprox
 
 mpl.rcParams["text.usetex"] = True
 
-__all__ = ['plot_landscape', 'plot_landscape_simple']
+__all__ = ["plot_landscape", "plot_landscape_simple"]
 
 
 def plot_landscape(
     landscape: PersLandscape,
-    num_steps: int=3000,
+    num_steps: int = 3000,
     colormap="default",
     title=None,
     labels=None,
@@ -50,31 +49,41 @@ def plot_landscape(
         )
 
 
-def plot_landscape_simple(landscape: PersLandscape,
-                   alpha=1,
-                   padding=0.1,
-                   num_steps=1000,
-                   title=None,
-                   ax=None,
-                   ):
+def plot_landscape_simple(
+    landscape: PersLandscape,
+    alpha=1,
+    padding=0.1,
+    num_steps=1000,
+    title=None,
+    ax=None,
+):
     """
-    plot landscape functions. 
+    plot landscape functions.
     """
     if isinstance(landscape, PersLandscapeExact):
-        return plot_landscape_exact_simple(landscape=landscape, alpha=alpha, title=title, ax=ax)
+        return plot_landscape_exact_simple(
+            landscape=landscape, alpha=alpha, title=title, ax=ax
+        )
 
     if isinstance(landscape, PersLandscapeApprox):
-        return plot_landscape_approx_simple(landscape=landscape, alpha=alpha, padding=padding, num_steps=num_steps, title=title, ax=ax)
+        return plot_landscape_approx_simple(
+            landscape=landscape,
+            alpha=alpha,
+            padding=padding,
+            num_steps=num_steps,
+            title=title,
+            ax=ax,
+        )
 
 
 def plot_landscape_exact(
     landscape: PersLandscapeExact,
-    num_steps: int=3000,
+    num_steps: int = 3000,
     colormap="default",
     alpha=0.8,
     labels=None,
-    padding: float=0.1,
-    depth_padding: float=0.7,
+    padding: float = 0.1,
+    depth_padding: float = 0.7,
     title=None,
     ax=None,
 ):
@@ -148,33 +157,34 @@ def plot_landscape_exact(
     ax.view_init(10, 90)
     plt.show()
 
-def plot_landscape_exact_simple(landscape: PersLandscapeExact,
-                   alpha = 1,
-                   title = None,
-                   ax=None):
+
+def plot_landscape_exact_simple(
+    landscape: PersLandscapeExact, alpha=1, title=None, ax=None
+):
     """
     A simple plot of the persistence landscape. This is a faster plotting utility than the standard plotting, but is recommended for smaller landscapes for ease of visualization.
-    
-    
+
+
     Parameters
     ----------
     alpha, default 1
         transparency of shading
-        
+
     """
     ax = ax or plt.gca()
     landscape.compute_landscape()
     crit_pairs = list(itertools.chain.from_iterable(landscape.critical_pairs))
-    min_crit_pt = min(crit_pairs, key=itemgetter(0))[0] # smallest birth time
-    max_crit_pt = max(crit_pairs, key=itemgetter(0))[0] # largest death time
-    max_crit_val = max(crit_pairs,key=itemgetter(1))[1] # largest peak of landscape
-    min_crit_val = min(crit_pairs, key=itemgetter(1))[1] # smallest peak of landscape
+    min_crit_pt = min(crit_pairs, key=itemgetter(0))[0]  # smallest birth time
+    max_crit_pt = max(crit_pairs, key=itemgetter(0))[0]  # largest death time
+    max_crit_val = max(crit_pairs, key=itemgetter(1))[1]  # largest peak of landscape
+    min_crit_val = min(crit_pairs, key=itemgetter(1))[1]  # smallest peak of landscape
     # for each landscape function
     for depth, l in enumerate(landscape):
         ls = np.array(l)
-        ax.plot(ls[:,0], ls[:,1], label=f'$\lambda_{{{depth}}}$', alpha=alpha)
+        ax.plot(ls[:, 0], ls[:, 1], label=f"$\lambda_{{{depth}}}$", alpha=alpha)
     ax.legend()
-    if title: ax.set_title(title)
+    if title:
+        ax.set_title(title)
 
 
 def plot_landscape_approx(
@@ -265,15 +275,17 @@ def plot_landscape_approx(
     plt.show()
 
 
-def plot_landscape_approx_simple(landscape: PersLandscapeApprox,
-                   alpha=1,
-                   padding=0.1,
-                   num_steps=1000,
-                   title=None,
-                   ax=None):
+def plot_landscape_approx_simple(
+    landscape: PersLandscapeApprox,
+    alpha=1,
+    padding=0.1,
+    num_steps=1000,
+    title=None,
+    ax=None,
+):
     """
     A simple plot of the persistence landscape. This is a faster plotting utility than the standard plotting, but is recommended for smaller landscapes for ease of visualization.
-    
+
     Parameters
     ----------
     alpha, default 1
@@ -281,10 +293,10 @@ def plot_landscape_approx_simple(landscape: PersLandscapeApprox,
 
     padding: float, default 0.1
         amount of empty grid shown to left and right of landscape functions
-        
+
     num_steps: int, default 1000
         number of sampled points that are plotted
-        
+
     """
     ax = ax or plt.gca()
 
@@ -292,18 +304,20 @@ def plot_landscape_approx_simple(landscape: PersLandscapeApprox,
 
     # TODO: RE the following line: is this better than np.concatenate?
     #       There is probably an even better way without creating an intermediary.
-    _vals = list(itertools.chain.from_iterable(landscape.values)) 
-    min_val = min(_vals) 
-    max_val = max(_vals) 
+    _vals = list(itertools.chain.from_iterable(landscape.values))
+    min_val = min(_vals)
+    max_val = max(_vals)
 
     # for each landscape function
     for depth, l in enumerate(landscape):
 
         # instantiate depth-specific domain
-        domain = np.linspace(landscape.start-padding*0.1, landscape.stop+padding*0.1, num=len(l))
+        domain = np.linspace(
+            landscape.start - padding * 0.1, landscape.stop + padding * 0.1, num=len(l)
+        )
 
         ax.plot(domain, l, label=f"$\lambda_{{{depth}}}$", alpha=alpha)
 
-    
     ax.legend()
-    if title: ax.set_title(title)
+    if title:
+        ax.set_title(title)

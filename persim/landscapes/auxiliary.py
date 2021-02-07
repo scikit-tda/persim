@@ -1,13 +1,15 @@
 """
     Auxilary functions for working with persistence diagrams.
-
-    authors: Gabrielle Angeloro, Michael Catanzaro
 """
 
 import itertools
 import numpy as np
 
-__all__ = ["death_vector", "linear_combination"]
+
+__all__ = [
+    "death_vector",
+    "linear_combination",
+]
 
 
 def death_vector(dgms: list, hom_deg: int = 0):
