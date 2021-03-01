@@ -139,6 +139,8 @@ class PersLandscapeExact(PersLandscape):
             self.dgms = dgms[self.hom_deg]
         else:  # critical pairs are passed. Is this the best check for this?
             self.dgms = dgms
+        if not dgms and not critical_pairs:
+            raise ValueError("dgms and critical_pairs cannot both be empty")
         self.max_depth = len(self.critical_pairs)
         if compute:
             self.compute_landscape()
