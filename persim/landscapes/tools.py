@@ -141,7 +141,7 @@ def average_approx(
 
 
 def vectorize(
-    l: PersLandscapeExact, start: float = None, stop: float = None, num_dims: int = 500
+    l: PersLandscapeExact, start: float = None, stop: float = None, num_steps: int = 500
 ) -> PersLandscapeApprox:
     """Converts a `PersLandscapeExact` type to a `PersLandscapeApprox` type.
 
@@ -162,10 +162,10 @@ def vectorize(
 
     l.compute_landscape()
     if start is None:
-        start = min(l.critical_pairs, key=itemgetter(0))[0]
+        start = min(l.critical_pairs[0], key=itemgetter(0))[0]
     if stop is None:
-        stop = max(l.critical_pairs, key=itemgetter(0))[0]
-    grid = np.linspace(start, stop, num_dims)
+        stop = max(l.critical_pairs[0], key=itemgetter(0))[0]
+    grid = np.linspace(start, stop, num_steps)
     result = []
     # creates sequential pairs of points for each lambda in critical_pairs
     for depth in l.critical_pairs:
@@ -174,7 +174,7 @@ def vectorize(
     return PersLandscapeApprox(
         start=start,
         stop=stop,
-        num_dims=num_dims,
+        num_steps=num_steps,
         hom_deg=l.hom_deg,
         values=np.array(result),
     )
