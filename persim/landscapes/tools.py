@@ -2,7 +2,6 @@
     Tools for working with exact and approximate persistence landscapes.
 """
 
-import itertools
 import numpy as np
 from operator import itemgetter, attrgetter
 
@@ -10,14 +9,38 @@ from .approximate import PersLandscapeApprox
 from .exact import PersLandscapeExact
 
 __all__ = [
+    "death_vector",
     "vectorize",
-    "snap_PL",
+    "snap_pl",
     "lc_approx",
     "average_approx",
 ]
 
 
-def snap_PL(
+def death_vector(dgms: list, hom_deg: int = 0):
+    """Returns the death vector in degree 0 for the persistence diagram
+
+    For Vietoris-Rips or Cech complexes, or any similar filtration, all bars in
+    homological degree 0 start at filtration value 0. Therefore, the discerning
+    information is the death values. The death vector is the vector of death times,
+    sorted from largest to smallest.
+
+    Parameters
+    ----------
+    dgms : list of persistence diagrams
+
+    hom_deg : int specifying the homological degree
+
+    """
+    if hom_deg != 0:
+        raise NotImplementedError(
+            "The death vector is not defined for "
+            "homological degrees greater than zero."
+        )
+    return sorted(dgms[hom_deg][:, 1], reverse=True)
+
+
+def snap_pl(
     pls: list, start: float = None, stop: float = None, num_steps: int = None
 ) -> list:
     """Snap a list of PersLandscapeApprox tpes to a common grid
@@ -71,7 +94,7 @@ def lc_approx(
     """Compute the linear combination of a list of PersLandscapeApprox objects.
 
     This uses vectorized arithmetic from numpy, so it should be faster and
-    more memory efficient than a naive for-loop.
+    more memory efficient than a standard for-loop.
 
     Parameters
     -------
@@ -100,7 +123,7 @@ def lc_approx(
     in `landscapes`
 
     """
-    pl = snap_PL(landscapes, start=start, stop=stop, num_steps=num_steps)
+    pl = snap_pl(landscapes, start=start, stop=stop, num_steps=num_steps)
     return np.sum(np.array(coeffs) * np.array(pl))
 
 

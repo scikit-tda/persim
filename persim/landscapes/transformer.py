@@ -3,11 +3,9 @@
     landscapes.
 """
 from operator import itemgetter
-import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 
 from .approximate import PersLandscapeApprox
-from .exact import PersLandscapeExact
 
 
 __all__ = ["PersistenceLandscaper"]
