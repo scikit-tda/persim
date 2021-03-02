@@ -5,7 +5,7 @@
 import numpy as np
 from operator import itemgetter
 from .base import PersLandscape
-from .auxiliary import union_vals, ndsnap_regular
+from .auxiliary import union_vals, ndsnap_regular, _p_norm
 
 __all__ = ["PersLandscapeApprox"]
 
@@ -364,7 +364,8 @@ class PersLandscapeApprox(PersLandscape):
         p: float, default 2
             value p of the L_{`p`} norm
         """
-        return np.sum([np.linalg.norm(depth, p) for depth in self.values])
+        super().p_norm(p=p)
+        return _p_norm(p=p, critical_pairs=self.values_to_pairs())
 
     def sup_norm(self) -> float:
         """

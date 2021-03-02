@@ -7,7 +7,7 @@ import numpy as np
 from operator import itemgetter
 
 from .approximate import PersLandscapeApprox
-from .auxiliary import union_crit_pairs
+from .auxiliary import union_crit_pairs, _p_norm
 from .base import PersLandscape
 
 __all__ = ["PersLandscapeExact"]
@@ -402,34 +402,8 @@ class PersLandscapeExact(PersLandscape):
         p: float, default 2
             value p of the L_{`p`} norm
         """
-        if p == -1:
-            return self.infinity_norm()
-        if p < -1 or -1 < p < 0:
-            raise ValueError(f"p can't be negative, but {p} was passed")
-        self.compute_landscape()
-        result = 0.0
-        for l in self.critical_pairs:
-            for [[x0, y0], [x1, y1]] in zip(l, l[1:]):
-                if y0 == y1:
-                    # horizontal line segment
-                    result += (np.abs(y0) ** p) * (x1 - x0)
-                    continue
-                # slope is well-defined
-                slope = (y1 - y0) / (x1 - x0)
-                b = y0 - slope * x0
-                # segment crosses the x-axis
-                if (y0 < 0 and y1 > 0) or (y0 > 0 and y1 < 0):
-                    z = -b / slope
-                    ev_x1 = (slope * x1 + b) ** (p + 1) / (slope * (p + 1))
-                    ev_x0 = (slope * x0 + b) ** (p + 1) / (slope * (p + 1))
-                    ev_z = (slope * z + +b) ** (p + 1) / (slope * (p + 1))
-                    result += np.abs(ev_x1 + ev_x0 - 2 * ev_z)
-                # segment does not cross the x-axis
-                else:
-                    ev_x1 = (slope * x1 + b) ** (p + 1) / (slope * (p + 1))
-                    ev_x0 = (slope * x0 + b) ** (p + 1) / (slope * (p + 1))
-                    result += np.abs(ev_x1 - ev_x0)
-        return (result) ** (1.0 / p)
+        super().p_norm(p=p)
+        return _p_norm(p=p, critical_pairs=self.critical_pairs)
 
     def sup_norm(self) -> float:
         """

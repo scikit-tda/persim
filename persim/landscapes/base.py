@@ -38,7 +38,11 @@ class PersLandscape(ABC):
 
     @abstractmethod
     def p_norm(self, p: int = 2) -> float:
-        pass
+        if p < -1 or -1 < p < 0:
+            raise ValueError(f"p can't be negative, but {p} was passed")
+        self.compute_landscape()
+        if p == -1:
+            return self.sup_norm()
 
     @abstractmethod
     def sup_norm(self) -> float:
