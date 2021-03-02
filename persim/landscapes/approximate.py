@@ -130,6 +130,8 @@ class PersLandscapeApprox(PersLandscape):
     ) -> None:
 
         super().__init__(dgms=dgms, hom_deg=hom_deg)
+        if not dgms and values.size == 0:
+            raise ValueError("dgms and values cannot both be emtpy")
         if dgms:  # diagrams are passed
             self.dgms = dgms[self.hom_deg]
             # remove infity values
@@ -142,9 +144,11 @@ class PersLandscapeApprox(PersLandscape):
         elif values.size > 0:  # values passed, diagrams weren't
             self.dgms = dgms
             if start is None:
-                raise ValueError("start parameter must be passed if values are passed.")
+                raise ValueError("start parameter must be passed if values are passed")
             if stop is None:
-                raise ValueError("stop parameter must be passed if values are passed.")
+                raise ValueError("stop parameter must be passed if values are passed")
+            if start > stop:
+                raise ValueError("start must be less than or equal to stop")
         self.start = start
         self.stop = stop
         self.values = values

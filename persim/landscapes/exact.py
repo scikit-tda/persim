@@ -240,6 +240,10 @@ class PersLandscapeExact(PersLandscape):
         list
             The critical pairs of the landscape function corresponding
         to depths given by key
+        
+        Note
+        ----
+        If the slice is beyond `self.max_depth` an IndexError is raised.
         """
         self.compute_landscape()
         return self.critical_pairs[key]
