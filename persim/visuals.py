@@ -67,23 +67,13 @@ def plot_diagrams(
 
     xlabel, ylabel = "Birth", "Death"
 
-    if labels is None:
-        # Provide default labels for diagrams if using self.dgm_
-        labels = [
-            "$H_0$",
-            "$H_1$",
-            "$H_2$",
-            "$H_3$",
-            "$H_4$",
-            "$H_5$",
-            "$H_6$",
-            "$H_7$",
-            "$H_8$",
-        ]
-
     if not isinstance(diagrams, list):
         # Must have diagrams as a list for processing downstream
         diagrams = [diagrams]
+
+    if labels is None:
+        # Provide default labels for diagrams if using self.dgm_
+        labels = ["$H_{{{}}}$".format(i) for i , _ in enumerate(diagrams)]
 
     if plot_only:
         diagrams = [diagrams[i] for i in plot_only]
