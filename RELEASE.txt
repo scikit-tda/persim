@@ -1,6 +1,9 @@
 0.3.0
     - Add implementations of Persistence Landscapes, including plotting methods, a transformer, and additional notebooks.
 
+0.2.1
+    - Allowed for more than 9 diagram labels in plot_persistence_diagrams.
+
 0.2.0
     - New full featured implementation of Persistence Images.
     - Legacy PersImage now deprecated.
