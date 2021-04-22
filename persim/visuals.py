@@ -195,6 +195,7 @@ def bottleneck_matching(I1, I2, matchidx, D, labels=["dgm1", "dgm2"], ax=None):
     persim.bottleneck_matching(A_h1, B_h1, matchidx, D)
 
     """
+    ax = ax or plt.gca()
 
     plot_diagrams([I1, I2], labels=labels, ax=ax)
     cp = np.cos(np.pi / 4)
@@ -246,6 +247,7 @@ def wasserstein_matching(I1, I2, matchidx, palette=None, labels=["dgm1", "dgm2"]
     persim.wasserstein_matching(A_h1, B_h1, matchidx, D)
 
     """
+    ax = ax or plt.gca()
 
     cp = np.cos(np.pi / 4)
     sp = np.sin(np.pi / 4)
