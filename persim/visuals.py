@@ -195,6 +195,7 @@ def bottleneck_matching(I1, I2, matchidx, D, labels=["dgm1", "dgm2"], ax=None):
     persim.bottleneck_matching(A_h1, B_h1, matchidx, D)
 
     """
+    ax = ax or plt.gca()
 
     plot_diagrams([I1, I2], labels=labels, ax=ax)
     cp = np.cos(np.pi / 4)
@@ -217,9 +218,9 @@ def bottleneck_matching(I1, I2, matchidx, D, labels=["dgm1", "dgm2"], ax=None):
     elif j >= I2.shape[0]:
         diagElem = np.array([I1Rot[i, 0], 0])
         diagElem = diagElem.dot(R.T)
-        plt.plot([I1[i, 0], diagElem[0]], [I1[i, 1], diagElem[1]], "g")
+        ax.plot([I1[i, 0], diagElem[0]], [I1[i, 1], diagElem[1]], "g")
     else:
-        plt.plot([I1[i, 0], I2[j, 0]], [I1[i, 1], I2[j, 1]], "g")
+        ax.plot([I1[i, 0], I2[j, 0]], [I1[i, 1], I2[j, 1]], "g")
 
 
 def wasserstein_matching(I1, I2, matchidx, palette=None, labels=["dgm1", "dgm2"], colors=None, ax=None):
@@ -246,6 +247,7 @@ def wasserstein_matching(I1, I2, matchidx, palette=None, labels=["dgm1", "dgm2"]
     persim.wasserstein_matching(A_h1, B_h1, matchidx, D)
 
     """
+    ax = ax or plt.gca()
 
     cp = np.cos(np.pi / 4)
     sp = np.sin(np.pi / 4)
@@ -267,8 +269,8 @@ def wasserstein_matching(I1, I2, matchidx, palette=None, labels=["dgm1", "dgm2"]
         elif j >= I2.shape[0]:
             diagElem = np.array([I1Rot[i, 0], 0])
             diagElem = diagElem.dot(R.T)
-            plt.plot([I1[i, 0], diagElem[0]], [I1[i, 1], diagElem[1]], "g")
+            ax.plot([I1[i, 0], diagElem[0]], [I1[i, 1], diagElem[1]], "g")
         else:
-            plt.plot([I1[i, 0], I2[j, 0]], [I1[i, 1], I2[j, 1]], "g")
+            ax.plot([I1[i, 0], I2[j, 0]], [I1[i, 1], I2[j, 1]], "g")
 
     plot_diagrams([I1, I2], labels=labels, ax=ax)
