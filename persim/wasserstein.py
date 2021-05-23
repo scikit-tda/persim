@@ -81,7 +81,7 @@ def wasserstein(dgm1, dgm2, matching=False):
     R = np.array([[cp, -sp], [sp, cp]])
     S = S[:, 0:2].dot(R)
     T = T[:, 0:2].dot(R)
-    D = np.inf*np.ones((M+N, M+N))
+    D = np.zeros((M+N, M+N))
     np.fill_diagonal(D, 0)
     D[0:M, 0:N] = DUL
     UR = np.inf*np.ones((M, M))
@@ -90,7 +90,6 @@ def wasserstein(dgm1, dgm2, matching=False):
     UL = np.inf*np.ones((N, N))
     np.fill_diagonal(UL, T[:, 1])
     D[M:N+M, 0:N] = UL
-    print(D)
 
     # Step 2: Run the hungarian algorithm
     matchi, matchj = optimize.linear_sum_assignment(D)
@@ -104,6 +103,8 @@ def wasserstein(dgm1, dgm2, matching=False):
         # Indicate diagonally matched points
         ret[ret[:, 0] >= M, 0] = -1
         ret[ret[:, 1] >= N, 1] = -1
+        # Exclude diagonal to diagonal
+        ret = ret[ret[:, 0] + ret[:, 1] != -2, :] 
         return matchdist, ret
 
     return matchdist

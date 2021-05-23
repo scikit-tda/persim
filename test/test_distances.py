@@ -183,10 +183,32 @@ class TestWasserstein:
         assert (np.allclose(dist1, np.sqrt(2)/2)) and (np.allclose(dist2, np.sqrt(2)/2))
     
     def test_repeated(self):
-        dgm1 = np.array([[0, 10], [0,10], [0,11]])
+        dgm1 = np.array([[0, 10], [0,10]])
         dgm2 = np.array([[0, 10]])
         dist = wasserstein(dgm1, dgm2)
-        assert dist == 10.5
+        assert dist == 5*np.sqrt(2)
+
+    def test_matching(self):
+        dgm1 = np.array([
+            [0.5, 1],
+            [0.6, 1.1]
+        ])
+        dgm2 = np.array([
+            [0.5, 1.1],
+            [0.6, 1.1],
+            [0.8, 1.1],
+            [1.0, 1.1],
+        ])
+
+        d, m = wasserstein(
+            dgm1, dgm2,
+            matching=True
+        )
+        u1 = np.unique(m[:, 0])
+        u1 = u1[u1 >= 0]
+        u2 = np.unique(m[:, 1])
+        u2 = u2[u2 >= 0]
+        assert u1.size == dgm1.shape[0] and u2.size == dgm2.shape[0]
 
 
 class TestSliced:
