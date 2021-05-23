@@ -180,6 +180,12 @@ class TestWasserstein:
         with pytest.warns(UserWarning, match="dgm2 has points with non-finite death") as w:
             dist2 = wasserstein(dgm, empty)
         assert (np.allclose(dist1, np.sqrt(2)/2)) and (np.allclose(dist2, np.sqrt(2)/2))
+    
+    def test_repeated(self):
+        dgm1 = np.array([[0, 10], [0,10], [0,11]])
+        dgm2 = np.array([[0, 10]])
+        dist = wasserstein(dgm1, dgm2)
+        assert dist == 10.5
 
 
 class TestSliced:
