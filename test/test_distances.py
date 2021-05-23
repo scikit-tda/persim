@@ -61,9 +61,7 @@ class TestBottleneck:
                 [0.5, 1.1]
             ])
         )
-
-        # These are very loose bounds
-        assert d == pytest.approx(0.1, 0.001)
+        assert d == 0.25
 
     def test_matching(self):
         dgm1 = np.array([
@@ -77,14 +75,15 @@ class TestBottleneck:
             [1.0, 1.1],
         ])
 
-        d, (m, D) = bottleneck(
+        d, m = bottleneck(
             dgm1, dgm2,
             matching=True
         )
-
-        # These are very loose bounds
-        assert len(m) == len(dgm1) + len(dgm2)
-        assert D.shape == (len(dgm1) + len(dgm2), len(dgm1) + len(dgm2))
+        u1 = np.unique(m[:, 0])
+        u1 = u1[u1 >= 0]
+        u2 = np.unique(m[:, 1])
+        u2 = u2[u2 >= 0]
+        assert u1.size == dgm1.shape[0] and u2.size == dgm2.shape[0]
     
     def test_matching_to_self(self):
         # Matching a diagram to itself should yield 0
@@ -121,6 +120,13 @@ class TestBottleneck:
         with pytest.warns(UserWarning, match="dgm2 has points with non-finite death") as w:
             dist2 = bottleneck(dgm, empty)
         assert (dist1 == 0.5) and (dist2 == 0.5)
+
+    def test_repeated(self):
+        # Issue #44
+        G = np.array([[ 0, 1], [0,1]])
+        H = np.array([[ 0, 1]])
+        dist = bottleneck(G, H)
+        assert dist == 0.5
 
 class TestWasserstein:
     def test_single(self):
@@ -175,6 +181,34 @@ class TestWasserstein:
         with pytest.warns(UserWarning, match="dgm2 has points with non-finite death") as w:
             dist2 = wasserstein(dgm, empty)
         assert (np.allclose(dist1, np.sqrt(2)/2)) and (np.allclose(dist2, np.sqrt(2)/2))
+    
+    def test_repeated(self):
+        dgm1 = np.array([[0, 10], [0,10]])
+        dgm2 = np.array([[0, 10]])
+        dist = wasserstein(dgm1, dgm2)
+        assert dist == 5*np.sqrt(2)
+
+    def test_matching(self):
+        dgm1 = np.array([
+            [0.5, 1],
+            [0.6, 1.1]
+        ])
+        dgm2 = np.array([
+            [0.5, 1.1],
+            [0.6, 1.1],
+            [0.8, 1.1],
+            [1.0, 1.1],
+        ])
+
+        d, m = wasserstein(
+            dgm1, dgm2,
+            matching=True
+        )
+        u1 = np.unique(m[:, 0])
+        u1 = u1[u1 >= 0]
+        u2 = np.unique(m[:, 1])
+        u2 = u2[u2 >= 0]
+        assert u1.size == dgm1.shape[0] and u2.size == dgm2.shape[0]
 
 
 class TestSliced:

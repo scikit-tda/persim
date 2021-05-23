@@ -198,8 +198,8 @@ class TestMatching:
             [0.3, 0.45]
         ])
 
-        d, (matching, D) = persim.bottleneck(dgm1, dgm2, matching=True)
-        persim.bottleneck_matching(dgm1, dgm2, matching, D)
+        d, matching = persim.bottleneck(dgm1, dgm2, matching=True)
+        persim.bottleneck_matching(dgm1, dgm2, matching)
 
     def test_plot_labels(self):
         dgm1 = np.array([
@@ -211,6 +211,6 @@ class TestMatching:
             [0.3, 0.45]
         ])
 
-        d, (matching, D) = persim.bottleneck(dgm1, dgm2, matching=True)
+        d, matching = persim.bottleneck(dgm1, dgm2, matching=True)
         persim.bottleneck_matching(
-            dgm1, dgm2, matching, D, labels=["X", "Y"])
+            dgm1, dgm2, matching, labels=["X", "Y"])
