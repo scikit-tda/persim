@@ -83,7 +83,8 @@ def bottleneck(dgm1, dgm2, matching=False):
 
     # Put diagonal elements into the matrix, being mindful that Linfinity
     # balls meet the diagonal line at a diamond vertex
-    D = np.zeros((M + N, M + N))
+    D = np.inf*np.ones((M + N, M + N))
+    np.fill_diagonal(D, 0)
     D[0:M, 0:N] = DUL
     UR = np.max(D) * np.ones((M, M))
     np.fill_diagonal(UR, 0.5 * (S[:, 1] - S[:, 0]))
@@ -95,7 +96,7 @@ def bottleneck(dgm1, dgm2, matching=False):
     # Step 2: Perform a binary search + Hopcroft Karp to find the
     # bottleneck distance
     M = D.shape[0]
-    ds = np.sort(np.unique(D.flatten()))
+    ds = np.sort(np.unique(D.flatten()))[0:-1] # Everything but np.inf
     bdist = ds[-1]
     matching = {}
     while len(ds) >= 1:

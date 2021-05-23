@@ -61,9 +61,7 @@ class TestBottleneck:
                 [0.5, 1.1]
             ])
         )
-
-        # These are very loose bounds
-        assert d == pytest.approx(0.1, 0.001)
+        assert d == 0.25
 
     def test_matching(self):
         dgm1 = np.array([
