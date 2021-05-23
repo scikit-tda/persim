@@ -122,6 +122,13 @@ class TestBottleneck:
             dist2 = bottleneck(dgm, empty)
         assert (dist1 == 0.5) and (dist2 == 0.5)
 
+    def test_repeated(self):
+        # Issue #44
+        G = np.array([[ 0, 1], [0,1]])
+        H = np.array([[ 0, 1]])
+        dist = bottleneck(G, H)
+        assert dist == 0.5
+
 class TestWasserstein:
     def test_single(self):
         d = wasserstein(
