@@ -75,14 +75,15 @@ class TestBottleneck:
             [1.0, 1.1],
         ])
 
-        d, (m, D) = bottleneck(
+        d, m = bottleneck(
             dgm1, dgm2,
             matching=True
         )
-
-        # These are very loose bounds
-        assert len(m) == len(dgm1) + len(dgm2)
-        assert D.shape == (len(dgm1) + len(dgm2), len(dgm1) + len(dgm2))
+        u1 = np.unique(m[:, 0])
+        u1 = u1[u1 >= 0]
+        u2 = np.unique(m[:, 1])
+        u2 = u2[u2 >= 0]
+        assert u1.size == dgm1.shape[0] and u2.size == dgm2.shape[0]
     
     def test_matching_to_self(self):
         # Matching a diagram to itself should yield 0

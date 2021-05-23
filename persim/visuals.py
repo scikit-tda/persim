@@ -168,20 +168,21 @@ def plot_diagrams(
 def plot_a_bar(p, q, c='b', linestyle='-'):
     plt.plot([p[0], q[0]], [p[1], q[1]], c=c, linestyle=linestyle, linewidth=1)
 
-def bottleneck_matching(I1, I2, matchidx, D, labels=["dgm1", "dgm2"], ax=None):
+def bottleneck_matching(dgm1, dgm2, matching, labels=["dgm1", "dgm2"], ax=None):
     """ Visualize bottleneck matching between two diagrams
 
     Parameters
     ===========
 
-    I1: array
-        A diagram
-    I2: array
-        A diagram
-    matchidx: tuples of matched indices
-        if input `matching=True`, then return matching
-    D: array
-        cross-similarity matrix
+    dgm1: Mx(>=2) 
+        array of birth/death pairs for PD 1
+    dgm2: Nx(>=2) 
+        array of birth/death paris for PD 2
+    matching: ndarray(Mx+Nx, 3)
+        A list of correspondences in an optimal matching, as well as their distance, where:
+        * First column is index of point in first persistence diagram, or -1 if diagonal
+        * Second column is index of point in second persistence diagram, or -1 if diagonal
+        * Third column is the distance of each matching
     labels: list of strings
         names of diagrams for legend. Default = ["dgm1", "dgm2"], 
     ax: matplotlib Axis object
@@ -191,50 +192,61 @@ def bottleneck_matching(I1, I2, matchidx, D, labels=["dgm1", "dgm2"], ax=None):
     Examples
     ==========
 
-    bn_matching, (matchidx, D) = persim.bottleneck(A_h1, B_h1, matching=True)
-    persim.bottleneck_matching(A_h1, B_h1, matchidx, D)
+    dist, matching = persim.bottleneck(A_h1, B_h1, matching=True)
+    persim.bottleneck_matching(A_h1, B_h1, matching)
 
     """
     ax = ax or plt.gca()
 
-    plot_diagrams([I1, I2], labels=labels, ax=ax)
+    plot_diagrams([dgm1, dgm2], labels=labels, ax=ax)
     cp = np.cos(np.pi / 4)
     sp = np.sin(np.pi / 4)
     R = np.array([[cp, -sp], [sp, cp]])
-    if I1.size == 0:
-        I1 = np.array([[0, 0]])
-    if I2.size == 0:
-        I2 = np.array([[0, 0]])
-    I1Rot = I1.dot(R)
-    I2Rot = I2.dot(R)
-    dists = [D[i, j] for (i, j) in matchidx]
-    (i, j) = matchidx[np.argmax(dists)]
-    if i >= I1.shape[0] and j >= I2.shape[0]:
-        return
-    if i >= I1.shape[0]:
-        diagElem = np.array([I2Rot[j, 0], 0])
-        diagElem = diagElem.dot(R.T)
-        plt.plot([I2[j, 0], diagElem[0]], [I2[j, 1], diagElem[1]], "g")
-    elif j >= I2.shape[0]:
-        diagElem = np.array([I1Rot[i, 0], 0])
-        diagElem = diagElem.dot(R.T)
-        ax.plot([I1[i, 0], diagElem[0]], [I1[i, 1], diagElem[1]], "g")
-    else:
-        ax.plot([I1[i, 0], I2[j, 0]], [I1[i, 1], I2[j, 1]], "g")
+    if dgm1.size == 0:
+        dgm1 = np.array([[0, 0]])
+    if dgm2.size == 0:
+        dgm2 = np.array([[0, 0]])
+    dgm1Rot = dgm1.dot(R)
+    dgm2Rot = dgm2.dot(R)
+    max_idx = np.argmax(matching[:, 2])
+    for idx, [i, j, d] in enumerate(matching):
+        i = int(i)
+        j = int(j)
+        linestyle = '--'
+        linewidth = 1
+        c = 'C2'
+        if idx == max_idx:
+            linestyle = '-'
+            linewidth = 2
+            c = 'C3'
+        if i != -1 or j != -1: # At least one point is a non-diagonal point
+            if i == -1:
+                diagElem = np.array([dgm2Rot[j, 0], 0])
+                diagElem = diagElem.dot(R.T)
+                plt.plot([dgm2[j, 0], diagElem[0]], [dgm2[j, 1], diagElem[1]], c, linewidth=linewidth, linestyle=linestyle)
+            elif j == -1:
+                diagElem = np.array([dgm1Rot[i, 0], 0])
+                diagElem = diagElem.dot(R.T)
+                ax.plot([dgm1[i, 0], diagElem[0]], [dgm1[i, 1], diagElem[1]], c, linewidth=linewidth, linestyle=linestyle)
+            else:
+                ax.plot([dgm1[i, 0], dgm2[j, 0]], [dgm1[i, 1], dgm2[j, 1]], c, linewidth=linewidth, linestyle=linestyle)
 
 
-def wasserstein_matching(I1, I2, matchidx, palette=None, labels=["dgm1", "dgm2"], colors=None, ax=None):
+def wasserstein_matching(dgm1, dgm2, matching, labels=["dgm1", "dgm2"], ax=None):
     """ Visualize bottleneck matching between two diagrams
 
     Parameters
     ===========
 
-    I1: array
+    dgm1: array
         A diagram
-    I2: array
+    dgm2: array
         A diagram
-    matchidx: tuples of matched indices
-        if input `matching=True`, then return matching
+    matching: ndarray(Mx+Nx, 3)
+        A list of correspondences in an optimal matching, as well as their distance, where:
+        * First column is index of point in first persistence diagram, or -1 if diagonal
+        * Second column is index of point in second persistence diagram, or -1 if diagonal
+        * Third column is the distance of each matching
     labels: list of strings
         names of diagrams for legend. Default = ["dgm1", "dgm2"], 
     ax: matplotlib Axis object
@@ -252,25 +264,25 @@ def wasserstein_matching(I1, I2, matchidx, palette=None, labels=["dgm1", "dgm2"]
     cp = np.cos(np.pi / 4)
     sp = np.sin(np.pi / 4)
     R = np.array([[cp, -sp], [sp, cp]])
-    if I1.size == 0:
-        I1 = np.array([[0, 0]])
-    if I2.size == 0:
-        I2 = np.array([[0, 0]])
-    I1Rot = I1.dot(R)
-    I2Rot = I2.dot(R)
-    for index in matchidx:
-        (i, j) = index
-        if i >= I1.shape[0] and j >= I2.shape[0]:
-            continue
-        if i >= I1.shape[0]:
-            diagElem = np.array([I2Rot[j, 0], 0])
-            diagElem = diagElem.dot(R.T)
-            plt.plot([I2[j, 0], diagElem[0]], [I2[j, 1], diagElem[1]], "g")
-        elif j >= I2.shape[0]:
-            diagElem = np.array([I1Rot[i, 0], 0])
-            diagElem = diagElem.dot(R.T)
-            ax.plot([I1[i, 0], diagElem[0]], [I1[i, 1], diagElem[1]], "g")
-        else:
-            ax.plot([I1[i, 0], I2[j, 0]], [I1[i, 1], I2[j, 1]], "g")
+    if dgm1.size == 0:
+        dgm1 = np.array([[0, 0]])
+    if dgm2.size == 0:
+        dgm2 = np.array([[0, 0]])
+    dgm1Rot = dgm1.dot(R)
+    dgm2Rot = dgm2.dot(R)
+    for [i, j, d] in matching:
+        i = int(i)
+        j = int(j)
+        if i != -1 or j != -1: # At least one point is a non-diagonal point
+            if i == -1:
+                diagElem = np.array([dgm2Rot[j, 0], 0])
+                diagElem = diagElem.dot(R.T)
+                plt.plot([dgm2[j, 0], diagElem[0]], [dgm2[j, 1], diagElem[1]], "g")
+            elif j == -1:
+                diagElem = np.array([dgm1Rot[i, 0], 0])
+                diagElem = diagElem.dot(R.T)
+                ax.plot([dgm1[i, 0], diagElem[0]], [dgm1[i, 1], diagElem[1]], "g")
+            else:
+                ax.plot([dgm1[i, 0], dgm2[j, 0]], [dgm1[i, 1], dgm2[j, 1]], "g")
 
-    plot_diagrams([I1, I2], labels=labels, ax=ax)
+    plot_diagrams([dgm1, dgm2], labels=labels, ax=ax)

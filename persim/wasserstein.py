@@ -70,7 +70,7 @@ def wasserstein(dgm1, dgm2, matching=False):
     if N == 0:
         T = np.array([[0, 0]])
         N = 1
-    # Step 1: Compute CSM between S and dgm2, including points on diagonal
+    # Compute CSM between S and dgm2, including points on diagonal
     DUL = metrics.pairwise.pairwise_distances(S, T)
 
     # Put diagonal elements into the matrix
@@ -81,14 +81,16 @@ def wasserstein(dgm1, dgm2, matching=False):
     R = np.array([[cp, -sp], [sp, cp]])
     S = S[:, 0:2].dot(R)
     T = T[:, 0:2].dot(R)
-    D = np.zeros((M+N, M+N))
+    D = np.inf*np.ones((M+N, M+N))
+    np.fill_diagonal(D, 0)
     D[0:M, 0:N] = DUL
-    UR = np.max(D)*np.ones((M, M))
+    UR = np.inf*np.ones((M, M))
     np.fill_diagonal(UR, S[:, 1])
     D[0:M, N:N+M] = UR
-    UL = np.max(D)*np.ones((N, N))
+    UL = np.inf*np.ones((N, N))
     np.fill_diagonal(UL, T[:, 1])
     D[M:N+M, 0:N] = UL
+    print(D)
 
     # Step 2: Run the hungarian algorithm
     matchi, matchj = optimize.linear_sum_assignment(D)
@@ -96,6 +98,12 @@ def wasserstein(dgm1, dgm2, matching=False):
 
     if matching:
         matchidx = [(i, j) for i, j in zip(matchi, matchj)]
-        return matchdist, (matchidx, D)
+        ret = np.zeros((len(matchidx), 3))
+        ret[:, 0:2] = np.array(matchidx)
+        ret[:, 2] = D[matchi, matchj]
+        # Indicate diagonally matched points
+        ret[ret[:, 0] >= M, 0] = -1
+        ret[ret[:, 1] >= N, 1] = -1
+        return matchdist, ret
 
     return matchdist

@@ -39,8 +39,11 @@ def bottleneck(dgm1, dgm2, matching=False):
 
     d: float
         bottleneck distance between dgm1 and dgm2
-    (matching, D): Only returns if `matching=True`
-        (tuples of matched indices, (N+M)x(N+M) cross-similarity matrix)
+    matching: ndarray(Mx+Nx, 3), Only returns if `matching=True`
+        A list of correspondences in an optimal matching, as well as their distance, where:
+        * First column is index of point in first persistence diagram, or -1 if diagonal
+        * Second column is index of point in second persistence diagram, or -1 if diagonal
+        * Third column is the distance of each matching
     """
 
     return_matching = matching
@@ -83,19 +86,21 @@ def bottleneck(dgm1, dgm2, matching=False):
 
     # Put diagonal elements into the matrix, being mindful that Linfinity
     # balls meet the diagonal line at a diamond vertex
-    D = np.inf*np.ones((M + N, M + N))
-    np.fill_diagonal(D, 0)
+    D = np.zeros((M + N, M + N))
+    # Upper left is Linfinity cross-similarity between two diagrams
     D[0:M, 0:N] = DUL
-    UR = np.max(D) * np.ones((M, M))
+    # Upper right is diagonal matching of points from S
+    UR = np.inf * np.ones((M, M))
     np.fill_diagonal(UR, 0.5 * (S[:, 1] - S[:, 0]))
     D[0:M, N::] = UR
-    UL = np.max(D) * np.ones((N, N))
+    # Lower left is diagonal matching of points from T
+    UL = np.inf * np.ones((N, N))
     np.fill_diagonal(UL, 0.5 * (T[:, 1] - T[:, 0]))
     D[M::, 0:N] = UL
+    # Lower right is all 0s by default (remaining diagonals match to diagonals)
 
     # Step 2: Perform a binary search + Hopcroft Karp to find the
     # bottleneck distance
-    M = D.shape[0]
     ds = np.sort(np.unique(D.flatten()))[0:-1] # Everything but np.inf
     bdist = ds[-1]
     matching = {}
@@ -105,10 +110,10 @@ def bottleneck(dgm1, dgm2, matching=False):
             idx = bisect_left(range(ds.size), int(ds.size / 2))
         d = ds[idx]
         graph = {}
-        for i in range(M):
-            graph["%s" % i] = {j for j in range(M) if D[i, j] <= d}
+        for i in range(D.shape[0]):
+            graph["{}".format(i)] = {j for j in range(D.shape[1]) if D[i, j] <= d}
         res = HopcroftKarp(graph).maximum_matching()
-        if len(res) == 2 * M and d <= bdist:
+        if len(res) == 2 * D.shape[0] and d <= bdist:
             bdist = d
             matching = res
             ds = ds[0:idx]
@@ -116,7 +121,18 @@ def bottleneck(dgm1, dgm2, matching=False):
             ds = ds[idx + 1::]
 
     if return_matching:
-        matchidx = [(i, matching["%i" % i]) for i in range(M)]
-        return bdist, (matchidx, D)
+        matchidx = []
+        for i in range(M+N):
+            j = matching["{}".format(i)]
+            d = D[i, j]
+            if i < M:
+                if j >= N:
+                    j = -1 # Diagonal match from first persistence diagram
+            else:
+                if j >= N: # Diagonal to diagonal, so don't include this
+                    continue
+                i = -1
+            matchidx.append([i, j, d])
+        return bdist, np.array(matchidx)
     else:
         return bdist
