@@ -21,22 +21,67 @@ __all__ = ["plot_landscape", "plot_landscape_simple"]
 def plot_landscape(
     landscape: PersLandscape,
     num_steps: int = 3000,
-    colormap="default",
+    color="default",
+    alpha: float = 0.8,
     title=None,
     labels=None,
+    padding: float = 0.1,
+    depth_spacing: float = 0.7,
     ax=None,
     depth_range=None,
 ):
     """
-    Plot landscape functions
+    A 3-dimensional plot of the exact persistence landscape.
+    
+    If the user wishes to modify the plot beyond the provided parameters, they
+    should create a matplotlib axis first and then pass it as the optional 'ax' 
+    parameter. This allows for easy modification of the plots after creation.
+
+    Warning: This function is quite slow, especially for large landscapes.
+
+    Parameters
+    ----------
+    landscape: PersLandscapeExact,
+        The persistence landscape to be plotted.
+        
+    num_steps: int, default 3000
+        The number of sampled points that are plotted.
+
+    color, defualt cm.viridis
+        The color scheme for shading of landscape functions.
+
+    alpha: float, default 0.8
+        The transparency of shading.
+        
+    title: string
+        The title of the plot.
+        
+    labels: list[string],
+        A list of strings specifying labels for the coordinate axes. 
+        Note that the second entry corresponds to the depth axis of the landscape.
+
+    padding: float, default 0.1
+        amount of empty grid shown to left and right of landscape functions
+
+    depth_spacing: float, default = 0.7
+        The amount of space between sequential landscape functions.
+        
+    ax: matplotlib axis, default = None
+        An optional parameter allowing the user to pass a matplotlib axis for later modification.
+        
+    depth_range: slice, default = None
+        Specifies a range of depths to be plotted. The default behavior is to plot all.
     """
     if isinstance(landscape, PersLandscapeApprox):
         return plot_landscape_approx(
             landscape=landscape,
             num_steps=num_steps,
-            colormap=colormap,
+            color=color,
+            alpha=alpha,
             title=title,
             labels=labels,
+            padding=padding,
+            depth_spacing=depth_spacing,
             ax=ax,
             depth_range=depth_range,
         )
@@ -44,9 +89,12 @@ def plot_landscape(
         return plot_landscape_exact(
             landscape=landscape,
             num_steps=num_steps,
-            colormap=colormap,
+            color=color,
+            alpha=alpha,
             title=title,
             labels=labels,
+            padding=padding,
+            depth_spacing=depth_spacing,
             ax=ax,
             depth_range=depth_range,
         )
@@ -63,12 +111,48 @@ def plot_landscape_simple(
     depth_range=None,
 ):
     """
-    plot landscape functions.
+    A 2-dimensional plot of the persistence landscape. This is a faster plotting 
+    utility than the standard plotting, but is recommended for smaller landscapes 
+    for ease of visualization.
+
+    If the user wishes to modify the plot beyond the provided parameters, they
+    should create a matplotlib axis first and then pass it as the optional 'ax' 
+    parameter. This allows for easy modification of the plots after creation.
+
+    Parameters
+    ----------
+    landscape: PersLandscape
+        The landscape to be plotted.
+    
+    alpha: float, default 1
+        The transparency of shading.
+
+    padding: float, default 0.1
+        The amount of empty space or margin shown to left and right of the
+        landscape functions.
+
+    num_steps: int, default 1000
+        The number of sampled points that are plotted. Only used for plotting 
+        PersLandscapeApprox classes.
+        
+    title: string
+        The title of the plot.
+        
+    ax: matplotlib axis, default = None
+        The axis to plot on.
+
+    labels: list[string],
+        A list of strings specifying labels for the coordinate axes.
+
+    depth_range: slice, default = None
+        Specifies a range of depths to be plotted. The default behavior is to plot all.
+
     """
     if isinstance(landscape, PersLandscapeExact):
         return plot_landscape_exact_simple(
             landscape=landscape,
             alpha=alpha,
+            padding=padding,
             title=title,
             ax=ax,
             labels=labels,
@@ -90,17 +174,17 @@ def plot_landscape_simple(
 def plot_landscape_exact(
     landscape: PersLandscapeExact,
     num_steps: int = 3000,
-    colormap="default",
+    color="default",
     alpha=0.8,
+    title=None,
     labels=None,
     padding: float = 0.1,
-    depth_padding: float = 0.7,
-    title=None,
+    depth_spacing: float = 0.7,
     ax=None,
     depth_range=None,
 ):
     """
-    A plot of the exact persistence landscape.
+    A 3-dimensional plot of the exact persistence landscape.
 
     Warning: This function is quite slow, especially for large landscapes.
 
@@ -133,7 +217,7 @@ def plot_landscape_exact(
 
     """
     fig = plt.figure()
-    plt.style.use(colormap)
+    plt.style.use(color)
     ax = fig.gca(projection="3d")
     landscape.compute_landscape()
     # itemgetter index selects which entry to take max/min wrt.
@@ -169,14 +253,14 @@ def plot_landscape_exact(
             # for coloring https://matplotlib.org/3.1.0/tutorials/colors/colormapnorms.html
             ax.plot(
                 [x, x],  # plotting a line to get shaded function
-                [depth_padding * depth, depth_padding * depth],
+                [depth_spacing * depth, depth_spacing * depth],
                 ztuple,
                 linewidth=0.5,
                 alpha=alpha,
                 # c=colormap(norm(z)))
                 c=scalarMap.to_rgba(z),
             )
-            ax.plot([x], [depth_padding * depth], [z], "k.", markersize=0.1)
+            ax.plot([x], [depth_spacing * depth], [z], "k.", markersize=0.1)
     ax.set_ylabel("depth")
     if labels:
         ax.set_xlabel(labels[0])
@@ -184,7 +268,7 @@ def plot_landscape_exact(
         ax.set_zlabel(labels[2])
     if title:
         plt.title(title)
-    ax.set_yticks(np.arange(0, depth * landscape.max_depth + 1, depth_padding))
+    ax.set_yticks(np.arange(0, depth * landscape.max_depth + 1, depth_spacing))
     ax.set_yticklabels(range(landscape.max_depth + 1))
     ax.view_init(10, 90)
     plt.show()
@@ -193,35 +277,43 @@ def plot_landscape_exact(
 def plot_landscape_exact_simple(
     landscape: PersLandscapeExact,
     alpha=1,
+    padding=0.1,
     title=None,
     ax=None,
     labels=None,
     depth_range=None,
 ):
     """
-    A simple plot of the persistence landscape. This is a faster plotting utility than the standard plotting, but is recommended for smaller landscapes for ease of visualization.
-
+    A 2-dimensional plot of the persistence landscape. This is a faster plotting 
+    utility than the standard plotting, but is recommended for smaller landscapes 
+    for ease of visualization.
 
     Parameters
     ----------
-    alpha, default 1
-        transparency of shading
+    landscape: PersLandscape
+        The landscape to be plotted.
+    
+    alpha: float, default 1
+        The transparency of shading.
+
+    padding: float, default 0.1
+        The amount of empty space or margin shown to left and right of the
+        landscape functions.
         
+    title: string
+        The title of the plot.
+        
+    ax: matplotlib axis, default = None
+        The axis to plot on.
+
     labels: list[string],
         A list of strings specifying labels for the coordinate axes.
-        
+
     depth_range: slice, default = None
         Specifies a range of depths to be plotted. The default behavior is to plot all.
     """
     ax = ax or plt.gca()
     landscape.compute_landscape()
-    crit_pairs = list(itertools.chain.from_iterable(landscape.critical_pairs))
-    min_crit_pt = min(crit_pairs, key=itemgetter(0))[0]  # smallest birth time
-    max_crit_pt = max(crit_pairs, key=itemgetter(0))[0]  # largest death time
-    max_crit_val = max(crit_pairs, key=itemgetter(1))[1]  # largest peak of landscape
-    min_crit_val = min(crit_pairs, key=itemgetter(1))[1]  # smallest peak of landscape
-    # for each landscape function
-
     if not depth_range:
         depth_range = range(landscape.max_depth + 1)
     for depth, l in enumerate(landscape):
@@ -240,12 +332,12 @@ def plot_landscape_exact_simple(
 def plot_landscape_approx(
     landscape: PersLandscapeApprox,
     num_steps: int = 3000,
-    colormap="default",
-    labels=None,
+    color="default",
     alpha=0.8,
-    padding: float = 0.1,
-    depth_padding: float = 0.7,
     title=None,
+    labels=None,
+    padding: float = 0.1,
+    depth_spacing: float = 0.7,
     ax=None,
     depth_range=None,
 ):
@@ -280,7 +372,7 @@ def plot_landscape_approx(
     """
     fig = plt.figure()
     ax = fig.gca(projection="3d")
-    plt.style.use(colormap)
+    plt.style.use(color)
     landscape.compute_landscape()
     # TODO: RE the following line: is this better than np.concatenate?
     #       There is probably an even better way without creating an intermediary.
@@ -319,20 +411,20 @@ def plot_landscape_approx(
             # for coloring https://matplotlib.org/3.1.0/tutorials/colors/colormapnorms.html
             ax.plot(
                 [x, x],  # plotting a line to get shaded function
-                [depth_padding * depth, depth_padding * depth],
+                [depth_spacing * depth, depth_spacing * depth],
                 ztuple,
                 linewidth=0.5,
                 alpha=alpha,
                 # c=colormap(norm(z)))
                 c=scalarMap.to_rgba(z),
             )
-            ax.plot([x], [depth_padding * depth], [z], "k.", markersize=0.1)
+            ax.plot([x], [depth_spacing * depth], [z], "k.", markersize=0.1)
     ax.set_ylabel("depth")
     if labels:
         ax.set_xlabel(labels[0])
         ax.set_ylabel(labels[1])
         ax.set_zlabel(labels[2])
-    ax.set_yticks(np.arange(0, depth * landscape.max_depth + 1, depth_padding))
+    ax.set_yticks(np.arange(0, depth * landscape.max_depth + 1, depth_spacing))
     ax.set_yticklabels(range(landscape.max_depth + 1))
     if title:
         plt.title(title)
@@ -351,35 +443,43 @@ def plot_landscape_approx_simple(
     depth_range=None,
 ):
     """
-    A simple plot of the persistence landscape. This is a faster plotting utility than the standard plotting, but is recommended for smaller landscapes for ease of visualization.
-
+    A 2-dimensional plot of the persistence landscape. This is a faster plotting 
+    utility than the standard plotting, but is recommended for smaller landscapes 
+    for ease of visualization.
+    
     Parameters
     ----------
-    alpha, default 1
-        transparency of shading
-
+    landscape: PersLandscape
+        The landscape to be plotted.
+    
+    alpha: float, default 1
+        The transparency of shading.
+    
     padding: float, default 0.1
-        amount of empty grid shown to left and right of landscape functions
-
+        The amount of empty space or margin shown to left and right of the
+        landscape functions.
+    
     num_steps: int, default 1000
-        number of sampled points that are plotted
-
+        The number of sampled points that are plotted. Only used for plotting 
+        PersLandscapeApprox classes.
+        
+    title: string
+        The title of the plot.
+        
+    ax: matplotlib axis, default = None
+        The axis to plot on.
+    
     labels: list[string],
         A list of strings specifying labels for the coordinate axes.
-
+    
     depth_range: slice, default = None
         Specifies a range of depths to be plotted. The default behavior is to plot all.
     """
+
     ax = ax or plt.gca()
-
     landscape.compute_landscape()
-
     # TODO: RE the following line: is this better than np.concatenate?
     #       There is probably an even better way without creating an intermediary.
-    _vals = list(itertools.chain.from_iterable(landscape.values))
-    min_val = min(_vals)
-    max_val = max(_vals)
-
     if not depth_range:
         depth_range = range(landscape.max_depth + 1)
     for depth, l in enumerate(landscape):
