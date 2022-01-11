@@ -25,7 +25,7 @@ def plot_landscape(
     alpha: float = 0.8,
     title=None,
     labels=None,
-    padding: float = 0.1,
+    padding: float = 0.0,
     depth_spacing: float = 0.7,
     ax=None,
     depth_range=None,
@@ -60,8 +60,9 @@ def plot_landscape(
         A list of strings specifying labels for the coordinate axes. 
         Note that the second entry corresponds to the depth axis of the landscape.
 
-    padding: float, default 0.1
-        amount of empty grid shown to left and right of landscape functions
+    padding: float, default 0.0
+        The amount of empty space or margin shown to left and right of the
+        landscape functions.
 
     depth_spacing: float, default = 0.7
         The amount of space between sequential landscape functions.
@@ -178,7 +179,7 @@ def plot_landscape_exact(
     alpha=0.8,
     title=None,
     labels=None,
-    padding: float = 0.1,
+    padding: float = 0.0,
     depth_spacing: float = 0.7,
     ax=None,
     depth_range=None,
@@ -206,7 +207,7 @@ def plot_landscape_exact(
         A list of strings specifying labels for the coordinate axes. 
         Note that the second entry corresponds to the depth axis of the landscape.
 
-    padding: float, default 0.1
+    padding: float, default 0.0
         amount of empty grid shown to left and right of landscape functions
 
     depth_padding: float, default = 0.7
@@ -230,9 +231,7 @@ def plot_landscape_exact(
     norm = mpl.colors.Normalize(vmin=min_crit_val, vmax=max_crit_val)
     scalarMap = mpl.cm.ScalarMappable(norm=norm)
     # x-axis for grid
-    domain = np.linspace(
-        min_crit_pt - padding * 0.1, max_crit_pt + padding * 0.1, num=num_steps
-    )
+    domain = np.linspace(min_crit_pt, max_crit_pt, num=num_steps)
     # for each landscape function
     if not depth_range:
         depth_range = range(landscape.max_depth + 1)
@@ -270,6 +269,7 @@ def plot_landscape_exact(
         plt.title(title)
     ax.set_yticks(np.arange(0, depth * landscape.max_depth + 1, depth_spacing))
     ax.set_yticklabels(range(landscape.max_depth + 1))
+    ax.margins(padding)
     ax.view_init(10, 90)
     plt.show()
 
@@ -322,6 +322,7 @@ def plot_landscape_exact_simple(
         ls = np.array(l)
         ax.plot(ls[:, 0], ls[:, 1], label=f"$\lambda_{{{depth}}}$", alpha=alpha)
     ax.legend()
+    ax.margins(padding)
     if title:
         ax.set_title(title)
     if labels:
@@ -336,7 +337,7 @@ def plot_landscape_approx(
     alpha=0.8,
     title=None,
     labels=None,
-    padding: float = 0.1,
+    padding: float = 0.0,
     depth_spacing: float = 0.7,
     ax=None,
     depth_range=None,
@@ -361,7 +362,7 @@ def plot_landscape_approx(
     alpha, default 0.8
         transparency of shading
 
-    padding: float, default 0.1
+    padding: float, default 0.0
         amount of empty grid shown to left and right of landscape functions
 
     depth_padding: float, default = 0.7
@@ -382,9 +383,7 @@ def plot_landscape_approx(
     norm = mpl.colors.Normalize(vmin=min_val, vmax=max_val)
     scalarMap = mpl.cm.ScalarMappable(norm=norm)
     # x-axis for grid
-    domain = np.linspace(
-        landscape.start - padding * 0.1, landscape.stop + padding * 0.1, num=num_steps
-    )
+    domain = np.linspace(landscape.start, landscape.stop, num=num_steps)
     # for each landscape function
     if not depth_range:
         depth_range = range(landscape.max_depth + 1)
@@ -426,6 +425,7 @@ def plot_landscape_approx(
         ax.set_zlabel(labels[2])
     ax.set_yticks(np.arange(0, depth * landscape.max_depth + 1, depth_spacing))
     ax.set_yticklabels(range(landscape.max_depth + 1))
+    ax.margins(padding)
     if title:
         plt.title(title)
     ax.view_init(10, 90)
@@ -486,12 +486,10 @@ def plot_landscape_approx_simple(
         if depth not in depth_range:
             continue
         # instantiate depth-specific domain
-        domain = np.linspace(
-            landscape.start - padding * 0.1, landscape.stop + padding * 0.1, num=len(l)
-        )
-
+        domain = np.linspace(landscape.start, landscape.stop, num=len(l))
         ax.plot(domain, l, label=f"$\lambda_{{{depth}}}$", alpha=alpha)
     ax.legend()
+    ax.margins(padding)
     if title:
         ax.set_title(title)
     if labels:
