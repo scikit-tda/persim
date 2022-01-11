@@ -56,15 +56,15 @@ def plot_landscape_simple(
     num_steps=1000,
     title=None,
     ax=None,
+    labels=None,
 ):
     """
     plot landscape functions.
     """
     if isinstance(landscape, PersLandscapeExact):
         return plot_landscape_exact_simple(
-            landscape=landscape, alpha=alpha, title=title, ax=ax
+            landscape=landscape, alpha=alpha, title=title, ax=ax, labels=labels
         )
-
     if isinstance(landscape, PersLandscapeApprox):
         return plot_landscape_approx_simple(
             landscape=landscape,
@@ -73,6 +73,7 @@ def plot_landscape_simple(
             num_steps=num_steps,
             title=title,
             ax=ax,
+            labels=labels,
         )
 
 
@@ -94,6 +95,9 @@ def plot_landscape_exact(
 
     Parameters
     ----------
+    landscape: PersLandscapeExact,
+        The persistence landscape to be plotted.
+        
     num_steps: int, default 3000
         number of sampled points that are plotted
 
@@ -102,6 +106,10 @@ def plot_landscape_exact(
 
     alpha, default 0.8
         transparency of shading
+        
+    labels: list[string],
+        A list of strings specifying labels for the coordinate axes. 
+        Note that the second entry corresponds to the depth axis of the landscape.
 
     padding: float, default 0.1
         amount of empty grid shown to left and right of landscape functions
@@ -151,7 +159,10 @@ def plot_landscape_exact(
                 c=scalarMap.to_rgba(z),
             )
             ax.plot([x], [depth_padding * depth], [z], "k.", markersize=0.1)
-    ax.set_ylabel("depth")
+    if labels:
+        ax.set_xlabel(labels[0])
+        ax.set_ylabel(labels[1])
+        ax.set_zlabel(labels[2])
     if title:
         plt.title(title)
     ax.view_init(10, 90)
@@ -159,7 +170,7 @@ def plot_landscape_exact(
 
 
 def plot_landscape_exact_simple(
-    landscape: PersLandscapeExact, alpha=1, title=None, ax=None
+    landscape: PersLandscapeExact, alpha=1, title=None, ax=None, labels=None
 ):
     """
     A simple plot of the persistence landscape. This is a faster plotting utility than the standard plotting, but is recommended for smaller landscapes for ease of visualization.
@@ -169,6 +180,10 @@ def plot_landscape_exact_simple(
     ----------
     alpha, default 1
         transparency of shading
+        
+    labels: list[string],
+        A list of strings specifying labels for the coordinate axes.
+        
 
     """
     ax = ax or plt.gca()
@@ -185,6 +200,9 @@ def plot_landscape_exact_simple(
     ax.legend()
     if title:
         ax.set_title(title)
+    if labels:
+        ax.set_xlabel(labels[0])
+        ax.set_ylabel(labels[1])
 
 
 def plot_landscape_approx(
@@ -210,6 +228,10 @@ def plot_landscape_approx(
 
     color, defualt cm.viridis
         color scheme for shading of landscape functions
+    
+    labels: list[string],
+        A list of strings specifying labels for the coordinate axes. 
+        Note that the second entry corresponds to the depth axis of the landscape.
 
     alpha, default 0.8
         transparency of shading
@@ -266,9 +288,10 @@ def plot_landscape_approx(
                 c=scalarMap.to_rgba(z),
             )
             ax.plot([x], [depth_padding * depth], [z], "k.", markersize=0.1)
-
-    # ax.set_xlabel('X')
-    ax.set_ylabel("depth")
+    if labels:
+        ax.set_xlabel(labels[0])
+        ax.set_ylabel(labels[1])
+        ax.set_zlabel(labels[2])
     if title:
         plt.title(title)
     ax.view_init(10, 90)
@@ -282,6 +305,7 @@ def plot_landscape_approx_simple(
     num_steps=1000,
     title=None,
     ax=None,
+    labels=None,
 ):
     """
     A simple plot of the persistence landscape. This is a faster plotting utility than the standard plotting, but is recommended for smaller landscapes for ease of visualization.
@@ -297,6 +321,8 @@ def plot_landscape_approx_simple(
     num_steps: int, default 1000
         number of sampled points that are plotted
 
+    labels: list[string],
+        A list of strings specifying labels for the coordinate axes.
     """
     ax = ax or plt.gca()
 
@@ -317,7 +343,9 @@ def plot_landscape_approx_simple(
         )
 
         ax.plot(domain, l, label=f"$\lambda_{{{depth}}}$", alpha=alpha)
-
     ax.legend()
     if title:
         ax.set_title(title)
+    if labels:
+        ax.set_xlabel(labels[0])
+        ax.set_ylabel(labels[1])
