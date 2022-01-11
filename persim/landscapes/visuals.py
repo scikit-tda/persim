@@ -478,8 +478,6 @@ def plot_landscape_approx_simple(
 
     ax = ax or plt.gca()
     landscape.compute_landscape()
-    # TODO: RE the following line: is this better than np.concatenate?
-    #       There is probably an even better way without creating an intermediary.
     if not depth_range:
         depth_range = range(landscape.max_depth + 1)
     for depth, l in enumerate(landscape):
