@@ -159,12 +159,15 @@ def plot_landscape_exact(
                 c=scalarMap.to_rgba(z),
             )
             ax.plot([x], [depth_padding * depth], [z], "k.", markersize=0.1)
+    ax.set_ylabel("depth")
     if labels:
         ax.set_xlabel(labels[0])
         ax.set_ylabel(labels[1])
         ax.set_zlabel(labels[2])
     if title:
         plt.title(title)
+    ax.set_yticks(np.arange(0, depth * landscape.max_depth + 1, depth_padding))
+    ax.set_yticklabels(range(landscape.max_depth + 1))
     ax.view_init(10, 90)
     plt.show()
 
@@ -288,10 +291,13 @@ def plot_landscape_approx(
                 c=scalarMap.to_rgba(z),
             )
             ax.plot([x], [depth_padding * depth], [z], "k.", markersize=0.1)
+    ax.set_ylabel("depth")
     if labels:
         ax.set_xlabel(labels[0])
         ax.set_ylabel(labels[1])
         ax.set_zlabel(labels[2])
+    ax.set_yticks(np.arange(0, depth * landscape.max_depth + 1, depth_padding))
+    ax.set_yticklabels(range(landscape.max_depth + 1))
     if title:
         plt.title(title)
     ax.view_init(10, 90)
