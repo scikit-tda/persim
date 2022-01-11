@@ -25,6 +25,7 @@ def plot_landscape(
     title=None,
     labels=None,
     ax=None,
+    depth_range=None,
 ):
     """
     Plot landscape functions
@@ -37,6 +38,7 @@ def plot_landscape(
             title=title,
             labels=labels,
             ax=ax,
+            depth_range=depth_range,
         )
     if isinstance(landscape, PersLandscapeExact):
         return plot_landscape_exact(
@@ -46,6 +48,7 @@ def plot_landscape(
             title=title,
             labels=labels,
             ax=ax,
+            depth_range=depth_range,
         )
 
 
@@ -57,13 +60,19 @@ def plot_landscape_simple(
     title=None,
     ax=None,
     labels=None,
+    depth_range=None,
 ):
     """
     plot landscape functions.
     """
     if isinstance(landscape, PersLandscapeExact):
         return plot_landscape_exact_simple(
-            landscape=landscape, alpha=alpha, title=title, ax=ax, labels=labels
+            landscape=landscape,
+            alpha=alpha,
+            title=title,
+            ax=ax,
+            labels=labels,
+            depth_range=depth_range,
         )
     if isinstance(landscape, PersLandscapeApprox):
         return plot_landscape_approx_simple(
@@ -74,6 +83,7 @@ def plot_landscape_simple(
             title=title,
             ax=ax,
             labels=labels,
+            depth_range=depth_range,
         )
 
 
@@ -87,6 +97,7 @@ def plot_landscape_exact(
     depth_padding: float = 0.7,
     title=None,
     ax=None,
+    depth_range=None,
 ):
     """
     A plot of the exact persistence landscape.
@@ -104,7 +115,7 @@ def plot_landscape_exact(
     color, defualt cm.viridis
         color scheme for shading of landscape functions
 
-    alpha, default 0.8
+    alpha: float, default 0.8
         transparency of shading
         
     labels: list[string],
@@ -116,6 +127,9 @@ def plot_landscape_exact(
 
     depth_padding: float, default = 0.7
         amount of space between sequential landscape functions
+        
+    depth_range: slice, default = None
+        Specifies a range of depths to be plotted. The default behavior is to plot all.
 
     """
     fig = plt.figure()
@@ -136,7 +150,11 @@ def plot_landscape_exact(
         min_crit_pt - padding * 0.1, max_crit_pt + padding * 0.1, num=num_steps
     )
     # for each landscape function
+    if not depth_range:
+        depth_range = range(landscape.max_depth + 1)
     for depth, l in enumerate(landscape):
+        if depth not in depth_range:
+            continue
         # sequential pairs in landscape
         xs, zs = zip(*l)
         image = np.interp(domain, xs, zs)
@@ -173,7 +191,12 @@ def plot_landscape_exact(
 
 
 def plot_landscape_exact_simple(
-    landscape: PersLandscapeExact, alpha=1, title=None, ax=None, labels=None
+    landscape: PersLandscapeExact,
+    alpha=1,
+    title=None,
+    ax=None,
+    labels=None,
+    depth_range=None,
 ):
     """
     A simple plot of the persistence landscape. This is a faster plotting utility than the standard plotting, but is recommended for smaller landscapes for ease of visualization.
@@ -187,7 +210,8 @@ def plot_landscape_exact_simple(
     labels: list[string],
         A list of strings specifying labels for the coordinate axes.
         
-
+    depth_range: slice, default = None
+        Specifies a range of depths to be plotted. The default behavior is to plot all.
     """
     ax = ax or plt.gca()
     landscape.compute_landscape()
@@ -197,7 +221,12 @@ def plot_landscape_exact_simple(
     max_crit_val = max(crit_pairs, key=itemgetter(1))[1]  # largest peak of landscape
     min_crit_val = min(crit_pairs, key=itemgetter(1))[1]  # smallest peak of landscape
     # for each landscape function
+
+    if not depth_range:
+        depth_range = range(landscape.max_depth + 1)
     for depth, l in enumerate(landscape):
+        if depth not in depth_range:
+            continue
         ls = np.array(l)
         ax.plot(ls[:, 0], ls[:, 1], label=f"$\lambda_{{{depth}}}$", alpha=alpha)
     ax.legend()
@@ -218,6 +247,7 @@ def plot_landscape_approx(
     depth_padding: float = 0.7,
     title=None,
     ax=None,
+    depth_range=None,
 ):
     """
     A plot of the approximate persistence landscape.
@@ -245,6 +275,8 @@ def plot_landscape_approx(
     depth_padding: float, default = 0.7
         amount of space between sequential landscape functions
 
+    depth_range: slice, default = None
+        Specifies a range of depths to be plotted. The default behavior is to plot all.
     """
     fig = plt.figure()
     ax = fig.gca(projection="3d")
@@ -262,7 +294,11 @@ def plot_landscape_approx(
         landscape.start - padding * 0.1, landscape.stop + padding * 0.1, num=num_steps
     )
     # for each landscape function
+    if not depth_range:
+        depth_range = range(landscape.max_depth + 1)
     for depth, l in enumerate(landscape):
+        if depth not in depth_range:
+            continue
         # sequential pairs in landscape
         # xs, zs = zip(*l)
         image = np.interp(
@@ -312,6 +348,7 @@ def plot_landscape_approx_simple(
     title=None,
     ax=None,
     labels=None,
+    depth_range=None,
 ):
     """
     A simple plot of the persistence landscape. This is a faster plotting utility than the standard plotting, but is recommended for smaller landscapes for ease of visualization.
@@ -329,6 +366,9 @@ def plot_landscape_approx_simple(
 
     labels: list[string],
         A list of strings specifying labels for the coordinate axes.
+
+    depth_range: slice, default = None
+        Specifies a range of depths to be plotted. The default behavior is to plot all.
     """
     ax = ax or plt.gca()
 
@@ -340,9 +380,11 @@ def plot_landscape_approx_simple(
     min_val = min(_vals)
     max_val = max(_vals)
 
-    # for each landscape function
+    if not depth_range:
+        depth_range = range(landscape.max_depth + 1)
     for depth, l in enumerate(landscape):
-
+        if depth not in depth_range:
+            continue
         # instantiate depth-specific domain
         domain = np.linspace(
             landscape.start - padding * 0.1, landscape.stop + padding * 0.1, num=len(l)
