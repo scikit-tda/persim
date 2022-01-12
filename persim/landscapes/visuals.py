@@ -5,7 +5,6 @@
 import itertools
 from operator import itemgetter
 import matplotlib as mpl
-from matplotlib import cm
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -31,9 +30,9 @@ def plot_landscape(
 ):
     """
     A 3-dimensional plot of the exact persistence landscape.
-    
+
     If the user wishes to modify the plot beyond the provided parameters, they
-    should create a matplotlib axis first and then pass it as the optional 'ax' 
+    should create a matplotlib axis first and then pass it as the optional 'ax'
     parameter. This allows for easy modification of the plots after creation.
 
     Warning: This function is quite slow, especially for large landscapes.
@@ -42,7 +41,7 @@ def plot_landscape(
     ----------
     landscape: PersLandscapeExact,
         The persistence landscape to be plotted.
-        
+
     num_steps: int, default 3000
         The number of sampled points that are plotted.
 
@@ -51,21 +50,21 @@ def plot_landscape(
 
     alpha: float, default 0.8
         The transparency of shading.
-        
+
     title: string
         The title of the plot.
-        
+
     labels: list[string],
-        A list of strings specifying labels for the coordinate axes. 
+        A list of strings specifying labels for the coordinate axes.
         Note that the second entry corresponds to the depth axis of the landscape.
 
     padding: float, default 0.0
         The amount of empty space or margin shown to left and right of the
         landscape functions.
-     
+
     ax: matplotlib axis, default = None
         An optional parameter allowing the user to pass a matplotlib axis for later modification.
-        
+
     depth_range: slice, default = None
         Specifies a range of depths to be plotted. The default behavior is to plot all.
     """
@@ -106,19 +105,19 @@ def plot_landscape_simple(
     depth_range=None,
 ):
     """
-    A 2-dimensional plot of the persistence landscape. This is a faster plotting 
-    utility than the standard plotting, but is recommended for smaller landscapes 
+    A 2-dimensional plot of the persistence landscape. This is a faster plotting
+    utility than the standard plotting, but is recommended for smaller landscapes
     for ease of visualization.
 
     If the user wishes to modify the plot beyond the provided parameters, they
-    should create a matplotlib axis first and then pass it as the optional 'ax' 
+    should create a matplotlib axis first and then pass it as the optional 'ax'
     parameter. This allows for easy modification of the plots after creation.
 
     Parameters
     ----------
     landscape: PersLandscape
         The landscape to be plotted.
-    
+
     alpha: float, default 1
         The transparency of shading.
 
@@ -127,12 +126,12 @@ def plot_landscape_simple(
         landscape functions.
 
     num_steps: int, default 1000
-        The number of sampled points that are plotted. Only used for plotting 
+        The number of sampled points that are plotted. Only used for plotting
         PersLandscapeApprox classes.
-        
+
     title: string
         The title of the plot.
-        
+
     ax: matplotlib axis, default = None
         The axis to plot on.
 
@@ -186,7 +185,7 @@ def plot_landscape_exact(
     ----------
     landscape: PersLandscapeExact,
         The persistence landscape to be plotted.
-        
+
     num_steps: int, default 3000
         number of sampled points that are plotted
 
@@ -195,21 +194,21 @@ def plot_landscape_exact(
 
     alpha: float, default 0.8
         transparency of shading
-        
+
     labels: list[string],
-        A list of strings specifying labels for the coordinate axes. 
+        A list of strings specifying labels for the coordinate axes.
         Note that the second entry corresponds to the depth axis of the landscape.
 
     padding: float, default 0.0
         amount of empty grid shown to left and right of landscape functions
-        
+
     depth_range: slice, default = None
         Specifies a range of depths to be plotted. The default behavior is to plot all.
 
     """
     fig = plt.figure()
     plt.style.use(color)
-    ax = fig.gca(projection="3d")
+    ax = fig.add_subplot(projection="3d")
     landscape.compute_landscape()
     # itemgetter index selects which entry to take max/min wrt.
     # the hanging [0] or [1] takes that entry.
@@ -272,25 +271,25 @@ def plot_landscape_exact_simple(
     depth_range=None,
 ):
     """
-    A 2-dimensional plot of the persistence landscape. This is a faster plotting 
-    utility than the standard plotting, but is recommended for smaller landscapes 
+    A 2-dimensional plot of the persistence landscape. This is a faster plotting
+    utility than the standard plotting, but is recommended for smaller landscapes
     for ease of visualization.
 
     Parameters
     ----------
     landscape: PersLandscape
         The landscape to be plotted.
-    
+
     alpha: float, default 1
         The transparency of shading.
 
     padding: float, default 0.1
         The amount of empty space or margin shown to left and right of the
         landscape functions.
-        
+
     title: string
         The title of the plot.
-        
+
     ax: matplotlib axis, default = None
         The axis to plot on.
 
@@ -341,9 +340,9 @@ def plot_landscape_approx(
 
     color, defualt cm.viridis
         color scheme for shading of landscape functions
-    
+
     labels: list[string],
-        A list of strings specifying labels for the coordinate axes. 
+        A list of strings specifying labels for the coordinate axes.
         Note that the second entry corresponds to the depth axis of the landscape.
 
     alpha, default 0.8
@@ -356,8 +355,8 @@ def plot_landscape_approx(
         Specifies a range of depths to be plotted. The default behavior is to plot all.
     """
     fig = plt.figure()
-    ax = fig.gca(projection="3d")
     plt.style.use(color)
+    ax = fig.add_subplot(projection="3d")
     landscape.compute_landscape()
     # TODO: RE the following line: is this better than np.concatenate?
     #       There is probably an even better way without creating an intermediary.
@@ -425,35 +424,35 @@ def plot_landscape_approx_simple(
     depth_range=None,
 ):
     """
-    A 2-dimensional plot of the persistence landscape. This is a faster plotting 
-    utility than the standard plotting, but is recommended for smaller landscapes 
+    A 2-dimensional plot of the persistence landscape. This is a faster plotting
+    utility than the standard plotting, but is recommended for smaller landscapes
     for ease of visualization.
-    
+
     Parameters
     ----------
     landscape: PersLandscape
         The landscape to be plotted.
-    
+
     alpha: float, default 1
         The transparency of shading.
-    
+
     padding: float, default 0.1
         The amount of empty space or margin shown to left and right of the
         landscape functions.
-    
+
     num_steps: int, default 1000
-        The number of sampled points that are plotted. Only used for plotting 
+        The number of sampled points that are plotted. Only used for plotting
         PersLandscapeApprox classes.
-        
+
     title: string
         The title of the plot.
-        
+
     ax: matplotlib axis, default = None
         The axis to plot on.
-    
+
     labels: list[string],
         A list of strings specifying labels for the coordinate axes.
-    
+
     depth_range: slice, default = None
         Specifies a range of depths to be plotted. The default behavior is to plot all.
     """
