@@ -1,3 +1,7 @@
+0.3.2
+    - Fixed plotting methods of Persistence Landscapes, added doc strings.
+    - Updated notebooks.
+
 0.3.1
     - Fixed bug with repeated intervals in bottleneck
     - Tidied up API for indicating matchings for bottleneck and wasserstein, and updated notebook

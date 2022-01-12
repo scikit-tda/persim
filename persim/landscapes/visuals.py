@@ -22,24 +22,25 @@ def plot_landscape(
     num_steps: int = 3000,
     color="default",
     alpha: float = 0.8,
-    title=None,
-    labels=None,
+    title: None,
+    labels: None,
     padding: float = 0.0,
     ax=None,
     depth_range=None,
 ):
     """
-    A 3-dimensional plot of the exact persistence landscape.
+    A 3-dimensional plot of a persistence landscape.
 
     If the user wishes to modify the plot beyond the provided parameters, they
-    should create a matplotlib axis first and then pass it as the optional 'ax'
-    parameter. This allows for easy modification of the plots after creation.
+    should create a matplotlib.pyplot figure axis first and then pass it as the 
+    optional 'ax' parameter. This allows for easy modification of the plots 
+    after creation.
 
     Warning: This function is quite slow, especially for large landscapes.
 
     Parameters
     ----------
-    landscape: PersLandscapeExact,
+    landscape: PersLandscape,
         The persistence landscape to be plotted.
 
     num_steps: int, default 3000
@@ -60,7 +61,7 @@ def plot_landscape(
 
     padding: float, default 0.0
         The amount of empty space or margin shown to left and right of the
-        landscape functions.
+        axis within the figure.
 
     ax: matplotlib axis, default = None
         An optional parameter allowing the user to pass a matplotlib axis for later modification.
@@ -110,7 +111,7 @@ def plot_landscape_simple(
     for ease of visualization.
 
     If the user wishes to modify the plot beyond the provided parameters, they
-    should create a matplotlib axis first and then pass it as the optional 'ax'
+    should create a matplotlib.figure axis first and then pass it as the optional 'ax'
     parameter. This allows for easy modification of the plots after creation.
 
     Parameters
@@ -187,20 +188,20 @@ def plot_landscape_exact(
         The persistence landscape to be plotted.
 
     num_steps: int, default 3000
-        number of sampled points that are plotted
+        The number of sampled points that are plotted.
 
-    color, defualt cm.viridis
-        color scheme for shading of landscape functions
+    color, default cm.viridis
+        The color scheme for shading of landscape functions.
 
     alpha: float, default 0.8
-        transparency of shading
+        The transparency of the shading.
 
     labels: list[string],
         A list of strings specifying labels for the coordinate axes.
         Note that the second entry corresponds to the depth axis of the landscape.
 
     padding: float, default 0.0
-        amount of empty grid shown to left and right of landscape functions
+        The amount of empty grid shown to left and right of landscape functions.
 
     depth_range: slice, default = None
         Specifies a range of depths to be plotted. The default behavior is to plot all.
@@ -464,7 +465,6 @@ def plot_landscape_approx_simple(
     for depth, l in enumerate(landscape):
         if depth not in depth_range:
             continue
-        # instantiate depth-specific domain
         domain = np.linspace(landscape.start, landscape.stop, num=len(l))
         ax.plot(domain, l, label=f"$\lambda_{{{depth}}}$", alpha=alpha)
     ax.legend()
