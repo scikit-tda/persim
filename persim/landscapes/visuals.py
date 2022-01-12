@@ -26,7 +26,6 @@ def plot_landscape(
     title=None,
     labels=None,
     padding: float = 0.0,
-    depth_spacing: float = 0.7,
     ax=None,
     depth_range=None,
 ):
@@ -63,10 +62,7 @@ def plot_landscape(
     padding: float, default 0.0
         The amount of empty space or margin shown to left and right of the
         landscape functions.
-
-    depth_spacing: float, default = 0.7
-        The amount of space between sequential landscape functions.
-        
+     
     ax: matplotlib axis, default = None
         An optional parameter allowing the user to pass a matplotlib axis for later modification.
         
@@ -82,7 +78,6 @@ def plot_landscape(
             title=title,
             labels=labels,
             padding=padding,
-            depth_spacing=depth_spacing,
             ax=ax,
             depth_range=depth_range,
         )
@@ -95,7 +90,6 @@ def plot_landscape(
             title=title,
             labels=labels,
             padding=padding,
-            depth_spacing=depth_spacing,
             ax=ax,
             depth_range=depth_range,
         )
@@ -180,7 +174,6 @@ def plot_landscape_exact(
     title=None,
     labels=None,
     padding: float = 0.0,
-    depth_spacing: float = 0.7,
     ax=None,
     depth_range=None,
 ):
@@ -209,9 +202,6 @@ def plot_landscape_exact(
 
     padding: float, default 0.0
         amount of empty grid shown to left and right of landscape functions
-
-    depth_padding: float, default = 0.7
-        amount of space between sequential landscape functions
         
     depth_range: slice, default = None
         Specifies a range of depths to be plotted. The default behavior is to plot all.
@@ -252,14 +242,14 @@ def plot_landscape_exact(
             # for coloring https://matplotlib.org/3.1.0/tutorials/colors/colormapnorms.html
             ax.plot(
                 [x, x],  # plotting a line to get shaded function
-                [depth_spacing * depth, depth_spacing * depth],
+                [depth, depth],
                 ztuple,
                 linewidth=0.5,
                 alpha=alpha,
                 # c=colormap(norm(z)))
                 c=scalarMap.to_rgba(z),
             )
-            ax.plot([x], [depth_spacing * depth], [z], "k.", markersize=0.1)
+            ax.plot([x], [depth], [z], "k.", markersize=0.1)
     ax.set_ylabel("depth")
     if labels:
         ax.set_xlabel(labels[0])
@@ -267,8 +257,6 @@ def plot_landscape_exact(
         ax.set_zlabel(labels[2])
     if title:
         plt.title(title)
-    ax.set_yticks(np.arange(0, depth * landscape.max_depth + 1, depth_spacing))
-    ax.set_yticklabels(range(landscape.max_depth + 1))
     ax.margins(padding)
     ax.view_init(10, 90)
     plt.show()
@@ -338,7 +326,6 @@ def plot_landscape_approx(
     title=None,
     labels=None,
     padding: float = 0.0,
-    depth_spacing: float = 0.7,
     ax=None,
     depth_range=None,
 ):
@@ -364,9 +351,6 @@ def plot_landscape_approx(
 
     padding: float, default 0.0
         amount of empty grid shown to left and right of landscape functions
-
-    depth_padding: float, default = 0.7
-        amount of space between sequential landscape functions
 
     depth_range: slice, default = None
         Specifies a range of depths to be plotted. The default behavior is to plot all.
@@ -410,21 +394,19 @@ def plot_landscape_approx(
             # for coloring https://matplotlib.org/3.1.0/tutorials/colors/colormapnorms.html
             ax.plot(
                 [x, x],  # plotting a line to get shaded function
-                [depth_spacing * depth, depth_spacing * depth],
+                [depth, depth],
                 ztuple,
                 linewidth=0.5,
                 alpha=alpha,
                 # c=colormap(norm(z)))
                 c=scalarMap.to_rgba(z),
             )
-            ax.plot([x], [depth_spacing * depth], [z], "k.", markersize=0.1)
+            ax.plot([x], [depth], [z], "k.", markersize=0.1)
     ax.set_ylabel("depth")
     if labels:
         ax.set_xlabel(labels[0])
         ax.set_ylabel(labels[1])
         ax.set_zlabel(labels[2])
-    ax.set_yticks(np.arange(0, depth * landscape.max_depth + 1, depth_spacing))
-    ax.set_yticklabels(range(landscape.max_depth + 1))
     ax.margins(padding)
     if title:
         plt.title(title)
