@@ -166,6 +166,13 @@ class TestPersLandscapeApprox:
         Q = PersLandscapeApprox(values=np.array([[2, 6], [4, 10]]), start=0, stop=5)
         assert Q.start == 0
         assert Q.stop == 5
+    
+    def test_max_depth(self):
+        P1 = PersLandscapeApprox(dgms=[np.array([[2,6],[4,10]])])
+        assert P1.max_depth == 2
+        P2 = PersLandscapeApprox(dgms=[np.array([[1,3],[5,7]])])
+        assert P2.max_depth == 1
+
 
     def test_approx_compute_landscape(self):
         diagrams1 = [np.array([[2, 6], [4, 10]])]

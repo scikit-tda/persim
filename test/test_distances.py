@@ -186,7 +186,7 @@ class TestWasserstein:
         dgm1 = np.array([[0, 10], [0,10]])
         dgm2 = np.array([[0, 10]])
         dist = wasserstein(dgm1, dgm2)
-        assert dist == 5*np.sqrt(2)
+        np.testing.assert_almost_equal(dist, 5*np.sqrt(2))
 
     def test_matching(self):
         dgm1 = np.array([
