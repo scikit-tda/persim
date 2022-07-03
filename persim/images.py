@@ -1,10 +1,6 @@
 from __future__ import division
 from itertools import product
-import collections
-try:
-    collectionsAbc = collections.abc
-except AttributeError:
-    collectionsAbc = collections
+import collections.abc
 
 import copy
 import numpy as np
@@ -90,7 +86,7 @@ Parameters
             return np.zeros((self.nx, self.ny))
         # if first entry of first entry is not iterable, then diagrams is singular and we need to make it a list of diagrams
         try:
-            singular = not isinstance(diagrams[0][0], collectionsAbc.Iterable)
+            singular = not isinstance(diagrams[0][0], collections.abc.Iterable)
         except IndexError:
             singular = False
 
@@ -619,7 +615,7 @@ class PersistenceImager(TransformerMixin):
     def _ensure_iterable(self, pers_dgms):
         # if first entry of first entry is not iterable, then diagrams is singular and we need to make it a list of diagrams
         try:
-            singular = not isinstance(pers_dgms[0][0], collectionsAbc.Iterable)
+            singular = not isinstance(pers_dgms[0][0], collections.abc.Iterable)
         except IndexError:
             singular = False
 
