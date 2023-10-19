@@ -1,3 +1,7 @@
+0.3.2
+    - Update codebase to support python 3.7 - 3.12.
+    - Change `PersistenceLandscaper` API for sklearn compatibility.
+
 0.3.1
     - Fixed bug with repeated intervals in bottleneck
     - Tidied up API for indicating matchings for bottleneck and wasserstein, and updated notebook
