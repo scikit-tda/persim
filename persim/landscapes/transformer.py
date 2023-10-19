@@ -4,6 +4,7 @@
 """
 from operator import itemgetter
 
+import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 
 from .approximate import PersLandscapeApprox
@@ -127,8 +128,3 @@ class PersistenceLandscaper(BaseEstimator, TransformerMixin):
             return (result.values).flatten()
         else:
             return result.values
-
-    def fit_transform(self, dgms):
-        self.fit(X=dgms)
-        vals = self.transform(X=dgms)
-        return vals
