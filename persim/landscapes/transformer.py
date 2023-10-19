@@ -80,7 +80,7 @@ class PersistenceLandscaper(BaseEstimator, TransformerMixin):
         else:
             return f"PersistenceLandscaper(hom_deg={self.hom_deg}, start={self.start}, stop={self.stop}, num_steps={self.num_steps})"
 
-    def fit(self, X):
+    def fit(self, X: np.ndarray, y=None):
         """Find optimal `start` and `stop` parameters for approximating grid.
 
         Parameters
@@ -88,6 +88,8 @@ class PersistenceLandscaper(BaseEstimator, TransformerMixin):
 
         X : list of (-,2) numpy.ndarrays
             List of persistence diagrams.
+        y : Ignored
+            Ignored; included for sklearn compatibility.
         """
         # TODO: remove infinities
         _dgm = X[self.hom_deg]
@@ -97,7 +99,7 @@ class PersistenceLandscaper(BaseEstimator, TransformerMixin):
             self.stop = max(_dgm, key=itemgetter(1))[1]
         return self
 
-    def transform(self, X):
+    def transform(self, X: np.ndarray, y=None):
         """Construct persistence landscape values.
 
         Parameters
@@ -105,6 +107,8 @@ class PersistenceLandscaper(BaseEstimator, TransformerMixin):
 
         X : list of (-,2) numpy.ndarrays
             List of persistence diagrams
+        y : Ignored
+            Ignored; included for sklearn compatibility.
 
         Returns
         -------
