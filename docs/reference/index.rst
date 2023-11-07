@@ -34,9 +34,9 @@ Persistence Landscapes
     :recursive:
     :nosignatures:
 
-    persim.PersLandscapeExact
-    persim.PersLandscapeApprox
-    persim.PersistenceLandscaper
+    persim.landscapes.PersLandscapeExact
+    persim.landscapes.PersLandscapeApprox
+    persim.landscapes.PersistenceLandscaper
 
 .. autosummary::
     :toctree: stubs
