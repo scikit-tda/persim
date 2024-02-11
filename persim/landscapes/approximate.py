@@ -151,6 +151,7 @@ class PersLandscapeApprox(PersLandscape):
         self.start = start
         self.stop = stop
         self.values = values
+        self.max_depth = len(self.values)
         self.num_steps = num_steps
         if compute:
             self.compute_landscape()
@@ -177,7 +178,6 @@ class PersLandscapeApprox(PersLandscape):
         if self.values.size:
             verboseprint("values was stored, exiting")
             return
-
         verboseprint("values was empty, computing values")
         # make grid
         grid_values, step = np.linspace(
@@ -213,17 +213,14 @@ class PersLandscapeApprox(PersLandscape):
                 j += 1
                 # j*step: adding points from a line with slope 1
                 W[ind_in_Wb + j].append(j * step)
-
             j = 0
             # j in (b+d/2, d)
             for _ in range(mid_pt + 1, ind_in_Wd):
                 j += 1
                 W[ind_in_Wd - j].append(j * step)
-
         # sort each list in W
         for i in range(len(W)):
             W[i] = sorted(W[i], reverse=True)
-
         # calculate k: max length of lists in W
         K = max([len(_) for _ in W])
 
@@ -234,13 +231,12 @@ class PersLandscapeApprox(PersLandscape):
         for i in range(self.num_steps):
             for k in range(len(W[i])):
                 L[k][i] = W[i][k]
-
         # check if L is empty
         if not L.size:
             L = np.array(["empty"])
             print("Bad choice of grid, values is empty")
-
         self.values = L
+        self.max_depth = len(L)
         return
 
     def values_to_pairs(self):

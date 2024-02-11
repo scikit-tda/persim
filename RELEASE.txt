@@ -1,3 +1,7 @@
+0.3.3
+    - Fix plotting methods of Persistence Landscapes, add doc strings.
+    - Update to notebooks.
+
 0.3.2
     - Update codebase to support python 3.7 - 3.12.
     - Change `PersistenceLandscaper` API for sklearn compatibility.
