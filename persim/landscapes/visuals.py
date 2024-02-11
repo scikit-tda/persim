@@ -32,8 +32,8 @@ def plot_landscape(
     A 3-dimensional plot of a persistence landscape.
 
     If the user wishes to modify the plot beyond the provided parameters, they
-    should create a matplotlib.pyplot figure axis first and then pass it as the 
-    optional 'ax' parameter. This allows for easy modification of the plots 
+    should create a matplotlib.pyplot figure axis first and then pass it as the
+    optional 'ax' parameter. This allows for easy modification of the plots
     after creation.
 
     Warning: This function is quite slow, especially for large landscapes.
@@ -105,8 +105,9 @@ def plot_landscape_simple(
     labels=None,
     depth_range=None,
 ):
-    """
-    A 2-dimensional plot of the persistence landscape. This is a faster plotting
+    """A 2-dimensional plot of the persistence landscape.
+
+    This is a faster plotting
     utility than the standard plotting, but is recommended for smaller landscapes
     for ease of visualization.
 
@@ -259,7 +260,7 @@ def plot_landscape_exact(
         plt.title(title)
     ax.margins(padding)
     ax.view_init(10, 90)
-    plt.show()
+    return fig
 
 
 def plot_landscape_exact_simple(
@@ -316,6 +317,7 @@ def plot_landscape_exact_simple(
     if labels:
         ax.set_xlabel(labels[0])
         ax.set_ylabel(labels[1])
+    return ax
 
 
 def plot_landscape_approx(
@@ -411,7 +413,7 @@ def plot_landscape_approx(
     if title:
         plt.title(title)
     ax.view_init(10, 90)
-    plt.show()
+    return fig
 
 
 def plot_landscape_approx_simple(
@@ -474,3 +476,4 @@ def plot_landscape_approx_simple(
     if labels:
         ax.set_xlabel(labels[0])
         ax.set_ylabel(labels[1])
+    return ax
