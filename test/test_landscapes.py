@@ -1,9 +1,16 @@
 import numpy as np
 import pytest
 
-from persim.landscapes import (PersistenceLandscaper, PersLandscapeApprox,
-                               PersLandscapeExact, average_approx,
-                               death_vector, lc_approx, snap_pl, vectorize)
+from persim.landscapes import (
+    PersistenceLandscaper,
+    PersLandscapeApprox,
+    PersLandscapeExact,
+    average_approx,
+    death_vector,
+    lc_approx,
+    snap_pl,
+    vectorize,
+)
 
 
 class TestPersLandscapeExact:

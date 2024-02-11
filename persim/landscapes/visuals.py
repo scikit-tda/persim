@@ -310,7 +310,6 @@ def plot_landscape_approx_simple(
 
     # for each landscape function
     for depth, l in enumerate(landscape):
-
         # instantiate depth-specific domain
         domain = np.linspace(
             landscape.start - padding * 0.1, landscape.stop + padding * 0.1, num=len(l)

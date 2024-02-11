@@ -101,7 +101,7 @@ class PersLandscapeExact(PersLandscape):
         [5.3, 1.2000000000000002], [6.5, 0]],
         [[4.1, 0], [4.55, 0.4500000000000002], [5.0, 0]]]
 
-    `p` norms are implemented for all `p` as well as the supremum norms::
+    `p` norms are implemented for all `p` as well as the supremum norm::
 
         >>> ple.p_norm(p=3)
 
