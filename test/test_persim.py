@@ -1,6 +1,6 @@
+import numpy as np
 import pytest
 
-import numpy as np
 from persim import PersImage
 
 
@@ -13,7 +13,7 @@ def test_landscape():
 
 
 def test_integer_diagrams():
-    """ This test is inspired by gh issue #3 by gh user muszyna25.
+    """This test is inspired by gh issue #3 by gh user muszyna25.
 
     Integer diagrams return nan values.
 
@@ -30,29 +30,27 @@ def test_integer_diagrams():
     res2 = pim.transform(dgm)
     np.testing.assert_array_equal(res, res2)
 
+
 class TestEmpty:
     def test_empty_diagram(self):
         dgm = np.zeros((0, 2))
-        pim = PersImage(pixels = (10, 10))
+        pim = PersImage(pixels=(10, 10))
         res = pim.transform(dgm)
         assert np.all(res == np.zeros((10, 10)))
 
     def test_empyt_diagram_list(self):
-        dgm1 = [np.array([[2, 3]]), 
-                np.zeros((0, 2))]
-        pim1 = PersImage(pixels = (10, 10))
+        dgm1 = [np.array([[2, 3]]), np.zeros((0, 2))]
+        pim1 = PersImage(pixels=(10, 10))
         res1 = pim1.transform(dgm1)
         assert np.all(res1[1] == np.zeros((10, 10)))
 
-        dgm2 = [np.zeros((0, 2)), 
-                np.array([[2, 3]])]
-        pim2 = PersImage(pixels = (10, 10))
+        dgm2 = [np.zeros((0, 2)), np.array([[2, 3]])]
+        pim2 = PersImage(pixels=(10, 10))
         res2 = pim2.transform(dgm2)
         assert np.all(res2[0] == np.zeros((10, 10)))
 
-        dgm3 = [np.zeros((0, 2)), 
-                np.zeros((0, 2))]
-        pim3 = PersImage(pixels = (10, 10))
+        dgm3 = [np.zeros((0, 2)), np.zeros((0, 2))]
+        pim3 = PersImage(pixels=(10, 10))
         res3 = pim3.transform(dgm3)
         assert np.all(res3[0] == np.zeros((10, 10)))
         assert np.all(res3[1] == np.zeros((10, 10)))
@@ -75,7 +73,7 @@ class TestWeighting:
 
         assert wf([1, 0]) == 0
         assert wf([1, 4]) == 1
-        assert wf([1, 2]) == .5
+        assert wf([1, 2]) == 0.5
 
 
 class TestKernels:

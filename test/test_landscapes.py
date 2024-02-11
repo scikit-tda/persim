@@ -1,11 +1,9 @@
-import pytest
 import numpy as np
+import pytest
 
-from persim.landscapes import PersLandscapeExact
-from persim.landscapes import PersLandscapeApprox
-from persim.landscapes import PersistenceLandscaper
-from persim.landscapes import vectorize, snap_pl, lc_approx, average_approx
-from persim.landscapes import death_vector
+from persim.landscapes import (PersistenceLandscaper, PersLandscapeApprox,
+                               PersLandscapeExact, average_approx,
+                               death_vector, lc_approx, snap_pl, vectorize)
 
 
 class TestPersLandscapeExact:
@@ -14,7 +12,10 @@ class TestPersLandscapeExact:
             PersLandscapeExact()
 
     def test_exact_hom_deg(self):
-        P = PersLandscapeExact(dgms=[np.array([[1.0, 5.0]])], hom_deg=0,)
+        P = PersLandscapeExact(
+            dgms=[np.array([[1.0, 5.0]])],
+            hom_deg=0,
+        )
         assert P.hom_deg == 0
         with pytest.raises(ValueError):
             PersLandscapeExact(hom_deg=-1)
@@ -32,35 +33,35 @@ class TestPersLandscapeExact:
         )
         P.compute_landscape()
 
+        expected_P_pairs = [
+            [
+                [1.0, 0],
+                [3.0, 2.0],
+                [3.5, 1.5],
+                [5.0, 3.0],
+                [6.5, 1.5],
+                [7.0, 2.0],
+                [9.0, 0],
+            ],
+            [[2.0, 0], [3.5, 1.5], [5.0, 0], [6.5, 1.5], [8.0, 0]],
+            [[3.0, 0], [3.5, 0.5], [4.0, 0], [6.0, 0], [6.5, 0.5], [7.0, 0]],
+        ]
+        assert len(P.critical_pairs) == len(expected_P_pairs)
+        for idx, lambda_level in enumerate(P.critical_pairs):
+            assert lambda_level == expected_P_pairs[idx]
+
         # duplicate bars
         Q = PersLandscapeExact(dgms=[np.array([[1, 5], [1, 5], [3, 6]])], hom_deg=0)
         Q.compute_landscape()
 
-        np.testing.assert_array_equal(
-            P.critical_pairs,
-            [
-                [
-                    [1.0, 0],
-                    [3.0, 2.0],
-                    [3.5, 1.5],
-                    [5.0, 3.0],
-                    [6.5, 1.5],
-                    [7.0, 2.0],
-                    [9.0, 0],
-                ],
-                [[2.0, 0], [3.5, 1.5], [5.0, 0], [6.5, 1.5], [8.0, 0]],
-                [[3.0, 0], [3.5, 0.5], [4.0, 0], [6.0, 0], [6.5, 0.5], [7.0, 0]],
-            ],
-        )
-
-        np.testing.assert_array_equal(
-            Q.critical_pairs,
-            [
-                [[1, 0], [3.0, 2.0], [4.0, 1.0], [4.5, 1.5], [6, 0]],
-                [[1, 0], [3.0, 2.0], [4.0, 1.0], [4.5, 1.5], [6, 0]],
-                [[3, 0], [4.0, 1.0], [5, 0]],
-            ],
-        )
+        expected_Q_pairs = [
+            [[1, 0], [3.0, 2.0], [4.0, 1.0], [4.5, 1.5], [6, 0]],
+            [[1, 0], [3.0, 2.0], [4.0, 1.0], [4.5, 1.5], [6, 0]],
+            [[3, 0], [4.0, 1.0], [5, 0]],
+        ]
+        assert len(Q.critical_pairs) == len(expected_Q_pairs)
+        for idx, lambda_level in enumerate(Q.critical_pairs):
+            assert lambda_level == expected_Q_pairs[idx]
 
     def test_exact_add(self):
         with pytest.raises(ValueError):
@@ -427,7 +428,10 @@ class TestPersLandscapeApprox:
 
     def test_approx_norm(self):
         P = PersLandscapeApprox(
-            start=0, stop=5, num_steps=6, values=np.array([[0, 1, 1, 1, 1, 0]]),
+            start=0,
+            stop=5,
+            num_steps=6,
+            values=np.array([[0, 1, 1, 1, 1, 0]]),
         )
         assert P.p_norm(p=2) == pytest.approx(np.sqrt(3 + (2.0 / 3.0)))
         assert P.sup_norm() == 1.0
@@ -457,7 +461,10 @@ class TestAuxiliary:
 
     def test_snap_PL(self):
         P = PersLandscapeApprox(
-            start=0, stop=5, num_steps=6, values=np.array([[0, 1, 1, 1, 1, 0]]),
+            start=0,
+            stop=5,
+            num_steps=6,
+            values=np.array([[0, 1, 1, 1, 1, 0]]),
         )
         [P_snapped] = snap_pl([P], start=0, stop=10, num_steps=11)
         assert P_snapped.hom_deg == P.hom_deg
@@ -526,7 +533,20 @@ class TestTransformer:
         assert pl.stop == 4.0
         np.testing.assert_array_equal(
             pl.transform(dgms),
-            np.array([0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,]),
+            np.array(
+                [
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                ]
+            ),
         )
         pl2 = PersistenceLandscaper(hom_deg=1, num_steps=4)
         assert pl2.hom_deg == 1
@@ -537,5 +557,18 @@ class TestTransformer:
         pl3 = PersistenceLandscaper(hom_deg=0, num_steps=5, flatten=True)
         np.testing.assert_array_equal(
             pl3.fit_transform(dgms),
-            np.array([0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,]),
+            np.array(
+                [
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                ]
+            ),
         )
