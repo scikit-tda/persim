@@ -1,8 +1,7 @@
 [![PyPI version](https://badge.fury.io/py/persim.svg)](https://badge.fury.io/py/persim)
-[![Downloads](https://pypip.in/download/persim/badge.svg)](https://pypi.python.org/pypi/persim/) 
+![PyPI - Downloads](https://img.shields.io/pypi/dm/persim)
 [![Conda Version](https://img.shields.io/conda/vn/conda-forge/persim.svg)](https://anaconda.org/conda-forge/persim)
 [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/persim.svg)](https://anaconda.org/conda-forge/persim)
-[![Build Status](https://travis-ci.org/scikit-tda/persim.svg?branch=master)](https://travis-ci.org/scikit-tda/persim)
 [![codecov](https://codecov.io/gh/scikit-tda/persim/branch/master/graph/badge.svg)](https://codecov.io/gh/scikit-tda/persim)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
