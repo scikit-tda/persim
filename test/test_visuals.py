@@ -6,6 +6,12 @@ import matplotlib.pyplot as plt
 import persim
 from persim import plot_diagrams
 
+from persim.landscapes import (
+    plot_landscape,
+    plot_landscape_simple,
+    PersLandscapeExact,
+    PersLandscapeApprox,
+)
 
 """
 
@@ -211,3 +217,20 @@ class TestMatching:
 
         d, matching = persim.bottleneck(dgm1, dgm2, matching=True)
         persim.bottleneck_matching(dgm1, dgm2, matching, labels=["X", "Y"])
+
+
+class TestLandscapePlots:
+    diagrams = [
+        np.array([[0, 1], [1, 1], [2, 4], [3, 5]]),
+        np.array([[0.5, 3], [2, 4], [4, 5], [10, 15]]),
+    ]
+
+    # Test to ensure plots are created
+
+    def test_simple_plots(self):
+        plot_landscape_simple(PersLandscapeApprox(dgms=self.diagrams))
+        plot_landscape_simple(PersLandscapeExact(dgms=self.diagrams, hom_deg=1))
+
+    def test_plots(self):
+        plot_landscape(PersLandscapeExact(dgms=self.diagrams))
+        plot_landscape(PersLandscapeApprox(dgms=self.diagrams, hom_deg=1))
