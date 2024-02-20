@@ -44,7 +44,10 @@ def union_crit_pairs(A, B):
         else:
             result_pairs.append(
                 slope_to_pos_interp(
-                    sum_slopes(pos_to_slope_interp(a), pos_to_slope_interp(b),)
+                    sum_slopes(
+                        pos_to_slope_interp(a),
+                        pos_to_slope_interp(b),
+                    )
                 )
             )
     return result_pairs
@@ -141,7 +144,7 @@ def ndsnap_regular(points, *grid_axes):
 
 def _p_norm(p: float, critical_pairs: list = []):
     """
-    Compute `p` norm of interpolated piecewise linear function defined from list of 
+    Compute `p` norm of interpolated piecewise linear function defined from list of
     critical pairs.
     """
     result = 0.0

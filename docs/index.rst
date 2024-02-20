@@ -36,6 +36,7 @@ Documentation
 
     notebooks/Persistence images
     notebooks/distances
+    notebooks/Persistence landscapes
     reference/index
 
 

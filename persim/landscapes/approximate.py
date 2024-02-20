@@ -87,8 +87,8 @@ class PersLandscapeApprox(PersLandscape):
 
         ValueError: Start values of grids do not coincide
 
-        >>> from persim import snap_PL
-        >>> [snapped_pla, snapped_wide_pl] = snap_PL([pla,wide_pl])
+        >>> from persim import snap_pl
+        >>> [snapped_pla, snapped_wide_pl] = snap_pl([pla,wide_pl])
         >>> print(snapped_pla, snapped_wide_pl)
 
         Approximate persistence landscape in homological degree 0 on grid from -1 to 4 with 1000 steps Approximate persistence landscape in homological degree 0 on grid from -1 to 4 with 1000 steps
@@ -128,7 +128,6 @@ class PersLandscapeApprox(PersLandscape):
         values=np.array([]),
         compute: bool = True,
     ) -> None:
-
         super().__init__(dgms=dgms, hom_deg=hom_deg)
         if not dgms and values.size == 0:
             raise ValueError("dgms and values cannot both be emtpy")

@@ -3,11 +3,12 @@
 """
 
 import itertools
-import numpy as np
 from operator import itemgetter
 
+import numpy as np
+
 from .approximate import PersLandscapeApprox
-from .auxiliary import union_crit_pairs, _p_norm
+from .auxiliary import _p_norm, union_crit_pairs
 from .base import PersLandscape
 
 __all__ = ["PersLandscapeExact"]
@@ -16,114 +17,99 @@ __all__ = ["PersLandscapeExact"]
 class PersLandscapeExact(PersLandscape):
     """Persistence Landscape Exact class.
 
-       This class implements an exact version of Persistence Landscapes. The landscape
-       functions are stored as a list of critical pairs, and the actual function is the
-       linear interpolation of these critical pairs. All
-       computations done with these classes are exact. For much faster but
-       approximate methods that should suffice for most applications, consider
-       `PersLandscapeApprox`.
+    This class implements an exact version of Persistence Landscapes. The landscape
+    functions are stored as a list of critical pairs, and the actual function is the
+    linear interpolation of these critical pairs. All
+    computations done with these classes are exact. For much faster but
+    approximate methods that should suffice for most applications, consider
+    `PersLandscapeApprox`.
 
-       Parameters
-       ----------
-       dgms : list of (-,2) numpy.ndarrays, optional
-           A nested list of numpy arrays, e.g., [array( array([:]), array([:]) ),..., array([:])]
-           Each entry in the list corresponds to a single homological degree.
-           Each array represents the birth-death pairs in that homological degree. This is
-           the output format from ripser.py: ripser(data_user)['dgms']. Only
-           one of diagrams or critical pairs should be specified.
+    Parameters
+    ----------
+    dgms : list of (-,2) numpy.ndarrays, optional
+        A nested list of numpy arrays, e.g., [array( array([:]), array([:]) ),..., array([:])]
+        Each entry in the list corresponds to a single homological degree.
+        Each array represents the birth-death pairs in that homological degree. This is
+        the output format from ripser.py: ripser(data_user)['dgms']. Only
+        one of diagrams or critical pairs should be specified.
 
-       hom_deg : int
-           Represents the homology degree of the persistence diagram.
+    hom_deg : int
+        Represents the homology degree of the persistence diagram.
 
-       critical_pairs : list, optional
-           List of lists of critical pairs (points, values) for specifying a persistence landscape.
-           These do not necessarily have to arise from a persistence
-           diagram. Only one of diagrams or critical pairs should be specified.
+    critical_pairs : list, optional
+        List of lists of critical pairs (points, values) for specifying a persistence landscape.
+        These do not necessarily have to arise from a persistence
+        diagram. Only one of diagrams or critical pairs should be specified.
 
-       compute : bool, optional
-           Flag determining whether landscape functions are computed upon instantiation.
-
-
-       Examples
-       --------
-       Define a persistence diagram and instantiate the landscape::
-
-           >>> from persim import PersLandscapeExact
-           >>> import numpy as np
-           >>> pd = [ np.array([[0,3],[1,4]]), np.array([[1,4]]) ]
-           >>> ple = PersLandscapeExact(dgms=pd, hom_deg=0)
-           >>> ple
-
-       `PersLandscapeExact` instances store the critical pairs of the landscape as a list of lists in the `critical_pairs` attribute. The `i`-th entry corresponds to the critical values of the depth `i` landscape::
-
-           >>> ple.critical_pairs
-
-           [[[0, 0], [1.5, 1.5], [2.0, 1.0], [2.5, 1.5], [4, 0]],
-           [[1, 0], [2.0, 1.0], [3, 0]]]
-
-       Addition, subtraction, and scalar multiplication between landscapes is implemented::
-
-           >>> pd2 = [ np.array([[0.5,7],[3,5],[4.1,6.5]]), np.array([[1,4]])]
-           >>> pl2 = PersLandscapeExact(dgms=pd2,hom_deg=0)
-           >>> pl_sum = ple + pl2
-           >>> pl_sum.critical_pairs
-
-           [[[0, 0], [0.5, 0.5], [1.5, 2.5], [2.0, 2.5],
-           [2.5, 3.5], [3.75, 3.5],[4, 3.0], [7.0, 0.0]],
-           [[1, 0], [2.0, 1.0], [3, 0.0], [4.0, 1.0],
-           [4.55, 0.45], [5.3, 1.2], [6.5, 0.0]],
-           [[4.1, 0], [4.55, 0.45], [5.0, 0]]]
-
-           >>> diff_pl = ple - pl2
-           >>> diff_pl.critical_pairs
-
-           [[[0, 0], [0.5, 0.5], [1.5, 0.5], [2.0, -0.5], 
-           [2.5, -0.5], [3.75, -3.0], [4, -3.0], [7.0, 0.0]],
-           [[1, 0], [2.0, 1.0], [3, 0.0], [4.0, -1.0], 
-           [4.55, -0.45], [5.3, -1.2], [6.5, 0.0]],
-           [[4.1, 0], [4.55, -0.45], [5.0, 0]]]
-
-           >>> (5*ple).critical_pairs
-
-           [[(0, 0), (1.5, 7.5), (2.0, 5.0), (2.5, 7.5), (4, 0)],
-           [(1, 0), (2.0, 5.0), (3, 0)]]
-
-       Landscapes are sliced by depth and slicing returns the critical pairs in the range specified::
-
-           >>> ple[0]
-
-           [[0, 0], [1.5, 1.5], [2.0, 1.0], [2.5, 1.5], [4, 0]]
-
-           >>> pl2[1:]
-
-           [[[3.0, 0], [4.0, 1.0], [4.55, 0.4500000000000002], 
-           [5.3, 1.2000000000000002], [6.5, 0]],
-           [[4.1, 0], [4.55, 0.4500000000000002], [5.0, 0]]]
-
-       `p` norms are implemented for all `p` as well as the supremum norms::
-
-           >>> ple.p_norm(p=3)
-
-           1.7170713638299977
-
-           >>> pl2.sup_norm()
-
-           3.25
+    compute : bool, optional
+        Flag determining whether landscape functions are computed upon instantiation.
 
 
+    Examples
+    --------
+    Define a persistence diagram and instantiate the landscape::
 
-       Methods
-       -------
-       compute_landscape : computes the set of critical pairs and stores them in
-           the attribute `critical_pairs`
+        >>> from persim import PersLandscapeExact
+        >>> import numpy as np
+        >>> pd = [ np.array([[0,3],[1,4]]), np.array([[1,4]]) ]
+        >>> ple = PersLandscapeExact(dgms=pd, hom_deg=0)
+        >>> ple
 
-       compute_landscape_by_depth : compute the set of critical pairs in a certain
-           range.
+    `PersLandscapeExact` instances store the critical pairs of the landscape as a list of lists in the `critical_pairs` attribute. The `i`-th entry corresponds to the critical values of the depth `i` landscape::
 
-       p_norm : returns p-norm of a landscape
+        >>> ple.critical_pairs
 
-       sup_norm : returns sup norm of a landscape
+        [[[0, 0], [1.5, 1.5], [2.0, 1.0], [2.5, 1.5], [4, 0]],
+        [[1, 0], [2.0, 1.0], [3, 0]]]
 
+    Addition, subtraction, and scalar multiplication between landscapes is implemented::
+
+        >>> pd2 = [ np.array([[0.5,7],[3,5],[4.1,6.5]]), np.array([[1,4]])]
+        >>> pl2 = PersLandscapeExact(dgms=pd2,hom_deg=0)
+        >>> pl_sum = ple + pl2
+        >>> pl_sum.critical_pairs
+
+        [[[0, 0], [0.5, 0.5], [1.5, 2.5], [2.0, 2.5],
+        [2.5, 3.5], [3.75, 3.5],[4, 3.0], [7.0, 0.0]],
+        [[1, 0], [2.0, 1.0], [3, 0.0], [4.0, 1.0],
+        [4.55, 0.45], [5.3, 1.2], [6.5, 0.0]],
+        [[4.1, 0], [4.55, 0.45], [5.0, 0]]]
+
+        >>> diff_pl = ple - pl2
+        >>> diff_pl.critical_pairs
+
+        [[[0, 0], [0.5, 0.5], [1.5, 0.5], [2.0, -0.5],
+        [2.5, -0.5], [3.75, -3.0], [4, -3.0], [7.0, 0.0]],
+        [[1, 0], [2.0, 1.0], [3, 0.0], [4.0, -1.0],
+        [4.55, -0.45], [5.3, -1.2], [6.5, 0.0]],
+        [[4.1, 0], [4.55, -0.45], [5.0, 0]]]
+
+        >>> (5*ple).critical_pairs
+
+        [[(0, 0), (1.5, 7.5), (2.0, 5.0), (2.5, 7.5), (4, 0)],
+        [(1, 0), (2.0, 5.0), (3, 0)]]
+
+    Landscapes are sliced by depth and slicing returns the critical pairs in the range specified::
+
+        >>> ple[0]
+
+        [[0, 0], [1.5, 1.5], [2.0, 1.0], [2.5, 1.5], [4, 0]]
+
+        >>> pl2[1:]
+
+        [[[3.0, 0], [4.0, 1.0], [4.55, 0.4500000000000002],
+        [5.3, 1.2000000000000002], [6.5, 0]],
+        [[4.1, 0], [4.55, 0.4500000000000002], [5.0, 0]]]
+
+    `p` norms are implemented for all `p` as well as the supremum norm::
+
+        >>> ple.p_norm(p=3)
+
+        1.7170713638299977
+
+        >>> pl2.sup_norm()
+
+        3.25
     """
 
     def __init__(
@@ -240,7 +226,7 @@ class PersLandscapeExact(PersLandscape):
         list
             The critical pairs of the landscape function corresponding
         to depths given by key
-        
+
         Note
         ----
         If the slice is beyond `self.max_depth` an IndexError is raised.
@@ -307,7 +293,6 @@ class PersLandscapeExact(PersLandscape):
                     break
 
             while L[landscape_idx][-1] != [np.inf, 0]:
-
                 # if d is > = all remaining pairs, then end lambda
                 # includes edge case with (b,d) pairs with the same death time
                 if all(d >= _[1] for _ in A):
