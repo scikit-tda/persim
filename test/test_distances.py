@@ -106,8 +106,11 @@ class TestBottleneck:
         # Issue #70: https://github.com/scikit-tda/persim/issues/70
         dgm1 = np.array([[0, 10]])
         dgm2 = np.array([[5, 5]])
-        dist = bottleneck(dgm1, dgm2)
+        dist, returned_matching = bottleneck(dgm1, dgm2, matching=True)
         assert dist == 5.0
+        np.testing.assert_array_equal(
+            returned_matching, np.array([[0.0, -1.0, 5.0], [-1.0, 0.0, 0.0]])
+        )
 
 
 class TestWasserstein:
