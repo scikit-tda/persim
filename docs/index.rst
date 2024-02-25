@@ -1,4 +1,4 @@
-|PyPI version| |Downloads| |Build Status| |Codecov| |License: MIT|
+|PyPI version| |Downloads| |Codecov| |License: MIT|
 
 Persim is a Python package for many tools used in analyzing Persistence Diagrams.  It currently includes implementations of most of the popular methods of working with persistence diagrams, including
 
