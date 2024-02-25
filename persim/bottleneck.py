@@ -27,9 +27,9 @@ def bottleneck(dgm1, dgm2, matching=False):
 
     Parameters
     -----------
-    dgm1: Mx(>=2) 
+    dgm1: Mx(>=2)
         array of birth/death pairs for PD 1
-    dgm2: Nx(>=2) 
+    dgm2: Nx(>=2)
         array of birth/death paris for PD 2
     matching: bool, default False
         if True, return matching infromation and cross-similarity matrix
@@ -47,15 +47,13 @@ def bottleneck(dgm1, dgm2, matching=False):
     """
 
     return_matching = matching
-
     S = np.array(dgm1)
     M = min(S.shape[0], S.size)
     if S.size > 0:
         S = S[np.isfinite(S[:, 1]), :]
         if S.shape[0] < M:
             warnings.warn(
-                "dgm1 has points with non-finite death times;"+
-                "ignoring those points"
+                "dgm1 has points with non-finite death times;" + "ignoring those points"
             )
             M = S.shape[0]
     T = np.array(dgm2)
@@ -64,8 +62,7 @@ def bottleneck(dgm1, dgm2, matching=False):
         T = T[np.isfinite(T[:, 1]), :]
         if T.shape[0] < N:
             warnings.warn(
-                "dgm2 has points with non-finite death times;"+
-                "ignoring those points"
+                "dgm2 has points with non-finite death times;" + "ignoring those points"
             )
             N = T.shape[0]
 
@@ -101,7 +98,7 @@ def bottleneck(dgm1, dgm2, matching=False):
 
     # Step 2: Perform a binary search + Hopcroft Karp to find the
     # bottleneck distance
-    ds = np.sort(np.unique(D.flatten()))[0:-1] # Everything but np.inf
+    ds = np.sort(np.unique(D.flatten()))  # [0:-1]  # Everything but np.inf
     bdist = ds[-1]
     matching = {}
     while len(ds) >= 1:
@@ -118,18 +115,18 @@ def bottleneck(dgm1, dgm2, matching=False):
             matching = res
             ds = ds[0:idx]
         else:
-            ds = ds[idx + 1::]
+            ds = ds[idx + 1 : :]
 
     if return_matching:
         matchidx = []
-        for i in range(M+N):
+        for i in range(M + N):
             j = matching["{}".format(i)]
             d = D[i, j]
             if i < M:
                 if j >= N:
-                    j = -1 # Diagonal match from first persistence diagram
+                    j = -1  # Diagonal match from first persistence diagram
             else:
-                if j >= N: # Diagonal to diagonal, so don't include this
+                if j >= N:  # Diagonal to diagonal, so don't include this
                     continue
                 i = -1
             matchidx.append([i, j, d])
