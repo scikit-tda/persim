@@ -50,12 +50,10 @@ Documentation
     notebooks/Persistence Landscapes and Machine Learning
     
 
-.. |Downloads| image:: https://pypip.in/download/persim/badge.svg
+.. |Downloads| image:: https://img.shields.io/pypi/dm/persim 
     :target: https://pypi.python.org/pypi/persim/
 .. |PyPI version| image:: https://badge.fury.io/py/persim.svg
    :target: https://badge.fury.io/py/persim
-.. |Build Status| image:: https://travis-ci.org/scikit-tda/persim.svg?branch=master
-   :target: https://travis-ci.org/scikit-tda/persim
 .. |Codecov| image:: https://codecov.io/gh/scikit-tda/persim/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/scikit-tda/persim
 .. |License: MIT| image:: https://img.shields.io/badge/License-MIT-yellow.svg
