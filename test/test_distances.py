@@ -2,8 +2,7 @@ import numpy as np
 import pytest
 import scipy.sparse as sps
 
-from persim import (bottleneck, gromov_hausdorff, heat, sliced_wasserstein,
-                    wasserstein)
+from persim import bottleneck, gromov_hausdorff, heat, sliced_wasserstein, wasserstein
 
 
 class TestBottleneck:
@@ -102,6 +101,13 @@ class TestBottleneck:
         H = np.array([[0, 1]])
         dist = bottleneck(G, H)
         assert dist == 0.5
+
+    def test_one_diagonal(self):
+        # Issue #70: https://github.com/scikit-tda/persim/issues/70
+        dgm1 = np.array([[0, 10]])
+        dgm2 = np.array([[5, 5]])
+        dist = bottleneck(dgm1, dgm2)
+        assert dist == 5.0
 
 
 class TestWasserstein:
