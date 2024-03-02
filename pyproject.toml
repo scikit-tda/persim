@@ -20,7 +20,7 @@ maintainers = [
   { name = "Chris Tralie", email = "chris.tralie@gmail.com" },
   { name = "Michael Catanzaro", email = "catanzaromj@pm.me" },
 ]
-requires-python = ">=3.6"
+requires-python = ">=3.8"
 
 dependencies = [
   "deprecated",
