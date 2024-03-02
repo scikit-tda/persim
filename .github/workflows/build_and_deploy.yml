@@ -23,7 +23,6 @@ jobs:
           fetch-depth: 0
 
       - name: Build SDist and wheel
-        uses: actions/setup-python@v5
         run: pipx run build dist
 
       - uses: actions/upload-artifact@v4
