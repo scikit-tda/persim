@@ -59,7 +59,7 @@ keywords = [
 [project.optional-dependencies]
 testing = ["pytest", "pytest-cov"]
 
-docs = ["sktda_docs_config"]
+docs = ["ripser", "sktda_docs_config"]
 
 [project.urls]
 Homepage = "https://persim.scikit-tda.org"
