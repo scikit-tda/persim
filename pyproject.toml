@@ -19,6 +19,7 @@ maintainers = [
   { name = "Nathaniel Saul", email = "nat@riverasaul.com" },
   { name = "Chris Tralie", email = "chris.tralie@gmail.com" },
   { name = "Michael Catanzaro", email = "catanzaromj@pm.me" },
+  { name = "Abraham Smith", email = "abraham.smith@geomdata.com" },
 ]
 
 dependencies = [
