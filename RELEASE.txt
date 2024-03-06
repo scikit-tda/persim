@@ -1,3 +1,6 @@
+0.3.5
+    - Fix broken notebook, Issue #77 (https://github.com/scikit-tda/persim/issues/77).
+
 0.3.4 
     - Fix bug of Issue #70 (https://github.com/scikit-tda/persim/issues/70).
 
