@@ -87,10 +87,7 @@ def wasserstein(dgm1, dgm2, matching=False):
     UR = np.inf*np.ones((M, M))
     np.fill_diagonal(UR, S[:, 1])
     D[0:M, N:N+M] = UR
-    UL = np.inf*np.ones((N, N))
-    np.fill_diagonal(UL, T[:, 1])
-    D[M:N+M, 0:N] = UL
-
+    
     # Step 2: Run the hungarian algorithm
     matchi, matchj = optimize.linear_sum_assignment(D)
     matchdist = np.sum(D[matchi, matchj])
