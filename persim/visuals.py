@@ -223,7 +223,7 @@ def bottleneck_matching(dgm1, dgm2, matching, labels=["dgm1", "dgm2"], ax=None):
             if i == -1:
                 diagElem = np.array([dgm2Rot[j, 0], 0])
                 diagElem = diagElem.dot(R.T)
-                plt.plot([dgm2[j, 0], diagElem[0]], [dgm2[j, 1], diagElem[1]], c, linewidth=linewidth, linestyle=linestyle)
+                ax.plot([dgm2[j, 0], diagElem[0]], [dgm2[j, 1], diagElem[1]], c, linewidth=linewidth, linestyle=linestyle)
             elif j == -1:
                 diagElem = np.array([dgm1Rot[i, 0], 0])
                 diagElem = diagElem.dot(R.T)
@@ -277,7 +277,7 @@ def wasserstein_matching(dgm1, dgm2, matching, labels=["dgm1", "dgm2"], ax=None)
             if i == -1:
                 diagElem = np.array([dgm2Rot[j, 0], 0])
                 diagElem = diagElem.dot(R.T)
-                plt.plot([dgm2[j, 0], diagElem[0]], [dgm2[j, 1], diagElem[1]], "g")
+                ax.plot([dgm2[j, 0], diagElem[0]], [dgm2[j, 1], diagElem[1]], "g")
             elif j == -1:
                 diagElem = np.array([dgm1Rot[i, 0], 0])
                 diagElem = diagElem.dot(R.T)
