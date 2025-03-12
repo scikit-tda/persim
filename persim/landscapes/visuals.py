@@ -12,8 +12,6 @@ from .base import PersLandscape
 from .exact import PersLandscapeExact
 from .approximate import PersLandscapeApprox
 
-mpl.rcParams["text.usetex"] = True
-
 __all__ = ["plot_landscape", "plot_landscape_simple"]
 
 

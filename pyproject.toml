@@ -1,0 +1,69 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "persim"
+dynamic = ["version"]
+description = "Distances and representations of persistence diagrams"
+readme = "README.md"
+authors = [
+  { name = "Nathaniel Saul", email = "nat@riverasaul.com" },
+  { name = "Chris Tralie", email = "chris.tralie@gmail.com" },
+  { name = "Francis Motta", email = "francis.c.motta@gmail.com" },
+  { name = "Michael Catanzaro", email = "catanzaromj@pm.me" },
+  { name = "Gabrielle Angeloro", email = "gabrielleangeloro@gmail.com" },
+  { name = "Calder Sheagren", email = "caldersheagren@gmail.com" },
+]
+maintainers = [
+  { name = "Nathaniel Saul", email = "nat@riverasaul.com" },
+  { name = "Chris Tralie", email = "chris.tralie@gmail.com" },
+  { name = "Michael Catanzaro", email = "catanzaromj@pm.me" },
+  { name = "Abraham Smith", email = "abraham.smith@geomdata.com" },
+]
+
+dependencies = [
+  "deprecated",
+  "hopcroftkarp",
+  "joblib",
+  "matplotlib",
+  "numpy",
+  "scikit-learn",
+]
+
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Education",
+  "Intended Audience :: Financial and Insurance Industry",
+  "Intended Audience :: Healthcare Industry",
+  "Topic :: Scientific/Engineering :: Information Analysis",
+  "Topic :: Scientific/Engineering :: Mathematics",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python",
+]
+
+
+keywords = [
+  "persistent homology",
+  "persistence images",
+  "persistence diagrams",
+  "topological data analysis",
+  "algebraic topology",
+  "unsupervised learning",
+  "supervised learning",
+  "machine learning",
+  "sliced wasserstein distance",
+  "bottleneck distance",
+]
+[project.optional-dependencies]
+testing = ["pytest", "pytest-cov"]
+
+docs = ["ripser", "sktda_docs_config"]
+
+[project.urls]
+Homepage = "https://persim.scikit-tda.org"
+Documentation = "https://persim.scikit-tda.org"
+Repository = "https://github.com/scikit-tda/persim"
+Issues = "https://github.com/scikit-tda/persim/issues"
+Changelog = "https://github.com/scikit-tda/persim/blob/master/RELEASE.txt"

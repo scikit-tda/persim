@@ -619,10 +619,10 @@ class PersistenceImager(TransformerMixin):
         skew : boolean
             Flag indicating if diagram(s) need to first be converted to birth-persistence coordinates (default: True).
         """
-        min_birth = np.Inf
-        max_birth = -np.Inf
-        min_pers = np.Inf
-        max_pers = -np.Inf
+        min_birth = np.inf
+        max_birth = -np.inf
+        min_pers = np.inf
+        max_pers = -np.inf
 
         # convert to a list of diagrams if necessary
         pers_dgms, singular = self._ensure_iterable(pers_dgms)
