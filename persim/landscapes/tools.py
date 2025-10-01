@@ -2,6 +2,8 @@
 Tools for working with exact and approximate persistence landscapes.
 """
 
+from typing import Optional
+
 import numpy as np
 from operator import itemgetter, attrgetter
 
@@ -164,8 +166,8 @@ def average_approx(
 
 def vectorize(
     landscape: PersLandscapeExact,
-    start: float | None = None,
-    stop: float | None = None,
+    start: Optional[float] = None,
+    stop: Optional[float] = None,
     num_steps: int = 500,
 ) -> PersLandscapeApprox:
     """Converts a `PersLandscapeExact` type to a `PersLandscapeApprox` type.
