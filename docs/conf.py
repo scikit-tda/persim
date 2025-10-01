@@ -1,18 +1,29 @@
 # -*- coding: utf-8 -*-
+import re
 import os
 import sys
 
 sys.path.insert(0, os.path.abspath("."))
 from sktda_docs_config import *
 
-from persim import __version__
+
+def get_version():
+    VERSIONFILE = "persim/_version.py"
+    verstrline = open(VERSIONFILE, "rt").read()
+    VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
+    mo = re.search(VSRE, verstrline, re.M)
+    if mo:
+        return mo.group(1)
+    else:
+        raise RuntimeError("Unable to find version string in %s." % (VERSIONFILE,))
+
 
 project = "Persim"
 copyright = "2019, Nathaniel Saul"
 author = "Nathaniel Saul"
 
-version = __version__
-release = __version__
+version = get_version()
+release = get_version()
 
 language = "en"
 
