@@ -1,12 +1,10 @@
 from __future__ import division
 
 import copy
-from itertools import product
 from typing import Iterable
 
 import matplotlib.pyplot as plt
 import numpy as np
-import scipy.spatial as spatial
 from deprecated.sphinx import deprecated
 from joblib import Parallel, delayed
 from matplotlib.collections import LineCollection

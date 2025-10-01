@@ -1,8 +1,9 @@
 """
-    Base Persistence Landscape class.
+Base Persistence Landscape class.
 
-    authors: Gabrielle Angeloro, Michael Catanzaro
+authors: Gabrielle Angeloro, Michael Catanzaro
 """
+
 from abc import ABC, abstractmethod
 import numpy as np
 
@@ -66,9 +67,7 @@ class PersLandscape(ABC):
     @abstractmethod
     def __mul__(self, other):
         if not isinstance(other, (int, float)):
-            raise TypeError(
-                "Can only multiply persistence landscapes" "by real numbers"
-            )
+            raise TypeError("Can only multiply persistence landscapesby real numbers")
 
     @abstractmethod
     def __truediv__(self, other):

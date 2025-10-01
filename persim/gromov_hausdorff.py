@@ -1,105 +1,106 @@
 # -*- coding: utf-8 -*-
 """
-    Implementation of the modified Gromov–Hausdorff (mGH) distance
-    between compact metric spaces induced by unweighted graphs. This
-    code complements the results from "Efficient estimation of a
-    Gromov–Hausdorff distance between unweighted graphs" by V. Oles et
-    al. (https://arxiv.org/pdf/1909.09772). The mGH distance was first
-    defined in "Some properties of Gromov–Hausdorff distances" by F.
-    Mémoli (Discrete & Computational Geometry, 2012).
+Implementation of the modified Gromov–Hausdorff (mGH) distance
+between compact metric spaces induced by unweighted graphs. This
+code complements the results from "Efficient estimation of a
+Gromov–Hausdorff distance between unweighted graphs" by V. Oles et
+al. (https://arxiv.org/pdf/1909.09772). The mGH distance was first
+defined in "Some properties of Gromov–Hausdorff distances" by F.
+Mémoli (Discrete & Computational Geometry, 2012).
 
-    Author: Vladyslav Oles
+Author: Vladyslav Oles
 
-    ===================================================================
+===================================================================
 
-    Usage examples:
+Usage examples:
 
-    1) Estimating the mGH distance between 4-clique and single-vertex
-    graph from their adjacency matrices. Note that it suffices to fill
-    only the upper triangle of an adjacency matrix.
+1) Estimating the mGH distance between 4-clique and single-vertex
+graph from their adjacency matrices. Note that it suffices to fill
+only the upper triangle of an adjacency matrix.
 
-    >>> AG = [[0, 1, 1, 1], [0, 0, 1, 1], [0, 0, 0, 1], [0, 0, 0, 0]]
-    >>> AH = [[0]]
-    >>> lb, ub = gromov_hausdorff(AG, AH)
-    >>> lb, ub
-    (0.5, 0.5)
+>>> AG = [[0, 1, 1, 1], [0, 0, 1, 1], [0, 0, 0, 1], [0, 0, 0, 0]]
+>>> AH = [[0]]
+>>> lb, ub = gromov_hausdorff(AG, AH)
+>>> lb, ub
+(0.5, 0.5)
 
-    2) Estimating the mGH distance between cycle graphs of length 2 and
-    5 from their adjacency matrices. Note that the adjacency matrices
-    can be given in both dense and sparse SciPy formats.
+2) Estimating the mGH distance between cycle graphs of length 2 and
+5 from their adjacency matrices. Note that the adjacency matrices
+can be given in both dense and sparse SciPy formats.
 
-    >>> AI = np.array([[0, 1], [0, 0]])
-    >>> AJ = sps.csr_matrix(([1] * 5, ([0, 0, 1, 2, 3], [1, 4, 2, 3, 4])), shape=(5, 5))
-    >>> lb, ub = gromov_hausdorff(AI, AJ)
-    >>> lb, ub
-    (0.5, 1.0)
+>>> AI = np.array([[0, 1], [0, 0]])
+>>> AJ = sps.csr_matrix(([1] * 5, ([0, 0, 1, 2, 3], [1, 4, 2, 3, 4])), shape=(5, 5))
+>>> lb, ub = gromov_hausdorff(AI, AJ)
+>>> lb, ub
+(0.5, 1.0)
 
-    3) Estimating all pairwise mGH distances between multiple graphs
-    from their adjacency matrices as an iterable.
+3) Estimating all pairwise mGH distances between multiple graphs
+from their adjacency matrices as an iterable.
 
-    >>> As = [AG, AH, AI, AJ]
-    >>> lbs, ubs = gromov_hausdorff(As)
-    >>> lbs
-    array([[0. , 0.5, 0.5, 0.5],
-           [0.5, 0. , 0.5, 1. ],
-           [0.5, 0.5, 0. , 0.5],
-           [0.5, 1. , 0.5, 0. ]])
-    >>> ubs
-    array([[0. , 0.5, 0.5, 0.5],
-           [0.5, 0. , 0.5, 1. ],
-           [0.5, 0.5, 0. , 1. ],
-           [0.5, 1. , 1. , 0. ]])
+>>> As = [AG, AH, AI, AJ]
+>>> lbs, ubs = gromov_hausdorff(As)
+>>> lbs
+array([[0. , 0.5, 0.5, 0.5],
+       [0.5, 0. , 0.5, 1. ],
+       [0.5, 0.5, 0. , 0.5],
+       [0.5, 1. , 0.5, 0. ]])
+>>> ubs
+array([[0. , 0.5, 0.5, 0.5],
+       [0.5, 0. , 0.5, 1. ],
+       [0.5, 0.5, 0. , 1. ],
+       [0.5, 1. , 1. , 0. ]])
 
-    ===================================================================
+===================================================================
 
-    Notations:
+Notations:
 
-    |X| denotes the number of elements in set X.
+|X| denotes the number of elements in set X.
 
-    X → Y denotes the set of all mappings of set X into set Y.
+X → Y denotes the set of all mappings of set X into set Y.
 
-    V(G) denotes vertex set of graph G.
+V(G) denotes vertex set of graph G.
 
-    mGH(X, Y) denotes the modified Gromov–Hausdorff distance between
-    compact metric spaces X and Y.
+mGH(X, Y) denotes the modified Gromov–Hausdorff distance between
+compact metric spaces X and Y.
 
-    row_i(A) denotes the i-th row of matrix A.
+row_i(A) denotes the i-th row of matrix A.
 
-    PSPS^n(A) denotes the set of all permutation similarities of
-    all n×n principal submatrices of square matrix A.
+PSPS^n(A) denotes the set of all permutation similarities of
+all n×n principal submatrices of square matrix A.
 
-    PSPS^n_{i←j}(A) denotes the set of all permutation similarities of
-    all n×n principal submatrices of square matrix A whose i-th row is
-    comprised of the entries in row_j(A).
+PSPS^n_{i←j}(A) denotes the set of all permutation similarities of
+all n×n principal submatrices of square matrix A whose i-th row is
+comprised of the entries in row_j(A).
 
-    ===================================================================
+===================================================================
 
-    Glossary:
+Glossary:
 
-    Distance matrix of metric space X is a |X|×|X| matrix whose
-    (i, j)-th entry holds the distance between i-th and j-th points of
-    X. By the properties of a metric, distance matrices are symmetric
-    and non-negative, their diagonal entries are 0 and off-diagonal
-    entries are positive.
+Distance matrix of metric space X is a |X|×|X| matrix whose
+(i, j)-th entry holds the distance between i-th and j-th points of
+X. By the properties of a metric, distance matrices are symmetric
+and non-negative, their diagonal entries are 0 and off-diagonal
+entries are positive.
 
-    Curvature is a generalization of distance matrix that allows
-    repetitions in the underlying points of a metric space. Curvature
-    of an n-tuple of points from metric space X is an n×n matrix whose
-    (i, j)-th entry holds the distance between the points from i-th and
-    j-th positions of the tuple. Since these points need not be
-    distinct, the off-diagonal entries of a curvature can equal 0.
+Curvature is a generalization of distance matrix that allows
+repetitions in the underlying points of a metric space. Curvature
+of an n-tuple of points from metric space X is an n×n matrix whose
+(i, j)-th entry holds the distance between the points from i-th and
+j-th positions of the tuple. Since these points need not be
+distinct, the off-diagonal entries of a curvature can equal 0.
 
-    n-th curvature set of metric space X is the set of all curvatures
-    of X that are of size n×n.
+n-th curvature set of metric space X is the set of all curvatures
+of X that are of size n×n.
 
-    d-bounded curvature for some d > 0 is a curvature whose
-    off-diagonal entries are all ≥ d.
+d-bounded curvature for some d > 0 is a curvature whose
+off-diagonal entries are all ≥ d.
 
-    Positive-bounded curvature is a curvature whose off-diagonal
-    entries are all positive, i.e. the points in the underlying tuple
-    are distinct. Equivalently, positive-bounded curvatures are
-    distance matrices on the subsets of a metric space.
+Positive-bounded curvature is a curvature whose off-diagonal
+entries are all positive, i.e. the points in the underlying tuple
+are distinct. Equivalently, positive-bounded curvatures are
+distance matrices on the subsets of a metric space.
 """
+
 import numpy as np
 import warnings
 import scipy.sparse as sps
@@ -110,11 +111,12 @@ __all__ = ["gromov_hausdorff"]
 
 
 # To sample √|X| * log (|X| + 1) mappings from X → Y by default.
-DEFAULT_MAPPING_SAMPLE_SIZE_ORDER = np.array([.5, 1])
+DEFAULT_MAPPING_SAMPLE_SIZE_ORDER = np.array([0.5, 1])
 
 
 def gromov_hausdorff(
-        AG, AH=None, mapping_sample_size_order=DEFAULT_MAPPING_SAMPLE_SIZE_ORDER):
+    AG, AH=None, mapping_sample_size_order=DEFAULT_MAPPING_SAMPLE_SIZE_ORDER
+):
     """
     Estimate the mGH distance between simple unweighted graphs,
     represented as compact metric spaces based on their shortest
@@ -127,7 +129,7 @@ def gromov_hausdorff(
         adjacency matrices if AH=None.
     AH: (M,M) np.array
         (Sparse) adjacency matrix of graph H with M vertices, or None.
-    mapping_sample_size_order: (2,) np.array 
+    mapping_sample_size_order: (2,) np.array
         Parameter that regulates the number of mappings to sample when
         tightening upper bound of the mGH distance.
 
@@ -143,8 +145,10 @@ def gromov_hausdorff(
     # Form iterable with adjacency matrices.
     if AH is None:
         if len(AG) < 2:
-            raise ValueError("'estimate_between_unweighted_graphs' needs at least"
-                             "2 graphs to discriminate")
+            raise ValueError(
+                "'estimate_between_unweighted_graphs' needs at least"
+                "2 graphs to discriminate"
+            )
         As = AG
     else:
         As = (AG, AH)
@@ -163,7 +167,8 @@ def gromov_hausdorff(
             # Find lower and upper bounds of the mGH distance between
             # the pair of graphs.
             lbs[i, j], ubs[i, j] = estimate(
-                DX, DY, mapping_sample_size_order=mapping_sample_size_order)
+                DX, DY, mapping_sample_size_order=mapping_sample_size_order
+            )
 
     if AH is None:
         # Symmetrize matrices with lower and upper bounds of pairwise
@@ -203,10 +208,14 @@ def make_distance_matrix_from_adjacency_matrix(AG):
     # Ensure compactness of metric space, represented by distance
     # matrix.
     if np.any(np.isinf(DG)):
-        warnings.warn("disconnected graph is approximated by its largest connected component")
+        warnings.warn(
+            "disconnected graph is approximated by its largest connected component"
+        )
         # Extract largest connected component of the graph.
         _, components_by_vertex = connected_components(AG, directed=False)
-        components, component_sizes = np.unique(components_by_vertex, return_counts=True)
+        components, component_sizes = np.unique(
+            components_by_vertex, return_counts=True
+        )
         largest_component = components[np.argmax(component_sizes)]
         DG = DG[components_by_vertex == largest_component]
 
@@ -253,8 +262,11 @@ def determine_optimal_int_type(value):
     optimal_int_type: np.dtype
         Optimal signed integer type to hold the value.
     """
-    feasible_int_types = (int_type for int_type in [np.int8, np.int16, np.int32, np.int64]
-                          if value <= np.iinfo(int_type).max)
+    feasible_int_types = (
+        int_type
+        for int_type in [np.int8, np.int16, np.int32, np.int64]
+        if value <= np.iinfo(int_type).max
+    )
     try:
         optimal_int_type = next(feasible_int_types)
     except StopIteration:
@@ -286,7 +298,9 @@ def estimate(DX, DY, mapping_sample_size_order=DEFAULT_MAPPING_SAMPLE_SIZE_ORDER
         Upper bound of mGH(X, Y).
     """
     # Ensure distance matrices are of integer type.
-    if not np.issubdtype(DX.dtype, np.integer) or not np.issubdtype(DY.dtype, np.integer):
+    if not np.issubdtype(DX.dtype, np.integer) or not np.issubdtype(
+        DY.dtype, np.integer
+    ):
         raise ValueError("non-integer metrics are not yet supported")
     # Cast distance matrices to signed integer type to allow
     # subtractions.
@@ -297,7 +311,8 @@ def estimate(DX, DY, mapping_sample_size_order=DEFAULT_MAPPING_SAMPLE_SIZE_ORDER
     # Estimate mGH(X, Y).
     double_lb = find_lb(DX, DY)
     double_ub = find_ub(
-        DX, DY, mapping_sample_size_order=mapping_sample_size_order, double_lb=double_lb)
+        DX, DY, mapping_sample_size_order=mapping_sample_size_order, double_lb=double_lb
+    )
 
     return 0.5 * double_lb, 0.5 * double_ub
 
@@ -372,8 +387,10 @@ def find_largest_size_bounded_curvature(DX, diam_X, d):
         # Pick a row (and column) with highest number of off-diagonal
         # distances < d, then with smallest sum of off-diagonal
         # distances ≥ d.
-        K_rows_sortkeys = -np.sum(K < d, axis=0) * (len(K) * diam_X) + \
-                      np.sum(np.ma.masked_less(K, d), axis=0).data
+        K_rows_sortkeys = (
+            -np.sum(K < d, axis=0) * (len(K) * diam_X)
+            + np.sum(np.ma.masked_less(K, d), axis=0).data
+        )
         row_to_remove = np.argmin(K_rows_sortkeys)
         # Remove the row and column from K.
         K = np.delete(K, row_to_remove, axis=0)
@@ -406,8 +423,9 @@ def confirm_lb_using_bounded_curvature(d, K, DY, max_diam):
     # If K exceeds DY in size, the Hausdorff distance between the n-th
     # curvature sets of X and Y is ≥ d, entailing 2*mGH(X, Y) ≥ d (from
     # Theorem A).
-    lb_is_confirmed = len(K) > len(DY) or \
-                      confirm_lb_using_bounded_curvature_row(d, K, DY, max_diam)
+    lb_is_confirmed = len(K) > len(DY) or confirm_lb_using_bounded_curvature_row(
+        d, K, DY, max_diam
+    )
 
     return lb_is_confirmed
 
@@ -438,9 +456,12 @@ def confirm_lb_using_bounded_curvature_row(d, K, DY, max_diam):
     # Represent row of K as distance distributions, and retain those
     # that are maximal by the entry-wise partial order.
     K_max_rows_distance_distributions = find_unique_max_distributions(
-        represent_distance_matrix_rows_as_distributions(K, max_diam))
+        represent_distance_matrix_rows_as_distributions(K, max_diam)
+    )
     # Represent rows of DY as distance distributions.
-    DY_rows_distance_distributions = represent_distance_matrix_rows_as_distributions(DY, max_diam)
+    DY_rows_distance_distributions = represent_distance_matrix_rows_as_distributions(
+        DY, max_diam
+    )
     # For each i ∈ 1,...,n, check if ||row_i(K) - row_i(L)||_∞ ≥ d
     # ∀L ∈ PSPS^n(DY), which entails that the Hausdorff distance
     # between the n-th curvature sets of X and Y is ≥ d, and therefore
@@ -458,12 +479,16 @@ def confirm_lb_using_bounded_curvature_row(d, K, DY, max_diam):
             # (bottleneck) assignment feasibility problem between the
             # entries of row_i(K) and row_j(DY).
             lb_is_confirmed = not check_assignment_feasibility(
-                K_max_rows_distance_distributions[i], DY_rows_distance_distributions[j], d)
+                K_max_rows_distance_distributions[i],
+                DY_rows_distance_distributions[j],
+                d,
+            )
             j += 1
 
         i += 1
 
     return lb_is_confirmed
+
 
 def represent_distance_matrix_rows_as_distributions(DX, max_d):
     """
@@ -488,15 +513,17 @@ def represent_distance_matrix_rows_as_distributions(DX, max_d):
     # Add imaginary part to distinguish identical distances from
     # different rows of D.
     unique_distances, distance_frequencies = np.unique(
-        DX + 1j * np.arange(len(DX))[:, None], return_counts=True)
+        DX + 1j * np.arange(len(DX))[:, None], return_counts=True
+    )
     # Type is signed integer to allow subtractions.
     optimal_int_type = determine_optimal_int_type(len(DX))
     DX_rows_distributons = np.zeros((len(DX), max_d + 1), dtype=optimal_int_type)
     # Construct index pairs for distance frequencies, so that the
     # frequencies of larger distances appear on the left.
-    distance_frequencies_index_pairs = \
-        (np.imag(unique_distances).astype(optimal_int_type),
-         max_d - np.real(unique_distances).astype(max_d.dtype))
+    distance_frequencies_index_pairs = (
+        np.imag(unique_distances).astype(optimal_int_type),
+        max_d - np.real(unique_distances).astype(max_d.dtype),
+    )
     # Fill frequency distributions of the rows of DX.
     DX_rows_distributons[distance_frequencies_index_pairs] = distance_frequencies
     # Remove (unit) frequency of distance 0 from each row.
@@ -524,18 +551,26 @@ def find_unique_max_distributions(distributions):
     unique_max_distributions: np.array (m×max_d)
         Unique frequency distributions of the maximal vectors; m ≤ M.
     """
-    pairwise_distribution_differences = \
-        np.cumsum(distributions - distributions[:, None, :], axis=2)
+    pairwise_distribution_differences = np.cumsum(
+        distributions - distributions[:, None, :], axis=2
+    )
     pairwise_distribution_less_thans = np.logical_and(
         np.all(pairwise_distribution_differences >= 0, axis=2),
-        np.any(pairwise_distribution_differences > 0, axis=2))
+        np.any(pairwise_distribution_differences > 0, axis=2),
+    )
     distributions_are_max = ~np.any(pairwise_distribution_less_thans, axis=1)
     try:
-        unique_max_distributions = np.unique(distributions[distributions_are_max], axis=0)
+        unique_max_distributions = np.unique(
+            distributions[distributions_are_max], axis=0
+        )
     except AttributeError:
         # `np.unique` is not implemented in NumPy 1.12 (Python 3.4).
         unique_max_distributions = np.vstack(
-            {tuple(distribution) for distribution in distributions[distributions_are_max]})
+            {
+                tuple(distribution)
+                for distribution in distributions[distributions_are_max]
+            }
+        )
 
     return unique_max_distributions
 
@@ -562,13 +597,17 @@ def check_assignment_feasibility(v_distribution, u_distribution, d):
     is_assignment_feasible: bool
         Whether such injective f: {1,...,p} → {1,...,q} exists.
     """
+
     def next_i_and_j(min_i, min_j):
         # Find reversed v distribution index of smallest v entries yet
         # to be assigned. Then find index in reversed u distribution of
         # smallest u entries to which the b entries can be assigned to.
         try:
-            i = next(i for i in range(min_i, len(reversed_v_distribution))
-                     if reversed_v_distribution[i] > 0)
+            i = next(
+                i
+                for i in range(min_i, len(reversed_v_distribution))
+                if reversed_v_distribution[i] > 0
+            )
         except StopIteration:
             # All v entries are assigned.
             i = None
@@ -583,9 +622,13 @@ def check_assignment_feasibility(v_distribution, u_distribution, d):
         # which v entries, corresponding to a given reversed v
         # distribution index, can be assigned to.
         try:
-            j = next(j for j in range(min_j, min(i + (d - 1),
-                                                 len(reversed_u_distribution) - 1) + 1)
-                     if reversed_u_distribution[j] > 0)
+            j = next(
+                j
+                for j in range(
+                    min_j, min(i + (d - 1), len(reversed_u_distribution) - 1) + 1
+                )
+                if reversed_u_distribution[j] > 0
+            )
         except StopIteration:
             # No u entries left to assign the particular v entries to.
             j = None
@@ -617,7 +660,10 @@ def check_assignment_feasibility(v_distribution, u_distribution, d):
 
     return is_assignment_feasible
 
-def find_ub(DX, DY, mapping_sample_size_order=DEFAULT_MAPPING_SAMPLE_SIZE_ORDER, double_lb=0):
+
+def find_ub(
+    DX, DY, mapping_sample_size_order=DEFAULT_MAPPING_SAMPLE_SIZE_ORDER, double_lb=0
+):
     """
     For X, Y metric spaces, find an upper bound of mGH(X, Y).
 
@@ -640,18 +686,28 @@ def find_ub(DX, DY, mapping_sample_size_order=DEFAULT_MAPPING_SAMPLE_SIZE_ORDER,
     """
     # Find upper bound of smallest distortion of a mapping in X → Y.
     ub_of_X_to_Y_min_distortion = find_ub_of_min_distortion(
-        DX, DY, mapping_sample_size_order=mapping_sample_size_order, goal_distortion=double_lb)
+        DX,
+        DY,
+        mapping_sample_size_order=mapping_sample_size_order,
+        goal_distortion=double_lb,
+    )
     # Find upper bound of smallest distortion of a mapping in Y → X.
     ub_of_Y_to_X_min_distortion = find_ub_of_min_distortion(
-        DY, DX, mapping_sample_size_order=mapping_sample_size_order,
-        goal_distortion=ub_of_X_to_Y_min_distortion)
+        DY,
+        DX,
+        mapping_sample_size_order=mapping_sample_size_order,
+        goal_distortion=ub_of_X_to_Y_min_distortion,
+    )
 
     return max(ub_of_X_to_Y_min_distortion, ub_of_Y_to_X_min_distortion)
 
 
-def find_ub_of_min_distortion(DX, DY,
-                              mapping_sample_size_order=DEFAULT_MAPPING_SAMPLE_SIZE_ORDER,
-                              goal_distortion=0):
+def find_ub_of_min_distortion(
+    DX,
+    DY,
+    mapping_sample_size_order=DEFAULT_MAPPING_SAMPLE_SIZE_ORDER,
+    goal_distortion=0,
+):
     """
     For X, Y metric spaces, find an upper bound of smallest distortion
     of a mapping in X → Y by heuristically constructing some mappings
@@ -675,13 +731,20 @@ def find_ub_of_min_distortion(DX, DY,
         Upper bound of smallest distortion of a mapping in X → Y.
     """
     # Compute the numper of mappings to sample.
-    n_mappings_to_sample = int(np.ceil(np.prod(
-        np.array([len(DX), np.log(len(DX) + 1)]) ** mapping_sample_size_order)))
+    n_mappings_to_sample = int(
+        np.ceil(
+            np.prod(
+                np.array([len(DX), np.log(len(DX) + 1)]) ** mapping_sample_size_order
+            )
+        )
+    )
     # Construct each mapping in X → Y in |X| steps by choosing the image
     # of π(i)-th point in X at i-th step, where π is randomly sampled
     # |X|-permutation. Image of each point is chosen to minimize the
     # intermediate distortion at each step.
-    permutations_generator = (np.random.permutation(len(DX)) for _ in range(n_mappings_to_sample))
+    permutations_generator = (
+        np.random.permutation(len(DX)) for _ in range(n_mappings_to_sample)
+    )
     ub_of_min_distortion = np.inf
     goal_distortion_is_matched = False
     all_sampled_permutations_are_tried = False
@@ -731,11 +794,12 @@ def construct_mapping(DX, DY, pi):
         # Choose point in Y that minimizes the distortion after
         # mapping π(i)-th point in X to it.
         bottlenecks_from_mapping_x = np.max(
-            np.abs(DX[x, mapped_xs] - DY[:, mapped_xs_images]), axis=1)
+            np.abs(DX[x, mapped_xs] - DY[:, mapped_xs_images]), axis=1
+        )
         y = np.argmin(bottlenecks_from_mapping_x)
         # Map π(i)-th point in X to the chosen point in Y.
         mapped_xs.append(x)
         mapped_xs_images.append(y)
         distortion = max(bottlenecks_from_mapping_x[y], distortion)
-        
+
     return mapped_xs_images, distortion

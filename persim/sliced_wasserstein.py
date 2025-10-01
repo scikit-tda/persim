@@ -3,25 +3,26 @@ from scipy.spatial.distance import cityblock
 
 __all__ = ["sliced_wasserstein"]
 
+
 def sliced_wasserstein(PD1, PD2, M=50):
-    """ Implementation of Sliced Wasserstein distance as described in 
-        Sliced Wasserstein Kernel for Persistence Diagrams by Mathieu Carriere, Marco Cuturi, Steve Oudot (https://arxiv.org/abs/1706.03358)
+    """Implementation of Sliced Wasserstein distance as described in
+    Sliced Wasserstein Kernel for Persistence Diagrams by Mathieu Carriere, Marco Cuturi, Steve Oudot (https://arxiv.org/abs/1706.03358)
 
 
-        Parameters
-        -----------
-        
-        PD1: np.array size (m,2)
-            Persistence diagram
-        PD2: np.array size (n,2)
-            Persistence diagram
-        M: int, default is 50
-            Iterations to run approximation.
+    Parameters
+    -----------
 
-        Returns
-        --------
-        sw: float
-            Sliced Wasserstein distance between PD1 and PD2
+    PD1: np.array size (m,2)
+        Persistence diagram
+    PD2: np.array size (n,2)
+        Persistence diagram
+    M: int, default is 50
+        Iterations to run approximation.
+
+    Returns
+    --------
+    sw: float
+        Sliced Wasserstein distance between PD1 and PD2
     """
 
     diag_theta = np.array(
@@ -34,8 +35,8 @@ def sliced_wasserstein(PD1, PD2, M=50):
     if (len(l_theta1) != PD1.shape[0]) or (len(l_theta2) != PD2.shape[0]):
         raise ValueError("The projected points and origin do not match")
 
-    PD_delta1 = [[np.sqrt(x ** 2 / 2.0)] * 2 for x in l_theta1]
-    PD_delta2 = [[np.sqrt(x ** 2 / 2.0)] * 2 for x in l_theta2]
+    PD_delta1 = [[np.sqrt(x**2 / 2.0)] * 2 for x in l_theta1]
+    PD_delta2 = [[np.sqrt(x**2 / 2.0)] * 2 for x in l_theta2]
 
     # i have the input now to compute the sw
     sw = 0

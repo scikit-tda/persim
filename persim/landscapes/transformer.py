@@ -1,7 +1,8 @@
 """
-    Implementation of scikit-learn transformers for persistence
-    landscapes.
+Implementation of scikit-learn transformers for persistence
+landscapes.
 """
+
 from operator import itemgetter
 
 import numpy as np

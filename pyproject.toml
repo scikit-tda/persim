@@ -61,9 +61,18 @@ testing = ["pytest", "pytest-cov"]
 
 docs = ["ripser", "sktda_docs_config"]
 
+ruff = ["ruff<0.14.0"]
+
 [project.urls]
 Homepage = "https://persim.scikit-tda.org"
 Documentation = "https://persim.scikit-tda.org"
 Repository = "https://github.com/scikit-tda/persim"
 Issues = "https://github.com/scikit-tda/persim/issues"
 Changelog = "https://github.com/scikit-tda/persim/blob/master/RELEASE.txt"
+
+[tool.ruff]
+# Exclude test directory 
+extend-exclude = ["test"]
+
+[tool.ruff.lint]
+extend-ignore = ["F403","F405"]

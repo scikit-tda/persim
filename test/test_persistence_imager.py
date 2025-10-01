@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 
 from persim import PersistenceImager, images_kernels, images_weights
 
