@@ -1,5 +1,5 @@
 """
-    Persistence Landscape Exact class
+Persistence Landscape Exact class
 """
 
 import itertools
@@ -7,7 +7,6 @@ from operator import itemgetter
 
 import numpy as np
 
-from .approximate import PersLandscapeApprox
 from .auxiliary import _p_norm, union_crit_pairs
 from .base import PersLandscape
 
@@ -270,7 +269,7 @@ class PersLandscapeExact(PersLandscape):
         A = sorted(A, key=lambda x: [x[0], -x[1]])
 
         while A:
-            verboseprint(f"computing landscape index {landscape_idx+1}...")
+            verboseprint(f"computing landscape index {landscape_idx + 1}...")
 
             # add a 0 element to begin count of lamda_k
             # size_landscapes = np.append(size_landscapes, [0])

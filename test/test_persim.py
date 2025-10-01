@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 
 from persim import PersImage
 
@@ -82,12 +81,12 @@ class TestKernels:
         kf = pim.kernel(2)
 
         data = np.array([[0, 0]])
-        assert kf(np.array([[0, 0]]), [0, 0]) >= kf(
-            np.array([[1, 1]]), [0, 0]
-        ), "decreasing away"
-        assert kf(np.array([[0, 0]]), [1, 1]) == kf(
-            np.array([[1, 1]]), [0, 0]
-        ), "symmetric"
+        assert kf(np.array([[0, 0]]), [0, 0]) >= kf(np.array([[1, 1]]), [0, 0]), (
+            "decreasing away"
+        )
+        assert kf(np.array([[0, 0]]), [1, 1]) == kf(np.array([[1, 1]]), [0, 0]), (
+            "symmetric"
+        )
 
 
 class TestTransforms:

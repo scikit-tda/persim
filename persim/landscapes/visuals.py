@@ -1,5 +1,5 @@
 """
-    Visualization methods for plotting persistence landscapes.
+Visualization methods for plotting persistence landscapes.
 """
 
 import itertools
@@ -224,11 +224,11 @@ def plot_landscape_exact(
     # for each landscape function
     if not depth_range:
         depth_range = range(landscape.max_depth + 1)
-    for depth, l in enumerate(landscape):
+    for depth, lscape in enumerate(landscape):
         if depth not in depth_range:
             continue
         # sequential pairs in landscape
-        xs, zs = zip(*l)
+        xs, zs = zip(*lscape)
         image = np.interp(domain, xs, zs)
         for x, z in zip(domain, image):
             if z == 0.0:
@@ -303,10 +303,10 @@ def plot_landscape_exact_simple(
     landscape.compute_landscape()
     if not depth_range:
         depth_range = range(landscape.max_depth + 1)
-    for depth, l in enumerate(landscape):
+    for depth, lscape in enumerate(landscape):
         if depth not in depth_range:
             continue
-        ls = np.array(l)
+        ls = np.array(lscape)
         ax.plot(ls[:, 0], ls[:, 1], label=f"$\lambda_{{{depth}}}$", alpha=alpha)
     ax.legend()
     ax.margins(padding)
@@ -371,7 +371,7 @@ def plot_landscape_approx(
     # for each landscape function
     if not depth_range:
         depth_range = range(landscape.max_depth + 1)
-    for depth, l in enumerate(landscape):
+    for depth, lscape in enumerate(landscape):
         if depth not in depth_range:
             continue
         # sequential pairs in landscape
@@ -381,7 +381,7 @@ def plot_landscape_approx(
             np.linspace(
                 start=landscape.start, stop=landscape.stop, num=landscape.num_steps
             ),
-            l,
+            lscape,
         )
         for x, z in zip(domain, image):
             if z == 0.0:
@@ -462,11 +462,11 @@ def plot_landscape_approx_simple(
     landscape.compute_landscape()
     if not depth_range:
         depth_range = range(landscape.max_depth + 1)
-    for depth, l in enumerate(landscape):
+    for depth, lscape in enumerate(landscape):
         if depth not in depth_range:
             continue
-        domain = np.linspace(landscape.start, landscape.stop, num=len(l))
-        ax.plot(domain, l, label=f"$\lambda_{{{depth}}}$", alpha=alpha)
+        domain = np.linspace(landscape.start, landscape.stop, num=len(lscape))
+        ax.plot(domain, lscape, label=f"$\lambda_{{{depth}}}$", alpha=alpha)
     ax.legend()
     ax.margins(padding)
     if title:

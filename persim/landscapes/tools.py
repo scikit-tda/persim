@@ -1,5 +1,5 @@
 """
-    Tools for working with exact and approximate persistence landscapes.
+Tools for working with exact and approximate persistence landscapes.
 """
 
 import numpy as np
@@ -34,8 +34,7 @@ def death_vector(dgms: list, hom_deg: int = 0):
     """
     if hom_deg != 0:
         raise NotImplementedError(
-            "The death vector is not defined for "
-            "homological degrees greater than zero."
+            "The death vector is not defined for homological degrees greater than zero."
         )
     return sorted(dgms[hom_deg][:, 1], reverse=True)
 
@@ -164,7 +163,10 @@ def average_approx(
 
 
 def vectorize(
-    l: PersLandscapeExact, start: float = None, stop: float = None, num_steps: int = 500
+    landscape: PersLandscapeExact,
+    start: float | None = None,
+    stop: float | None = None,
+    num_steps: int = 500,
 ) -> PersLandscapeApprox:
     """Converts a `PersLandscapeExact` type to a `PersLandscapeApprox` type.
 
@@ -183,21 +185,21 @@ def vectorize(
 
     """
 
-    l.compute_landscape()
+    landscape.compute_landscape()
     if start is None:
-        start = min(l.critical_pairs[0], key=itemgetter(0))[0]
+        start = min(landscape.critical_pairs[0], key=itemgetter(0))[0]
     if stop is None:
-        stop = max(l.critical_pairs[0], key=itemgetter(0))[0]
+        stop = max(landscape.critical_pairs[0], key=itemgetter(0))[0]
     grid = np.linspace(start, stop, num_steps)
     result = []
     # creates sequential pairs of points for each lambda in critical_pairs
-    for depth in l.critical_pairs:
+    for depth in landscape.critical_pairs:
         xs, ys = zip(*depth)
         result.append(np.interp(grid, xs, ys))
     return PersLandscapeApprox(
         start=start,
         stop=stop,
         num_steps=num_steps,
-        hom_deg=l.hom_deg,
+        hom_deg=landscape.hom_deg,
         values=np.array(result),
     )

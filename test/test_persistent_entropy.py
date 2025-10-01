@@ -1,6 +1,5 @@
 import numpy as np
 
-import pytest
 
 from persim import persistent_entropy as pe
 
