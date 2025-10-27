@@ -1,5 +1,5 @@
 """
-    Auxilary functions for working with persistence diagrams.
+Auxilary functions for working with persistence diagrams.
 """
 
 import itertools
@@ -53,7 +53,7 @@ def union_crit_pairs(A, B):
     return result_pairs
 
 
-def pos_to_slope_interp(l: list) -> list:
+def pos_to_slope_interp(input_list: list) -> list:
     """Convert positions of critical pairs to (x-value, slope) pairs.
 
     Intended for internal use. Inverse function of `slope_to_pos_interp`.
@@ -66,14 +66,14 @@ def pos_to_slope_interp(l: list) -> list:
 
     output = []
     # for sequential pairs in landscape function
-    for [[x0, y0], [x1, y1]] in zip(l, l[1:]):
+    for [[x0, y0], [x1, y1]] in zip(input_list, input_list[1:]):
         slope = (y1 - y0) / (x1 - x0)
         output.append([x0, slope])
-    output.append([l[-1][0], 0])
+    output.append([input_list[-1][0], 0])
     return output
 
 
-def slope_to_pos_interp(l: list) -> list:
+def slope_to_pos_interp(input_list: list) -> list:
     """Convert positions of (x-value, slope) pairs to critical pairs.
 
     Intended
@@ -84,9 +84,9 @@ def slope_to_pos_interp(l: list) -> list:
     list
         [(xi, yi)]_i for i in len(function in landscape)
     """
-    output = [[l[0][0], 0]]
+    output = [[input_list[0][0], 0]]
     # for sequential pairs in [(xi,mi)]_i
-    for [[x0, m], [x1, _]] in zip(l, l[1:]):
+    for [[x0, m], [x1, _]] in zip(input_list, input_list[1:]):
         # uncover y0 and y1 from slope formula
         y0 = output[-1][1]
         y1 = y0 + (x1 - x0) * m
@@ -148,8 +148,8 @@ def _p_norm(p: float, critical_pairs: list = []):
     critical pairs.
     """
     result = 0.0
-    for l in critical_pairs:
-        for [[x0, y0], [x1, y1]] in zip(l, l[1:]):
+    for crit_pair in critical_pairs:
+        for [[x0, y0], [x1, y1]] in zip(crit_pair, crit_pair[1:]):
             if y0 == y1:
                 # horizontal line segment
                 result += (np.abs(y0) ** p) * (x1 - x0)

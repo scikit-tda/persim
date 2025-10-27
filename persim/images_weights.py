@@ -1,17 +1,19 @@
 """
 Weight Functions for PersistenceImager() transformer:
 
-A valid weight function is a Python function of the form 
+A valid weight function is a Python function of the form
 
-weight(birth, persistence, **kwargs) 
+weight(birth, persistence, **kwargs)
 
 defining a scalar-valued function over the birth-persistence plane, where birth and persistence are assumed to be numpy arrays of equal length. To ensure stability, functions should vanish continuously at the line persistence = 0.
 """
+
 import numpy as np
 
+
 def linear_ramp(birth, pers, low=0.0, high=1.0, start=0.0, end=1.0):
-    """ Continuous peicewise linear ramp function which is constant below and above specified input values.
-    
+    """Continuous peicewise linear ramp function which is constant below and above specified input values.
+
     Parameters
     ----------
     birth : (N,) numpy.ndarray
@@ -19,14 +21,14 @@ def linear_ramp(birth, pers, low=0.0, high=1.0, start=0.0, end=1.0):
     pers : (N,) numpy.ndarray
         Persistence coordinates of a collection of persistence pairs.
     low : float
-        Minimum weight. 
+        Minimum weight.
     high : float
        Maximum weight.
     start : float
         Start persistence value of linear transition from low to high weight.
     end : float
         End persistence value of linear transition from low to high weight.
-    
+
     Returns
     -------
     (N,) numpy.ndarray
@@ -34,7 +36,7 @@ def linear_ramp(birth, pers, low=0.0, high=1.0, start=0.0, end=1.0):
     """
     try:
         n = len(birth)
-    except:
+    except TypeError:
         n = 1
         birth = [birth]
         pers = [pers]
@@ -50,9 +52,10 @@ def linear_ramp(birth, pers, low=0.0, high=1.0, start=0.0, end=1.0):
 
     return w
 
+
 def persistence(birth, pers, n=1.0):
-    """ Continuous monotonic function which weight a persistence pair (b,p) by p^n for some n > 0.
-    
+    """Continuous monotonic function which weight a persistence pair (b,p) by p^n for some n > 0.
+
     Parameters
     ----------
     birth : (N,) numpy.ndarray
@@ -61,10 +64,10 @@ def persistence(birth, pers, n=1.0):
         Persistence coordinates of a collection of persistence pairs.
     n : positive float
         Exponent of persistence weighting function.
-    
+
     Returns
     -------
     (N,) numpy.ndarray
         Weights at the persistence pairs.
     """
-    return pers ** n
+    return pers**n
