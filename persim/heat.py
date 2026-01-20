@@ -1,13 +1,14 @@
 """
-    Implementation of the "multiscale heat kernel" (CVPR 2015), 
+Implementation of the "multiscale heat kernel" (CVPR 2015),
 
-    Author: Chris Tralie
+Author: Chris Tralie
 
 """
 
 import numpy as np
 
 __all__ = ["heat"]
+
 
 def evalHeatKernel(dgm1, dgm2, sigma):
     """

@@ -1,5 +1,5 @@
 """
-    Persistence Landscape Approximate class
+Persistence Landscape Approximate class
 """
 
 import numpy as np

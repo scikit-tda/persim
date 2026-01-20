@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
+from importlib import metadata
 
 sys.path.insert(0, os.path.abspath("."))
 from sktda_docs_config import *
 
-from persim import __version__
 
 project = "Persim"
 copyright = "2019, Nathaniel Saul"
 author = "Nathaniel Saul"
 
-version = __version__
-release = __version__
+version = metadata.version("persim")
+release = metadata.version("persim")
 
 language = "en"
 

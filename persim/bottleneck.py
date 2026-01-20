@@ -1,9 +1,9 @@
 """
 
-    Implementation of the bottleneck distance using binary
-    search and the Hopcroft-Karp algorithm
+Implementation of the bottleneck distance using binary
+search and the Hopcroft-Karp algorithm
 
-    Author: Chris Tralie
+Author: Chris Tralie
 
 """
 
