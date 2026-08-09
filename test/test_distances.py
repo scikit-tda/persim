@@ -110,6 +110,39 @@ class TestBottleneck:
         assert dist == 5.0
         assert returned_matching.shape[1] == 3
 
+    def test_matching_is_optimal_when_several_are(self):
+        # The bottleneck distance is unique; the optimal matching attaining it
+        # is not. Where more than one attains it, which one is returned is a
+        # property of the matching routine rather than of the diagrams, so this
+        # pins the contract every optimal matching satisfies and deliberately
+        # does not pin the pairs themselves.
+        #
+        # On this pair the choice is real rather than hypothetical: the cost is
+        # set by dgm1's third point going to the diagonal, which leaves dgm1's
+        # first point free to pair with dgm2's only point or to go to the
+        # diagonal as well. Both are optimal, and they differ in how many rows
+        # the matching has -- a diagonal-to-diagonal row is dropped on the way
+        # out, so asserting a row count here would assert an implementation.
+        dgm1 = np.array([[0.9726, 1.4526], [0.8899, 1.1223], [0.8224, 1.6243]])
+        dgm2 = np.array([[0.9235, 1.1897]])
+
+        dist, matching = bottleneck(dgm1, dgm2, matching=True)
+
+        # Set by dgm1[2] -> diagonal, at 0.5 * (1.6243 - 0.8224).
+        assert dist == pytest.approx(0.40095, abs=1e-9)
+
+        # Every point of both diagrams is accounted for exactly once, whether
+        # it was paired across or sent to the diagonal.
+        left = np.sort(matching[matching[:, 0] >= 0, 0])
+        right = np.sort(matching[matching[:, 1] >= 0, 1])
+        assert left.tolist() == list(range(dgm1.shape[0]))
+        assert right.tolist() == list(range(dgm2.shape[0]))
+
+        # No pair in an optimal matching may cost more than the distance the
+        # matching attains, and at least one must attain it.
+        assert np.all(matching[:, 2] <= dist + 1e-12)
+        assert np.max(matching[:, 2]) == pytest.approx(dist)
+
 
 class TestWasserstein:
     def test_single(self):

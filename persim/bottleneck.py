@@ -1,7 +1,8 @@
 """
 
 Implementation of the bottleneck distance using binary
-search and the Hopcroft-Karp algorithm
+search and the Hopcroft-Karp algorithm, via
+scipy.sparse.csgraph.maximum_bipartite_matching
 
 Author: Chris Tralie
 
@@ -10,7 +11,8 @@ Author: Chris Tralie
 import numpy as np
 
 from bisect import bisect_left
-from hopcroftkarp import HopcroftKarp
+from scipy.sparse import csr_matrix
+from scipy.sparse.csgraph import maximum_bipartite_matching
 import warnings
 
 __all__ = ["bottleneck"]
@@ -100,17 +102,20 @@ def bottleneck(dgm1, dgm2, matching=False):
     # bottleneck distance
     ds = np.sort(np.unique(D.flatten()))  # [0:-1]  # Everything but np.inf
     bdist = ds[-1]
-    matching = {}
+    matching = np.array([], dtype=int)
     while len(ds) >= 1:
         idx = 0
         if len(ds) > 1:
             idx = bisect_left(range(ds.size), int(ds.size / 2))
         d = ds[idx]
-        graph = {}
-        for i in range(D.shape[0]):
-            graph["{}".format(i)] = {j for j in range(D.shape[1]) if D[i, j] <= d}
-        res = HopcroftKarp(graph).maximum_matching()
-        if len(res) == 2 * D.shape[0] and d <= bdist:
+        # Edges are the pairs within distance d. `maximum_bipartite_matching`
+        # reads the sparsity structure, and building the CSR matrix from a
+        # boolean array drops the non-edges rather than storing them as
+        # explicit zeros.
+        res = maximum_bipartite_matching(csr_matrix(D <= d), perm_type="column")
+        # res[i] is the column matched to row i, or -1 if row i is unmatched.
+        # D is square, so every row being matched is a perfect matching.
+        if np.all(res >= 0) and d <= bdist:
             bdist = d
             matching = res
             ds = ds[0:idx]
@@ -120,7 +125,7 @@ def bottleneck(dgm1, dgm2, matching=False):
     if return_matching:
         matchidx = []
         for i in range(M + N):
-            j = matching["{}".format(i)]
+            j = matching[i]
             d = D[i, j]
             if i < M:
                 if j >= N:
