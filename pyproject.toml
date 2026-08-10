@@ -24,11 +24,11 @@ maintainers = [
 
 dependencies = [
   "deprecated",
-  "hopcroftkarp",
   "joblib",
   "matplotlib",
   "numpy",
   "scikit-learn",
+  "scipy",
 ]
 
 classifiers = [

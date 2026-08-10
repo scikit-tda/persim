@@ -110,6 +110,35 @@ class TestBottleneck:
         assert dist == 5.0
         assert returned_matching.shape[1] == 3
 
+    def test_matching_is_exact_on_an_unambiguous_pair(self):
+        # Pins the matching itself, not just its shape. Each point has one
+        # obviously-best partner: cross-matching costs 1.1 and going to the
+        # diagonal costs at least 1.0, against 0.1 for the paired assignment,
+        # so the optimum is unique and the expected indices are not a
+        # tie-breaking artifact.
+        dgm1 = np.array([[0.0, 1.0], [0.0, 2.0]])
+        dgm2 = np.array([[0.0, 1.1], [0.0, 2.1]])
+
+        dist, m = bottleneck(dgm1, dgm2, matching=True)
+
+        assert dist == pytest.approx(0.1)
+        pairs = {(int(i), int(j)) for i, j, _ in m if i >= 0 and j >= 0}
+        assert pairs == {(0, 0), (1, 1)}
+
+    def test_matching_indices_form_a_permutation(self):
+        # The matching is consumed by index, so an off-by-one or a
+        # wrong-orientation result would still produce well-formed output while
+        # silently pairing the wrong points. Assert each side is used once.
+        dgm1 = np.array([[0.5, 1.0], [0.6, 1.1], [0.2, 1.4]])
+        dgm2 = np.array([[0.5, 1.1], [0.6, 1.1], [0.8, 1.1]])
+
+        _, m = bottleneck(dgm1, dgm2, matching=True)
+
+        rows = [int(i) for i, _, _ in m if i >= 0]
+        cols = [int(j) for _, j, _ in m if j >= 0]
+        assert sorted(rows) == list(range(dgm1.shape[0]))
+        assert sorted(cols) == list(range(dgm2.shape[0]))
+
 
 class TestWasserstein:
     def test_single(self):
