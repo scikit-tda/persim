@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 import pytest
 import scipy.sparse as sps
@@ -32,6 +34,21 @@ class TestBottleneck:
     def test_different_size(self):
         d = bottleneck(np.array([[0.5, 1], [0.6, 1.1]]), np.array([[0.5, 1.1]]))
         assert d == 0.25
+
+    def test_matching_true_warns_about_tie_breaking(self):
+        dgm1 = np.array([[0.5, 1], [0.6, 1.1]])
+        dgm2 = np.array([[0.5, 1.1], [0.6, 1.3]])
+
+        with pytest.warns(UserWarning, match="optimal matching"):
+            bottleneck(dgm1, dgm2, matching=True)
+
+    def test_matching_false_does_not_warn(self):
+        dgm1 = np.array([[0.5, 1], [0.6, 1.1]])
+        dgm2 = np.array([[0.5, 1.1], [0.6, 1.3]])
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            bottleneck(dgm1, dgm2, matching=False)
 
     def test_matching(self):
         dgm1 = np.array([[0.5, 1], [0.6, 1.1]])
