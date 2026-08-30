@@ -48,6 +48,15 @@ def bottleneck(dgm1, dgm2, matching=False):
     """
 
     return_matching = matching
+    if return_matching:
+        warnings.warn(
+            "As of 0.4.0, bottleneck(..., matching=True) may return a different "
+            "optimal matching than earlier versions when several matchings tie "
+            "for the bottleneck distance; the distance itself is unaffected. "
+            "This is a one-time notice for the 0.4.x series and will be removed "
+            "in 0.5.0.",
+            UserWarning,
+        )
     S = np.array(dgm1)
     M = min(S.shape[0], S.size)
     if S.size > 0:
