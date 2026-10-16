@@ -13,6 +13,36 @@ from persim.landscapes import (
 )
 
 
+@pytest.mark.parametrize("p", [1, 1.5, 2, 3, 4])
+@pytest.mark.parametrize("approximate", [False, True])
+def test_signed_landscape_norm(p, approximate):
+    if approximate:
+        landscape = PersLandscapeApprox(
+            start=0, stop=4, num_steps=5, values=np.array([[0.0, 1.0, -1.0, 1.0, 0.0]])
+        )
+    else:
+        landscape = PersLandscapeExact(
+            critical_pairs=[[[0, 0.0], [1, 1.0], [2, -1.0], [3, 1.0], [4, 0.0]]]
+        )
+    # Each unit-length segment integrates to 1 / (p + 1).
+    assert landscape.p_norm(p) == pytest.approx((4 / (p + 1)) ** (1 / p))
+
+
+def test_landscape_norm_translation():
+    heights = [0.0, 1e-9, 0.0]
+    original = PersLandscapeExact(critical_pairs=[list(zip([0, 1, 2], heights))])
+    translated = PersLandscapeExact(
+        critical_pairs=[list(zip([2**40, 2**40 + 1, 2**40 + 2], heights))]
+    )
+    assert translated.p_norm(2) == pytest.approx(original.p_norm(2), rel=1e-14, abs=0)
+
+
+def test_norm_of_landscape_difference():
+    first = PersLandscapeExact(dgms=[np.array([[0.0, 4.0]])])
+    second = PersLandscapeExact(dgms=[np.array([[1.0, 5.0]])])
+    assert (first - second).p_norm(2) == pytest.approx(np.sqrt(3))
+
+
 class TestPersLandscapeExact:
     def test_exact_empty(self):
         with pytest.raises(ValueError):

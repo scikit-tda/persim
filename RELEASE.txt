@@ -1,3 +1,6 @@
+Unreleased
+    - Correct Lp norms of signed persistence landscapes, including zero crossings and fractional p. Compute segment integrals from endpoint magnitudes to avoid coordinate-intercept cancellation.
+
 0.4.0
     - Replace the abandoned GPLv3 `hopcroftkarp` dependency with `scipy.sparse.csgraph.maximum_bipartite_matching` in bottleneck, Issue #106 (https://github.com/scikit-tda/persim/issues/106).
     - `bottleneck(..., matching=True)` may now return a different optimal matching where several exist! The distance returned is unchanged. A UserWarning is now emitted on `matching=True` noting this; one-time notice for the 0.4.x series, will be removed in 0.5.0.
