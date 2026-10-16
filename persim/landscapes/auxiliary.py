@@ -156,17 +156,14 @@ def _p_norm(p: float, critical_pairs: list = []):
                 continue
             # slope is well-defined
             slope = (y1 - y0) / (x1 - x0)
-            b = y0 - slope * x0
+            # Endpoint magnitudes avoid cancellation from the line intercept
+            # and keep fractional powers real on negative segments.
+            value0 = np.abs(y0) ** (p + 1)
+            value1 = np.abs(y1) ** (p + 1)
             # segment crosses the x-axis
             if (y0 < 0 and y1 > 0) or (y0 > 0 and y1 < 0):
-                z = -b / slope
-                ev_x1 = (slope * x1 + b) ** (p + 1) / (slope * (p + 1))
-                ev_x0 = (slope * x0 + b) ** (p + 1) / (slope * (p + 1))
-                ev_z = (slope * z + +b) ** (p + 1) / (slope * (p + 1))
-                result += np.abs(ev_x1 + ev_x0 - 2 * ev_z)
+                result += (value0 + value1) / (np.abs(slope) * (p + 1))
             # segment does not cross the x-axis
             else:
-                ev_x1 = (slope * x1 + b) ** (p + 1) / (slope * (p + 1))
-                ev_x0 = (slope * x0 + b) ** (p + 1) / (slope * (p + 1))
-                result += np.abs(ev_x1 - ev_x0)
+                result += np.abs((value1 - value0) / (slope * (p + 1)))
     return (result) ** (1.0 / p)
