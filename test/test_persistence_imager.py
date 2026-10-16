@@ -10,7 +10,7 @@ from persim import PersistenceImager, images_kernels, images_weights
 
 @pytest.mark.parametrize(
     "width,pixel_size,count",
-    [(0.3, 0.1, 3), (4.3, 0.1, 43), (0.95, 0.2, 5), (1.3, 0.3, 5)],
+    [(0.3, 0.1, 3), (4.3, 0.1, 43), (0.95, 0.2, 5), (1.3, 0.3, 5), (0.9, 0.3, 3)],
 )
 @pytest.mark.parametrize("operation", ["constructor", "pixel_size", "birth_range", "pers_range"])
 def test_pixel_grid_dimensions(width, pixel_size, count, operation):

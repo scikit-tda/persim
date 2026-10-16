@@ -23,8 +23,6 @@ def _pixel_count(bounds, pixel_size):
     count = int(np.ceil(span / pixel_size))
     if count > 0 and (count - 1) * pixel_size >= span:
         return count - 1
-    if count * pixel_size < span:
-        return count + 1
     return count
 
 
