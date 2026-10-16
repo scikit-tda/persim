@@ -43,6 +43,23 @@ def test_norm_of_landscape_difference():
     assert (first - second).p_norm(2) == pytest.approx(np.sqrt(3))
 
 
+@pytest.mark.parametrize("copies", [2, 3, 4])
+@pytest.mark.parametrize("other", [(3, 5), (2, 4), (1, 4), (0, 3), (0.5, 1.5), (-1, 2)])
+def test_duplicate_bars_against_sorted_tents(copies, other):
+    diagram = np.array([[0, 2]] * copies + [other], dtype=float)
+    landscape = PersLandscapeExact(dgms=[diagram])
+    grid = np.linspace(-1, 5, 49)
+    tents = np.maximum(
+        np.minimum(grid[:, None] - diagram[:, 0], diagram[:, 1] - grid[:, None]), 0
+    )
+    expected = np.sort(tents, axis=1)[:, ::-1]
+    actual = np.zeros_like(expected)
+    for depth, pairs in enumerate(landscape.critical_pairs):
+        points = np.array(pairs)
+        actual[:, depth] = np.interp(grid, points[:, 0], points[:, 1], left=0, right=0)
+    np.testing.assert_allclose(actual, expected, atol=0, rtol=0)
+
+
 class TestPersLandscapeExact:
     def test_exact_empty(self):
         with pytest.raises(ValueError):
@@ -93,7 +110,7 @@ class TestPersLandscapeExact:
 
         expected_Q_pairs = [
             [[1, 0], [3.0, 2.0], [4.0, 1.0], [4.5, 1.5], [6, 0]],
-            [[1, 0], [3.0, 2.0], [4.0, 1.0], [4.5, 1.5], [6, 0]],
+            [[1, 0], [3.0, 2.0], [5, 0]],
             [[3, 0], [4.0, 1.0], [5, 0]],
         ]
         assert len(Q.critical_pairs) == len(expected_Q_pairs)
@@ -143,9 +160,7 @@ class TestPersLandscapeExact:
 
     def test_exact_get_item(self):
         P = PersLandscapeExact(dgms=[np.array([[1, 5], [1, 5], [3, 6]])])
-        np.testing.assert_array_equal(
-            P[1], [[1, 0], [3, 2], [4, 1], [4.5, 1.5], [6, 0]]
-        )
+        np.testing.assert_array_equal(P[1], [[1, 0], [3, 2], [5, 0]])
         with pytest.raises(IndexError):
             P[3]
 
