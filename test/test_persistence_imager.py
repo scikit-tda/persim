@@ -53,6 +53,21 @@ def test_unchanged_grid_parameter(attribute):
     np.testing.assert_array_equal(imager._ppnts, persistence_points)
 
 
+@pytest.mark.parametrize("pixel_size", [0.1, 0.2, 0.3, 0.05])
+@pytest.mark.parametrize("operation", ["constructor", "pixel_size"])
+def test_integer_pixel_multiple(pixel_size, operation):
+    width = 3 * pixel_size
+    imager = PersistenceImager(
+        birth_range=(0, width),
+        pers_range=(0, width),
+        pixel_size=pixel_size if operation == "constructor" else width,
+    )
+    if operation == "pixel_size":
+        imager.pixel_size = pixel_size
+    assert imager.resolution == (3, 3)
+    np.testing.assert_allclose(np.diff(imager._bpnts), pixel_size, rtol=1e-13)
+
+
 def test_empty_diagram():
     dgm = np.zeros((0, 2))
     persimgr = PersistenceImager(pixel_size=0.1)
