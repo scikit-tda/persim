@@ -1,3 +1,6 @@
+Unreleased
+    - Preserve integer persistence-image pixel counts and pad constructor ranges consistently with parameter updates. Reassigning an unchanged grid parameter keeps the grid unchanged.
+
 0.4.1
     - Correct Lp norms of signed persistence landscapes, including zero crossings and fractional p. Compute segment integrals from endpoint magnitudes to avoid coordinate-intercept cancellation.
 
