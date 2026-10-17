@@ -1,4 +1,4 @@
-Unreleased
+0.4.1
     - Correct Lp norms of signed persistence landscapes, including zero crossings and fractional p. Compute segment integrals from endpoint magnitudes to avoid coordinate-intercept cancellation.
 
 0.4.0
