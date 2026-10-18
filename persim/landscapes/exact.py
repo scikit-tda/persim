@@ -281,15 +281,12 @@ class PersLandscapeExact(PersLandscape):
             # outer brackets for start of L_k
             L.append([[-np.inf, 0], [b, 0], [(b + d) / 2, (d - b) / 2]])
 
-            # check for duplicates of (b,d)
+            # Copy duplicate tents only if no later bar extends the landscape.
             duplicate = 0
-
-            for j, itemj in enumerate(A):
-                if itemj == [b, d]:
+            if A and A[0] == [b, d] and all(d >= item[1] for item in A):
+                while A and A[0] == [b, d]:
                     duplicate += 1
-                    A.pop(j)
-                else:
-                    break
+                    A.pop(0)
 
             while L[landscape_idx][-1] != [np.inf, 0]:
                 # if d is > = all remaining pairs, then end lambda
@@ -297,7 +294,6 @@ class PersLandscapeExact(PersLandscape):
                 if all(d >= _[1] for _ in A):
                     # add to end of L_k
                     L[landscape_idx].extend([[d, 0], [np.inf, 0]])
-                    # for duplicates, add another copy of the last computed lambda
                     for _ in range(duplicate):
                         L.append(L[-1])
                         landscape_idx += 1
