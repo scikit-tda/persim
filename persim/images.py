@@ -17,6 +17,15 @@ from persim import images_kernels, images_weights
 __all__ = ["PersImage", "PersistenceImager"]
 
 
+def _pixel_count(bounds, pixel_size):
+    """Count covering pixels without quotient-rounding an exact multiple up."""
+    span = bounds[1] - bounds[0]
+    count = int(np.ceil(span / pixel_size))
+    if count > 0 and (count - 1) * pixel_size >= span:
+        return count - 1
+    return count
+
+
 @deprecated(
     reason="""Replaced with the class :class:`persim.PersistenceImager`.""",
     version="0.1.5",
@@ -345,12 +354,13 @@ class PersistenceImager(TransformerMixin):
         self._pixel_size = pixel_size
         self._birth_range = birth_range
         self._pers_range = pers_range
-        self._width = birth_range[1] - birth_range[0]
-        self._height = pers_range[1] - pers_range[0]
+        # Retain integer counts: dividing rounded widths can lose a pixel.
         self._resolution = (
-            int(self._width / self._pixel_size),
-            int(self._height / self._pixel_size),
+            _pixel_count(birth_range, pixel_size),
+            _pixel_count(pers_range, pixel_size),
         )
+        self._width = self._resolution[0] * pixel_size
+        self._height = self._resolution[1] * pixel_size
         self._create_mesh()
 
     @property
@@ -403,19 +413,15 @@ class PersistenceImager(TransformerMixin):
 
     @pixel_size.setter
     def pixel_size(self, val):
+        if val == self._pixel_size:
+            return
         self._pixel_size = val
-        self._width = (
-            int(np.ceil((self.birth_range[1] - self.birth_range[0]) / self.pixel_size))
-            * self.pixel_size
-        )
-        self._height = (
-            int(np.ceil((self.pers_range[1] - self.pers_range[0]) / self.pixel_size))
-            * self.pixel_size
-        )
         self._resolution = (
-            int(self.width / self.pixel_size),
-            int(self.height / self.pixel_size),
+            _pixel_count(self.birth_range, self.pixel_size),
+            _pixel_count(self.pers_range, self.pixel_size),
         )
+        self._width = self._resolution[0] * self.pixel_size
+        self._height = self._resolution[1] * self.pixel_size
         self._create_mesh()
 
     @property
@@ -432,15 +438,12 @@ class PersistenceImager(TransformerMixin):
 
     @birth_range.setter
     def birth_range(self, val):
+        if np.array_equal(val, self._birth_range):
+            return
         self._birth_range = val
-        self._width = (
-            int(np.ceil((self.birth_range[1] - self.birth_range[0]) / self.pixel_size))
-            * self._pixel_size
-        )
-        self._resolution = (
-            int(self.width / self.pixel_size),
-            int(self.height / self.pixel_size),
-        )
+        count = _pixel_count(self.birth_range, self.pixel_size)
+        self._width = count * self.pixel_size
+        self._resolution = (count, self.resolution[1])
         self._create_mesh()
 
     @property
@@ -457,15 +460,12 @@ class PersistenceImager(TransformerMixin):
 
     @pers_range.setter
     def pers_range(self, val):
+        if np.array_equal(val, self._pers_range):
+            return
         self._pers_range = val
-        self._height = (
-            int(np.ceil((self.pers_range[1] - self.pers_range[0]) / self.pixel_size))
-            * self._pixel_size
-        )
-        self._resolution = (
-            int(self.width / self.pixel_size),
-            int(self.height / self.pixel_size),
-        )
+        count = _pixel_count(self.pers_range, self.pixel_size)
+        self._height = count * self.pixel_size
+        self._resolution = (self.resolution[0], count)
         self._create_mesh()
 
     def __repr__(self):

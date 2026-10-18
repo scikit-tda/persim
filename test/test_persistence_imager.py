@@ -1,10 +1,71 @@
 import numpy as np
+import pytest
 
 from persim import PersistenceImager, images_kernels, images_weights
 
 # ----------------------------------------
 # New PersistenceImager Tests
 # ----------------------------------------
+
+
+@pytest.mark.parametrize(
+    "width,pixel_size,count",
+    [(0.3, 0.1, 3), (4.3, 0.1, 43), (0.95, 0.2, 5), (1.3, 0.3, 5), (0.9, 0.3, 3)],
+)
+@pytest.mark.parametrize("operation", ["constructor", "pixel_size", "birth_range", "pers_range"])
+def test_pixel_grid_dimensions(width, pixel_size, count, operation):
+    if operation == "constructor":
+        imager = PersistenceImager(
+            birth_range=(0, width), pers_range=(0, width), pixel_size=pixel_size
+        )
+        expected = (count, count)
+    elif operation == "pixel_size":
+        imager = PersistenceImager(
+            birth_range=(0, width), pers_range=(0, width), pixel_size=width
+        )
+        imager.pixel_size = pixel_size
+        expected = (count, count)
+    else:
+        imager = PersistenceImager(
+            birth_range=(0, pixel_size),
+            pers_range=(0, pixel_size),
+            pixel_size=pixel_size,
+        )
+        setattr(imager, operation, (0, width))
+        expected = (count, 1) if operation == "birth_range" else (1, count)
+
+    assert imager.resolution == expected
+    assert imager.transform(np.array([[0.1, 0.2]])).shape == expected
+    np.testing.assert_allclose(np.diff(imager._bpnts), pixel_size, rtol=1e-13)
+    np.testing.assert_allclose(np.diff(imager._ppnts), pixel_size, rtol=1e-13)
+    assert imager._bpnts[-1] == pytest.approx(imager.birth_range[1])
+    assert imager._ppnts[-1] == pytest.approx(imager.pers_range[1])
+
+
+@pytest.mark.parametrize("attribute", ["pixel_size", "birth_range", "pers_range"])
+def test_unchanged_grid_parameter(attribute):
+    imager = PersistenceImager(birth_range=(0, 0.3), pers_range=(0, 0.3), pixel_size=0.1)
+    before = (imager.resolution, imager.birth_range, imager.pers_range)
+    birth_points, persistence_points = imager._bpnts.copy(), imager._ppnts.copy()
+    setattr(imager, attribute, getattr(imager, attribute))
+    assert (imager.resolution, imager.birth_range, imager.pers_range) == before
+    np.testing.assert_array_equal(imager._bpnts, birth_points)
+    np.testing.assert_array_equal(imager._ppnts, persistence_points)
+
+
+@pytest.mark.parametrize("pixel_size", [0.1, 0.2, 0.3, 0.05])
+@pytest.mark.parametrize("operation", ["constructor", "pixel_size"])
+def test_integer_pixel_multiple(pixel_size, operation):
+    width = 3 * pixel_size
+    imager = PersistenceImager(
+        birth_range=(0, width),
+        pers_range=(0, width),
+        pixel_size=pixel_size if operation == "constructor" else width,
+    )
+    if operation == "pixel_size":
+        imager.pixel_size = pixel_size
+    assert imager.resolution == (3, 3)
+    np.testing.assert_allclose(np.diff(imager._bpnts), pixel_size, rtol=1e-13)
 
 
 def test_empty_diagram():
