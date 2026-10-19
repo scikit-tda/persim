@@ -103,14 +103,27 @@ class TestBottleneck:
         dgm = np.array([[1, 2]])
         empty = np.array([[0, np.inf]])
         with pytest.warns(
-            UserWarning, match="dgm1 has points with non-finite death"
+            UserWarning, match="dgm1 has points with non-finite birth or death"
         ) as w:
             dist1 = bottleneck(empty, dgm)
         with pytest.warns(
-            UserWarning, match="dgm2 has points with non-finite death"
+            UserWarning, match="dgm2 has points with non-finite birth or death"
         ) as w:
             dist2 = bottleneck(dgm, empty)
         assert (dist1 == 0.5) and (dist2 == 0.5)
+
+    def test_inf_birthtime(self):
+        # Issue #111: only deaths were checked for non-finite values, so a
+        # -inf birth left a NaN in the cross-similarity matrix and made
+        # bottleneck silently return NaN.
+        dgm = np.array([[1, 2]])
+        neg_inf_birth = np.array([[-np.inf, 0.5]])
+        with pytest.warns(UserWarning, match="dgm1 has points with non-finite birth"):
+            dist1 = bottleneck(neg_inf_birth, dgm)
+        with pytest.warns(UserWarning, match="dgm2 has points with non-finite birth"):
+            dist2 = bottleneck(dgm, neg_inf_birth)
+        assert np.isfinite(dist1) and np.isfinite(dist2)
+        assert dist1 == 0.5 and dist2 == 0.5
 
     def test_repeated(self):
         # Issue #44
@@ -195,16 +208,28 @@ class TestWasserstein:
         dgm = np.array([[1, 2]])
         empty = np.array([[0, np.inf]])
         with pytest.warns(
-            UserWarning, match="dgm1 has points with non-finite death"
+            UserWarning, match="dgm1 has points with non-finite birth or death"
         ) as w:
             dist1 = wasserstein(empty, dgm)
         with pytest.warns(
-            UserWarning, match="dgm2 has points with non-finite death"
+            UserWarning, match="dgm2 has points with non-finite birth or death"
         ) as w:
             dist2 = wasserstein(dgm, empty)
         assert (np.allclose(dist1, np.sqrt(2) / 2)) and (
             np.allclose(dist2, np.sqrt(2) / 2)
         )
+
+    def test_inf_birthtime(self):
+        # Issue #111: a -inf birth produced NaN pairwise distances, which made
+        # sklearn's linear_sum_assignment raise ValueError.
+        dgm = np.array([[1, 2]])
+        neg_inf_birth = np.array([[-np.inf, 0.5]])
+        with pytest.warns(UserWarning, match="dgm1 has points with non-finite birth"):
+            dist1 = wasserstein(neg_inf_birth, dgm)
+        with pytest.warns(UserWarning, match="dgm2 has points with non-finite birth"):
+            dist2 = wasserstein(dgm, neg_inf_birth)
+        assert np.isfinite(dist1) and np.isfinite(dist2)
+        assert dist1 == pytest.approx(dist2)
 
     def test_repeated(self):
         dgm1 = np.array([[0, 10], [0, 10]])
